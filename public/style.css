@@ -1686,10 +1686,6 @@ select option {
   max-height: var(--steam-card-body-height);
 }
 
-.game-grid .game-card:not(.game-card--compact) .game-cover-actions {
-  bottom: var(--steam-card-body-height);
-}
-
 .game-card {
   position: relative;
   background: var(--surface);
@@ -1718,7 +1714,7 @@ select option {
 .game-cover-loading {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 6;
   display: flex;
   align-items: center;
   justify-content: center;
