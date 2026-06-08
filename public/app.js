@@ -1,10 +1,17 @@
 const els = {
-  userCards: document.getElementById('userCards'),
-  btnAddUser: document.getElementById('btnAddUser'),
   btnRefresh: document.getElementById('btnRefresh'),
+  btnContinueMetaEnrich: document.getElementById('btnContinueMetaEnrich'),
   btnImportHidden: document.getElementById('btnImportHidden'),
+  btnImportCollections: document.getElementById('btnImportCollections'),
   btnRandom: document.getElementById('btnRandom'),
-  cacheInfo: document.getElementById('cacheInfo'),
+  btnTokenStatus: document.getElementById('btnTokenStatus'),
+  tokenStatusDot: document.getElementById('tokenStatusDot'),
+  btnSettings: document.getElementById('btnSettings'),
+  btnUserMenu: document.getElementById('btnUserMenu'),
+  userMenuAvatar: document.getElementById('userMenuAvatar'),
+  userMenuName: document.getElementById('userMenuName'),
+  userMenuDropdown: document.getElementById('userMenuDropdown'),
+  userMenuList: document.getElementById('userMenuList'),
   loadProgress: document.getElementById('loadProgress'),
   loadProgressFill: document.getElementById('loadProgressFill'),
   loadProgressText: document.getElementById('loadProgressText'),
@@ -27,18 +34,24 @@ const els = {
   filterShareable: document.getElementById('filterShareable'),
   filterNonShareable: document.getElementById('filterNonShareable'),
   filterFamilyOnly: document.getElementById('filterFamilyOnly'),
+  filterInstalledOnly: document.getElementById('filterInstalledOnly'),
+  filterInputMethod: document.getElementById('filterInputMethod'),
+  filterInputMethodWrap: document.getElementById('filterInputMethodWrap'),
   filterFavoritesOnly: document.getElementById('filterFavoritesOnly'),
   filterHiddenOnly: document.getElementById('filterHiddenOnly'),
   statsBar: document.getElementById('statsBar'),
+  libraryFooter: document.getElementById('libraryFooter'),
   gameGrid: document.getElementById('gameGrid'),
   toast: document.getElementById('toast'),
+  gameActionConfirmDialog: document.getElementById('gameActionConfirmDialog'),
+  gameActionConfirmTitle: document.getElementById('gameActionConfirmTitle'),
+  gameActionConfirmMessage: document.getElementById('gameActionConfirmMessage'),
+  btnCancelGameActionConfirm: document.getElementById('btnCancelGameActionConfirm'),
+  btnConfirmGameAction: document.getElementById('btnConfirmGameAction'),
   randomDialog: document.getElementById('randomDialog'),
   randomBody: document.getElementById('randomBody'),
   btnCloseRandom: document.getElementById('btnCloseRandom'),
   btnRandomAgain: document.getElementById('btnRandomAgain'),
-  authSection: document.getElementById('authSection'),
-  authStatus: document.getElementById('authStatus'),
-  btnTokenModal: document.getElementById('btnTokenModal'),
   tokenDialog: document.getElementById('tokenDialog'),
   tokenDialogTitle: document.getElementById('tokenDialogTitle'),
   btnCloseToken: document.getElementById('btnCloseToken'),
@@ -64,57 +77,41 @@ const els = {
   userEditName: document.getElementById('userEditName'),
   userEditSteamId: document.getElementById('userEditSteamId'),
   userEditKeyStatus: document.getElementById('userEditKeyStatus'),
-  platformTabs: document.getElementById('platformTabs'),
-  steamPanel: document.getElementById('steamPanel'),
-  epicPanel: document.getElementById('epicPanel'),
-  ubisoftPanel: document.getElementById('ubisoftPanel'),
-  epicAuthStatus: document.getElementById('epicAuthStatus'),
-  btnEpicConnect: document.getElementById('btnEpicConnect'),
-  epicCacheInfo: document.getElementById('epicCacheInfo'),
-  ubisoftAuthStatus: document.getElementById('ubisoftAuthStatus'),
-  btnUbisoftConnect: document.getElementById('btnUbisoftConnect'),
-  ubisoftCacheInfo: document.getElementById('ubisoftCacheInfo'),
   filterChecksSteam: document.querySelector('.filter-checks-steam'),
-  epicDialog: document.getElementById('epicDialog'),
-  btnCloseEpic: document.getElementById('btnCloseEpic'),
-  btnCancelEpic: document.getElementById('btnCancelEpic'),
-  btnSaveEpic: document.getElementById('btnSaveEpic'),
-  inputEpicEmail: document.getElementById('inputEpicEmail'),
-  inputEpicPassword: document.getElementById('inputEpicPassword'),
-  inputEpicVerificationCode: document.getElementById('inputEpicVerificationCode'),
-  epicVerificationField: document.getElementById('epicVerificationField'),
-  epicAuthCodeField: document.getElementById('epicAuthCodeField'),
-  inputEpicAuthCode: document.getElementById('inputEpicAuthCode'),
-  btnSaveEpicAuthCode: document.getElementById('btnSaveEpicAuthCode'),
-  ubisoftDialog: document.getElementById('ubisoftDialog'),
-  btnCloseUbisoft: document.getElementById('btnCloseUbisoft'),
-  btnCancelUbisoft: document.getElementById('btnCancelUbisoft'),
-  btnSaveUbisoft: document.getElementById('btnSaveUbisoft'),
-  inputUbisoftEmail: document.getElementById('inputUbisoftEmail'),
-  inputUbisoftPassword: document.getElementById('inputUbisoftPassword'),
-  inputUbisoftVerificationCode: document.getElementById('inputUbisoftVerificationCode'),
-  ubisoftVerificationField: document.getElementById('ubisoftVerificationField'),
   hiddenImportDialog: document.getElementById('hiddenImportDialog'),
   btnCloseHiddenImport: document.getElementById('btnCloseHiddenImport'),
   btnCancelHiddenImport: document.getElementById('btnCancelHiddenImport'),
   btnConfirmHiddenImport: document.getElementById('btnConfirmHiddenImport'),
   inputSteamPath: document.getElementById('inputSteamPath'),
   hiddenImportHint: document.getElementById('hiddenImportHint'),
+  collectionsImportDialog: document.getElementById('collectionsImportDialog'),
+  btnCloseCollectionsImport: document.getElementById('btnCloseCollectionsImport'),
+  btnCancelCollectionsImport: document.getElementById('btnCancelCollectionsImport'),
+  btnConfirmCollectionsImport: document.getElementById('btnConfirmCollectionsImport'),
+  inputCollectionsSteamPath: document.getElementById('inputCollectionsSteamPath'),
+  collectionsImportHint: document.getElementById('collectionsImportHint'),
+  settingsDialog: document.getElementById('settingsDialog'),
+  btnCloseSettings: document.getElementById('btnCloseSettings'),
+  btnCancelSettings: document.getElementById('btnCancelSettings'),
+  btnSaveSettings: document.getElementById('btnSaveSettings'),
+  inputSettingsSteamPath: document.getElementById('inputSettingsSteamPath'),
+  inputSettingsHttpsProxy: document.getElementById('inputSettingsHttpsProxy'),
+  inputSettingsLogLevel: document.getElementById('inputSettingsLogLevel'),
+  inputSettingsLogToFile: document.getElementById('inputSettingsLogToFile'),
+  inputSettingsCoverOrphanTtlDays: document.getElementById('inputSettingsCoverOrphanTtlDays'),
+  inputSettingsCoverCleanupIntervalHours: document.getElementById('inputSettingsCoverCleanupIntervalHours'),
+  settingsSteamDetected: document.getElementById('settingsSteamDetected'),
   pagination: document.getElementById('pagination'),
   btnPagePrev: document.getElementById('btnPagePrev'),
   btnPageNext: document.getElementById('btnPageNext'),
   pageInfo: document.getElementById('pageInfo'),
   appRoot: document.getElementById('appRoot'),
-  appSidebar: document.getElementById('appSidebar'),
-  btnToggleSidebar: document.getElementById('btnToggleSidebar'),
-  btnExpandSidebar: document.getElementById('btnExpandSidebar'),
   btnToggleFilters: document.getElementById('btnToggleFilters'),
   filtersBody: document.getElementById('filtersBody'),
   filtersDrawer: document.getElementById('filtersDrawer'),
   filtersBackdrop: document.getElementById('filtersBackdrop'),
   btnCloseFilters: document.getElementById('btnCloseFilters'),
   libraryMain: document.getElementById('libraryMain'),
-  topbarTitle: document.getElementById('topbarTitle'),
   gameEditDialog: document.getElementById('gameEditDialog'),
   btnCloseGameEdit: document.getElementById('btnCloseGameEdit'),
   btnCancelGameEdit: document.getElementById('btnCancelGameEdit'),
@@ -136,45 +133,191 @@ const els = {
   coverLookupResults: document.getElementById('coverLookupResults'),
   inputCoverLocalize: document.getElementById('inputCoverLocalize'),
   inputLockFromRefresh: document.getElementById('inputLockFromRefresh'),
-};
-
-const SIDEBAR_COLLAPSED_KEY = 'sidebarCollapsed';
-const PLATFORM_TITLES = {
-  steam: 'MyGame · Steam',
-  epic: 'MyGame · Epic',
-  ubisoft: 'MyGame · 育碧',
+  btnRefreshGameMeta: document.getElementById('btnRefreshGameMeta'),
+  btnRefetchCover: document.getElementById('btnRefetchCover'),
+  refreshDialog: document.getElementById('refreshDialog'),
+  btnCloseRefresh: document.getElementById('btnCloseRefresh'),
+  btnCancelRefresh: document.getElementById('btnCancelRefresh'),
+  btnConfirmRefresh: document.getElementById('btnConfirmRefresh'),
+  refreshDialogHint: document.getElementById('refreshDialogHint'),
+  refreshOptLibrary: document.getElementById('refreshOptLibrary'),
+  refreshOptMetaWrap: document.getElementById('refreshOptMetaWrap'),
+  refreshOptMeta: document.getElementById('refreshOptMeta'),
+  refreshOptMetaSubWrap: document.getElementById('refreshOptMetaSubWrap'),
+  refreshOptMetaModeAll: document.getElementById('refreshOptMetaModeAll'),
+  refreshOptCoversRefresh: document.getElementById('refreshOptCoversRefresh'),
+  refreshOptCoversSubWrap: document.getElementById('refreshOptCoversSubWrap'),
+  refreshOptCoversModeAll: document.getElementById('refreshOptCoversModeAll'),
+  refreshOptCoversOverwriteLocal: document.getElementById('refreshOptCoversOverwriteLocal'),
+  refreshOptCoversOverwriteLocalWrap: document.getElementById('refreshOptCoversOverwriteLocalWrap'),
+  refreshOptLocalize: document.getElementById('refreshOptLocalize'),
+  refreshOptLocalizeSubWrap: document.getElementById('refreshOptLocalizeSubWrap'),
+  refreshOptLocalizeOverwriteLocal: document.getElementById('refreshOptLocalizeOverwriteLocal'),
+  refreshOptLocalizeRetry: document.getElementById('refreshOptLocalizeRetry'),
 };
 
 let gameEditTarget = null;
+let gameEditPreviewObjectUrl = '';
 let currentPageGames = [];
+let currentRandomGame = null;
 
 let editUserId = '';
-let currentPlatform = 'steam';
 
 let tokenPreviewTimer = null;
 let tokenPreviewRequestId = 0;
 let enrichAbortController = null;
-let epicCoverRequested = new Set();
+let metaEnriching = false;
+let progressHoldCount = 0;
+let libraryFetchController = null;
+let libraryFetchToken = 0;
+const updatingCards = new Set();
 
 const PAGE_SIZE = 48;
+const GRID_ROWS = 4;
 let dynamicPageSize = PAGE_SIZE;
 let gridLayoutTimer = null;
 
 let libraryLoaded = false;
 let libraryGameCount = 0;
 let libraryFilteredCount = 0;
+let libraryMeta = {
+  source: '',
+  cachedAt: null,
+  sessionExpired: false,
+  installedCount: 0,
+  metaPending: 0,
+};
 let libraryPagination = { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 };
 let filterReloadTimer = null;
 let currentSteamId = '';
-let envHasSteamId = false;
 let activeUserId = '';
 let users = [];
 let includeFamilyLoaded = false;
 let loadedAccountCount = 1;
 let tokenDialogMode = 'add';
 let gamesLoading = false;
-let favoriteByPlatform = { steam: new Set(), epic: new Set(), ubisoft: new Set() };
-let hiddenByPlatform = { steam: new Set(), epic: new Set(), ubisoft: new Set() };
+let favoriteByPlatform = { steam: new Set() };
+let hiddenByPlatform = { steam: new Set() };
+let appSettings = {
+  steamPath: '',
+  httpsProxy: '',
+  logLevel: 'info',
+  logToFile: true,
+  coverOrphanTtlDays: 3,
+  coverCleanupIntervalHours: 24,
+  detected: { steam: [] },
+};
+
+function applySettingsToForm(data = appSettings) {
+  if (els.inputSettingsSteamPath) els.inputSettingsSteamPath.value = data.steamPath || '';
+  if (els.inputSettingsHttpsProxy) els.inputSettingsHttpsProxy.value = data.httpsProxy || '';
+  if (els.inputSettingsLogLevel) els.inputSettingsLogLevel.value = data.logLevel || 'info';
+  if (els.inputSettingsLogToFile) els.inputSettingsLogToFile.checked = data.logToFile !== false;
+  if (els.inputSettingsCoverOrphanTtlDays) {
+    els.inputSettingsCoverOrphanTtlDays.value = String(data.coverOrphanTtlDays ?? 3);
+  }
+  if (els.inputSettingsCoverCleanupIntervalHours) {
+    els.inputSettingsCoverCleanupIntervalHours.value = String(data.coverCleanupIntervalHours ?? 24);
+  }
+}
+
+function readSettingsFromForm() {
+  return {
+    steamPath: els.inputSettingsSteamPath?.value.trim() || '',
+    httpsProxy: els.inputSettingsHttpsProxy?.value.trim() || '',
+    logLevel: els.inputSettingsLogLevel?.value || 'info',
+    logToFile: !!els.inputSettingsLogToFile?.checked,
+    coverOrphanTtlDays: Math.max(1, Number(els.inputSettingsCoverOrphanTtlDays?.value) || 3),
+    coverCleanupIntervalHours: Math.max(1, Number(els.inputSettingsCoverCleanupIntervalHours?.value) || 24),
+  };
+}
+
+function formatDetectedPaths(list, emptyText) {
+  const paths = Array.isArray(list) ? list.filter(Boolean) : [];
+  if (!paths.length) return emptyText || '未检测到有效路径';
+  return `已检测：${paths.join('；')}`;
+}
+
+function renderSettingsDetected(data = appSettings) {
+  const detected = data.detected || {};
+  if (els.settingsSteamDetected) {
+    els.settingsSteamDetected.textContent = formatDetectedPaths(detected.steam, '未检测到 Steam 安装目录');
+  }
+}
+
+async function loadAppSettings() {
+  const res = await fetch('/api/settings');
+  const data = await readApiJson(res);
+  if (!res.ok) throw new Error(data.error || '读取设置失败');
+  appSettings = {
+    steamPath: data.steamPath || '',
+    httpsProxy: data.httpsProxy || '',
+    logLevel: data.logLevel || 'info',
+    logToFile: data.logToFile !== false,
+    coverOrphanTtlDays: data.coverOrphanTtlDays ?? 3,
+    coverCleanupIntervalHours: data.coverCleanupIntervalHours ?? 24,
+    detected: data.detected || { steam: [] },
+  };
+  return appSettings;
+}
+
+async function openSettingsDialog() {
+  els.settingsDialog?.showModal();
+  renderSettingsDetected({ detected: { steam: [] } });
+  if (els.btnSaveSettings) {
+    els.btnSaveSettings.disabled = true;
+    els.btnSaveSettings.textContent = '加载中...';
+  }
+  try {
+    const data = await loadAppSettings();
+    applySettingsToForm(data);
+    renderSettingsDetected(data);
+  } catch (err) {
+    showToast(err.message, true);
+    renderSettingsDetected();
+  } finally {
+    if (els.btnSaveSettings) {
+      els.btnSaveSettings.disabled = false;
+      els.btnSaveSettings.textContent = '保存';
+    }
+  }
+}
+
+function closeSettingsDialog() {
+  els.settingsDialog?.close();
+}
+
+async function saveSettings() {
+  const payload = readSettingsFromForm();
+  els.btnSaveSettings.disabled = true;
+  els.btnSaveSettings.textContent = '保存中...';
+  try {
+    const res = await fetch('/api/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await readApiJson(res);
+    if (!res.ok) throw new Error(data.error || '保存失败');
+    appSettings = {
+      steamPath: data.steamPath || '',
+      httpsProxy: data.httpsProxy || '',
+      logLevel: data.logLevel || 'info',
+      logToFile: data.logToFile !== false,
+      coverOrphanTtlDays: data.coverOrphanTtlDays ?? 3,
+      coverCleanupIntervalHours: data.coverCleanupIntervalHours ?? 24,
+      detected: data.detected || { steam: [] },
+    };
+    renderSettingsDetected(appSettings);
+    closeSettingsDialog();
+    showToast('设置已保存');
+  } catch (err) {
+    showToast(err.message, true);
+  } finally {
+    els.btnSaveSettings.disabled = false;
+    els.btnSaveSettings.textContent = '保存';
+  }
+}
 
 function debugLog(label, detail = undefined) {
   const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
@@ -279,14 +422,33 @@ async function readApiJson(res) {
   }
 }
 
+function bindDialogBackdropClose(dialog, onClose) {
+  if (!dialog || typeof onClose !== 'function') return;
+  dialog.addEventListener('click', (e) => {
+    if (e.target !== dialog) return;
+    onClose();
+  });
+}
+
+function initDialogBackdropClose() {
+  bindDialogBackdropClose(els.settingsDialog, closeSettingsDialog);
+  bindDialogBackdropClose(els.gameEditDialog, closeGameEditDialog);
+  bindDialogBackdropClose(els.userEditDialog, closeUserEditDialog);
+  bindDialogBackdropClose(els.tokenDialog, closeTokenDialog);
+  bindDialogBackdropClose(els.refreshDialog, closeRefreshDialog);
+  bindDialogBackdropClose(els.hiddenImportDialog, closeHiddenImportDialog);
+  bindDialogBackdropClose(els.collectionsImportDialog, closeCollectionsImportDialog);
+  bindDialogBackdropClose(els.randomDialog, () => els.randomDialog?.close());
+  bindDialogBackdropClose(els.gameActionConfirmDialog, () => finishGameActionConfirm(false));
+}
+
 function getToastHost() {
   const dialogs = [
     els.tokenDialog,
     els.userEditDialog,
-    els.epicDialog,
-    els.ubisoftDialog,
     els.hiddenImportDialog,
     els.randomDialog,
+    els.gameActionConfirmDialog,
   ];
   return dialogs.find((dialog) => dialog?.open) || document.body;
 }
@@ -321,42 +483,57 @@ function iconUrl(appid, hash) {
   return coverUrl(appid);
 }
 
-function gamePlatform(game) {
-  return game.platform || 'steam';
+function gamePlatform() {
+  return 'steam';
+}
+
+function resolveCoverLookupQuery(game) {
+  const candidates = [
+    game.display_name,
+    game.custom_name_cn,
+    game.source_name_cn,
+    game.custom_name_en,
+    game.source_name,
+    game.name_cn,
+    game.name,
+    ...(game.aliases || []),
+  ];
+  for (const raw of candidates) {
+    const value = String(raw || '').trim();
+    if (value) return value;
+  }
+  return '';
 }
 
 function gameSourceName(game) {
-  return game.source_name_cn || game.source_name || game.name_cn || game.name || '';
+  const candidates = [
+    game.source_name_cn,
+    game.source_name,
+    game.display_name,
+    game.custom_name_cn,
+    game.name_cn,
+    game.name,
+  ];
+  for (const raw of candidates) {
+    const value = String(raw || '').trim();
+    if (value) return value;
+  }
+  return '';
 }
 
 function gameStoreUrl(game) {
   const url = String(game.store_url || '').trim();
-  if (url && url !== '#') {
-    if (gamePlatform(game) === 'epic' && /browse\?namespace=/i.test(url)) {
-      const name = gameSourceName(game);
-      if (name) return `https://store.epicgames.com/browse?q=${encodeURIComponent(name)}`;
-    }
-    return url;
-  }
-  if (gamePlatform(game) === 'steam') {
-    return `https://store.steampowered.com/app/${game.appid}`;
-  }
-  if (gamePlatform(game) === 'epic') {
-    const name = gameSourceName(game);
-    if (name) return `https://store.epicgames.com/browse?q=${encodeURIComponent(name)}`;
-  }
-  return '#';
+  if (url && url !== '#') return url;
+  return `https://store.steampowered.com/app/${game.appid}`;
 }
 
 function gameCoverImage(game) {
   if (game.cover_url) return game.cover_url;
-  if (gamePlatform(game) === 'steam') return coverUrl(game.appid);
-  return '';
+  return coverUrl(game.appid);
 }
 
 function gameCoverFallback(game) {
-  if (gamePlatform(game) === 'steam') return iconUrl(game.appid, game.img_icon_url);
-  return '';
+  return iconUrl(game.appid, game.img_icon_url);
 }
 
 function escapeHtml(text) {
@@ -393,12 +570,13 @@ function gameCoverPlaceholderColor(seed) {
   return `hsl(${hash % 360} 42% 32%)`;
 }
 
-function gameCoverPlaceholderHtml(game, { fallback = false } = {}) {
+function gameCoverPlaceholderHtml(game, { fallback = false, initiallyVisible = false } = {}) {
   const title = gameTitle(game);
   const abbrev = escapeHtml(gameCoverAbbrev(title));
   const bg = gameCoverPlaceholderColor(game.appid || title);
+  const hiddenClass = fallback && !initiallyVisible ? ' hidden' : '';
   const classes = fallback
-    ? 'game-cover game-cover-placeholder is-fallback hidden'
+    ? `game-cover game-cover-placeholder is-fallback${hiddenClass}`
     : 'game-cover game-cover-placeholder';
   return `<div class="${classes}" style="background:${bg}" aria-hidden="true"><span class="game-cover-abbrev">${abbrev}</span></div>`;
 }
@@ -421,8 +599,22 @@ function handleGameCoverError(img) {
     return;
   }
   img.classList.add('is-hidden');
-  const wrap = img.closest('.game-cover-wrap, .random-cover-wrap');
+  const wrap = img.closest('.game-cover-wrap');
   wrap?.querySelector('.game-cover-placeholder.is-fallback')?.classList.remove('hidden');
+}
+
+function handleGameCoverLoad(img) {
+  const wrap = img.closest('.game-cover-wrap');
+  wrap?.querySelector('.game-cover-placeholder.is-fallback')?.classList.add('hidden');
+}
+
+function finalizeCoverImage(img) {
+  if (!(img instanceof HTMLImageElement)) return;
+  if (img.complete && img.naturalWidth > 0) {
+    handleGameCoverLoad(img);
+    return;
+  }
+  img.addEventListener('load', () => handleGameCoverLoad(img), { once: true });
 }
 
 function gameSearchText(g) {
@@ -436,9 +628,7 @@ function gameSearchText(g) {
     g.source_name_cn,
     ...(g.aliases || []),
   ];
-  if (currentPlatform === 'steam') {
-    parts.push(...(g.genres || []), ...(g.tags || []));
-  }
+  parts.push(...(g.genres || []), ...(g.tags || []));
   return parts.filter(Boolean).join(' ').toLowerCase();
 }
 
@@ -450,35 +640,12 @@ const SORT_OPTIONS_STEAM = [
   { value: 'recent', label: '最近游玩' },
 ];
 
-const SORT_OPTIONS_COMMON = [
-  { value: 'name-asc', label: '名称 A-Z' },
-  { value: 'name-desc', label: '名称 Z-A' },
-];
-
-function updateSortOptionsForPlatform() {
-  const isSteam = currentPlatform === 'steam';
-  const options = isSteam ? SORT_OPTIONS_STEAM : SORT_OPTIONS_COMMON;
+function updateSortOptions() {
   const current = els.filterSort.value;
-  els.filterSort.innerHTML = options
+  els.filterSort.innerHTML = SORT_OPTIONS_STEAM
     .map((item) => `<option value="${item.value}">${item.label}</option>`)
     .join('');
-  els.filterSort.value = options.some((item) => item.value === current) ? current : 'name-asc';
-}
-
-function clearSteamOnlyFilterValues() {
-  els.filterGenre.value = '';
-  els.filterTag.value = '';
-  els.filterMinHours.value = '0';
-  els.filterMaxHours.value = '';
-  els.filterUnplayed.checked = false;
-  els.filterShareable.checked = false;
-  els.filterNonShareable.checked = false;
-  els.filterFamilyOnly.checked = false;
-  els.filterOwner.value = '';
-  els.filterCollection.value = '';
-  if (!SORT_OPTIONS_COMMON.some((item) => item.value === els.filterSort.value)) {
-    els.filterSort.value = 'name-asc';
-  }
+  els.filterSort.value = SORT_OPTIONS_STEAM.some((item) => item.value === current) ? current : 'name-asc';
 }
 
 function gameMatchesSearch(g, search) {
@@ -491,11 +658,35 @@ function gameMatchesSearch(g, search) {
   return false;
 }
 
+function sanitizeStoreGameNameClient(name) {
+  let s = String(name || '').trim();
+  if (!s) return '';
+  s = s
+    .replace(/^Steam 上的\s+/i, '')
+    .replace(/\s+on Steam$/i, '')
+    .replace(/\s*\/\s*Steam\s*$/i, '')
+    .trim();
+  if (/在\s*Steam\s*上购买/i.test(s) || (/立省/.test(s) && /购买|Buy/i.test(s))) {
+    const fromBook = s.match(/《([^》]+)》/);
+    if (fromBook?.[1]) return fromBook[1].trim();
+    const fromQuote = s.match(/[“"]([^”"]+)[”"]/);
+    if (fromQuote?.[1]) return fromQuote[1].trim();
+    return '';
+  }
+  return s;
+}
+
+function isPromoStoreTitle(name) {
+  const s = sanitizeStoreGameNameClient(name);
+  return !s && /在\s*Steam\s*上购买|立省/.test(String(name || ''));
+}
+
 function gameTitle(g) {
   if (g.display_name) return g.display_name;
   const customCn = g.custom_name_cn || '';
   if (customCn && customCn !== g.name) return customCn;
-  if (g.name_cn && g.name_cn !== g.name) return g.name_cn;
+  const cn = sanitizeStoreGameNameClient(g.name_cn || '');
+  if (cn && cn !== g.name && !isPromoStoreTitle(g.name_cn)) return cn;
   return g.name || '';
 }
 
@@ -508,57 +699,89 @@ function gameSubtitle(g) {
 }
 
 function updateModeUi() {
-  const isSteam = currentPlatform === 'steam';
-  els.filterChecksSteam?.classList.toggle('hidden', !isSteam);
-  els.filterGenreWrap?.classList.toggle('hidden', !isSteam);
-  els.filterTagWrap?.classList.toggle('hidden', !isSteam);
-  els.filterMinHoursWrap?.classList.toggle('hidden', !isSteam);
-  els.filterMaxHoursWrap?.classList.toggle('hidden', !isSteam);
-  els.filterOwnerWrap?.classList.toggle('hidden', !isSteam);
-  els.filterCollectionWrap?.classList.toggle('hidden', !isSteam);
-  els.filterGenre.disabled = !isSteam || !libraryLoaded;
-  els.filterTag.disabled = !isSteam || !libraryLoaded;
-  els.filterMinHours.disabled = !isSteam || !libraryLoaded;
-  els.filterMaxHours.disabled = !isSteam || !libraryLoaded;
-  els.filterUnplayed.disabled = !isSteam || !libraryLoaded;
-  els.filterShareable.disabled = !isSteam || !libraryLoaded;
-  els.filterNonShareable.disabled = !isSteam || !libraryLoaded;
-  els.filterFamilyOnly.disabled = !isSteam || !libraryLoaded;
+  els.filterGenre.disabled = !libraryLoaded;
+  els.filterTag.disabled = !libraryLoaded;
+  els.filterMinHours.disabled = !libraryLoaded;
+  els.filterMaxHours.disabled = !libraryLoaded;
+  els.filterUnplayed.disabled = !libraryLoaded;
+  els.filterShareable.disabled = !libraryLoaded;
+  els.filterNonShareable.disabled = !libraryLoaded;
+  els.filterFamilyOnly.disabled = !libraryLoaded;
+  els.filterInstalledOnly.disabled = !libraryLoaded;
+  els.filterInputMethod.disabled = !libraryLoaded;
   els.filterFavoritesOnly.disabled = !libraryLoaded;
   els.filterHiddenOnly.disabled = !libraryLoaded;
-  els.filterOwner.disabled = !isSteam || !libraryLoaded;
-  els.filterCollection.disabled = !isSteam || !libraryLoaded;
-  els.btnImportHidden.disabled = !isSteam || !activeUserId;
-  els.btnImportHidden?.classList.toggle('hidden', !isSteam);
-  updateSortOptionsForPlatform();
-  if (els.topbarTitle) {
-    els.topbarTitle.textContent = PLATFORM_TITLES[currentPlatform] || '游戏库';
-  }
+  els.filterOwner.disabled = !libraryLoaded;
+  els.filterCollection.disabled = !libraryLoaded;
+  els.btnImportHidden.disabled = !activeUserId;
+  els.btnImportCollections.disabled = !activeUserId;
+  updateSortOptions();
 }
 
-function setSidebarCollapsed(collapsed) {
-  els.appRoot?.classList.toggle('sidebar-collapsed', collapsed);
-  els.btnToggleSidebar?.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-  try {
-    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? '1' : '0');
-  } catch {
-    /* ignore */
-  }
-  requestAnimationFrame(() => layoutGameGrid({ reload: true }));
+function showGameGridLoading(text = '正在加载...') {
+  if (!els.gameGrid) return;
+  els.gameGrid.classList.add('is-loading');
+  els.gameGrid.innerHTML = `<div class="grid-loading-state">${escapeHtml(text)}</div>`;
 }
 
-function toggleSidebar() {
-  setSidebarCollapsed(!els.appRoot?.classList.contains('sidebar-collapsed'));
+function hideGameGridLoading() {
+  els.gameGrid?.classList.remove('is-loading');
 }
 
-function initSidebarState() {
-  let collapsed = false;
-  try {
-    collapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1';
-  } catch {
-    /* ignore */
+function computeGameGridLayout() {
+  if (!els.libraryMain || !els.gameGrid) {
+    return { cols: 8, rows: GRID_ROWS, pageSize: PAGE_SIZE, cardH: 168, bodyH: 44, isCompactCard: true };
   }
-  setSidebarCollapsed(collapsed);
+
+  const styles = getComputedStyle(document.documentElement);
+  const colGap = parseFloat(styles.getPropertyValue('--card-gap-x')) || 14;
+  const rowGap = parseFloat(styles.getPropertyValue('--card-gap-y')) || 10;
+  const gridInsetBottom = parseFloat(styles.getPropertyValue('--grid-layout-inset-bottom')) || 6;
+  const mainRect = els.libraryMain.getBoundingClientRect();
+  const mainGap = parseFloat(styles.getPropertyValue('--library-main-gap')) || 4;
+  const footH = (els.libraryFooter?.offsetHeight || 0) + mainGap;
+  const availableH = Math.max(220, mainRect.height - footH - gridInsetBottom);
+  const availableW = els.gameGrid.clientWidth || mainRect.width;
+
+  const minCardW = 168;
+  const maxCols = 10;
+  let cols = Math.floor((availableW + colGap) / (minCardW + colGap));
+  cols = Math.max(4, Math.min(cols, maxCols));
+  if (availableW >= 1360 && cols >= 9) cols = 10;
+
+  const rows = GRID_ROWS;
+  const cardH = Math.floor((availableH - rowGap * (rows - 1)) / rows);
+  const bodyH = 142;
+
+  const pageSize = cols * rows;
+  const isCompactCard = false;
+
+  return { cols, rows, pageSize, cardH, bodyH, isCompactCard };
+}
+
+function applyGameGridLayout(metrics) {
+  document.documentElement.style.setProperty('--grid-cols', String(metrics.cols));
+  document.documentElement.style.setProperty('--grid-rows', String(metrics.rows));
+  document.documentElement.style.setProperty('--card-min-height', `${metrics.cardH}px`);
+  els.gameGrid?.classList.toggle('game-grid--compact', metrics.isCompactCard);
+}
+
+function layoutGameGrid() {
+  const metrics = computeGameGridLayout();
+  applyGameGridLayout(metrics);
+  dynamicPageSize = metrics.pageSize;
+  libraryPagination.pageSize = metrics.pageSize;
+  return metrics;
+}
+
+function relayoutGridIfNeeded() {
+  const prevSize = dynamicPageSize;
+  layoutGameGrid();
+  if (libraryLoaded && !gamesLoading && dynamicPageSize !== prevSize) {
+    showGameGridLoading('正在调整布局...');
+    return fetchLibraryPage(false, libraryPagination.page, { quiet: true }).catch(() => {});
+  }
+  return Promise.resolve();
 }
 
 function setFiltersExpanded(expanded) {
@@ -570,54 +793,13 @@ function setFiltersExpanded(expanded) {
     els.btnToggleFilters.textContent = expanded ? '收起筛选' : '筛选';
   }
   if (!expanded) {
-    requestAnimationFrame(() => layoutGameGrid());
+    requestAnimationFrame(() => relayoutGridIfNeeded());
   }
 }
 
 function toggleFilters() {
   const expanded = els.filtersDrawer?.classList.contains('collapsed');
   setFiltersExpanded(!!expanded);
-}
-
-function layoutGameGrid(options = {}) {
-  const { reload = false } = options;
-  if (!els.libraryMain || !els.gameGrid) return;
-
-  const styles = getComputedStyle(document.documentElement);
-  const gap = parseFloat(styles.getPropertyValue('--card-gap')) || 10;
-  const mainRect = els.libraryMain.getBoundingClientRect();
-  const paginationH = els.pagination ? els.pagination.offsetHeight + 6 : 36;
-  const availableH = Math.max(220, mainRect.height - paginationH);
-  const availableW = els.gameGrid.clientWidth || mainRect.width;
-
-  const minCardW = 162;
-  let cols = Math.floor((availableW + gap) / (minCardW + gap));
-  cols = Math.max(4, Math.min(cols, 12));
-
-  const cardW = cols > 0 ? (availableW - gap * Math.max(cols - 1, 0)) / cols : availableW;
-  const coverRatio = 215 / 460;
-  const coverH = cardW * coverRatio;
-  const bodyH = 64;
-  const cardH = coverH + bodyH;
-  let rows = Math.floor((availableH + gap) / (cardH + gap));
-  rows = Math.max(2, rows - 1);
-
-  const pageSize = Math.max(cols * rows, cols * 2);
-
-  document.documentElement.style.setProperty('--grid-cols', String(cols));
-  document.documentElement.style.setProperty('--grid-rows', String(rows));
-  document.documentElement.style.setProperty('--card-min-height', `${Math.ceil(cardH)}px`);
-
-  const sizeChanged = pageSize !== dynamicPageSize;
-  dynamicPageSize = pageSize;
-  libraryPagination.pageSize = pageSize;
-
-  if ((reload || sizeChanged) && libraryLoaded && !gamesLoading) {
-    clearTimeout(gridLayoutTimer);
-    gridLayoutTimer = setTimeout(() => {
-      fetchLibraryPage(false, 1, { quiet: true }).catch(() => {});
-    }, 120);
-  }
 }
 
 function setControlsEnabled(enabled) {
@@ -636,6 +818,8 @@ function setControlsEnabled(enabled) {
     els.filterShareable,
     els.filterNonShareable,
     els.filterFamilyOnly,
+    els.filterInstalledOnly,
+    els.filterInputMethod,
     els.filterFavoritesOnly,
     els.filterHiddenOnly,
   ].forEach((el) => {
@@ -652,6 +836,8 @@ function getFilterParams() {
     shareableOnly: els.filterShareable.checked,
     nonShareableOnly: els.filterNonShareable.checked,
     familyOnly: els.filterFamilyOnly.checked,
+    installedOnly: els.filterInstalledOnly.checked,
+    inputMethod: els.filterInputMethod.value,
     favoritesOnly: els.filterFavoritesOnly.checked,
     hiddenOnly: els.filterHiddenOnly.checked,
     ownerSteamId: els.filterOwner.value,
@@ -663,25 +849,24 @@ function getFilterParams() {
 
 function buildFilterQueryParams(page = libraryPagination.page) {
   const params = new URLSearchParams();
-  const isSteam = currentPlatform === 'steam';
   params.set('page', String(page));
   params.set('pageSize', String(dynamicPageSize || PAGE_SIZE));
   params.set('sort', els.filterSort.value);
 
   const filters = getFilterParams();
   if (filters.search) params.set('search', filters.search);
-  if (isSteam) {
-    if (filters.genre) params.set('genre', filters.genre);
-    if (filters.tagSearch) params.set('tagSearch', filters.tagSearch);
-    if (filters.unplayed) params.set('unplayed', 'true');
-    if (filters.shareableOnly) params.set('shareableOnly', 'true');
-    if (filters.nonShareableOnly) params.set('nonShareableOnly', 'true');
-    if (filters.familyOnly) params.set('familyOnly', 'true');
-    if (filters.ownerSteamId) params.set('ownerSteamId', filters.ownerSteamId);
-    if (filters.steamCollectionId) params.set('steamCollectionId', filters.steamCollectionId);
-    if (filters.minHours > 0) params.set('minHours', String(filters.minHours));
-    if (Number.isFinite(filters.maxHours)) params.set('maxHours', String(filters.maxHours));
-  }
+  if (filters.genre) params.set('genre', filters.genre);
+  if (filters.tagSearch) params.set('tagSearch', filters.tagSearch);
+  if (filters.unplayed) params.set('unplayed', 'true');
+  if (filters.shareableOnly) params.set('shareableOnly', 'true');
+  if (filters.nonShareableOnly) params.set('nonShareableOnly', 'true');
+  if (filters.familyOnly) params.set('familyOnly', 'true');
+  if (filters.installedOnly) params.set('installedOnly', 'true');
+  if (filters.inputMethod) params.set('inputMethod', filters.inputMethod);
+  if (filters.ownerSteamId) params.set('ownerSteamId', filters.ownerSteamId);
+  if (filters.steamCollectionId) params.set('steamCollectionId', filters.steamCollectionId);
+  if (filters.minHours > 0) params.set('minHours', String(filters.minHours));
+  if (Number.isFinite(filters.maxHours)) params.set('maxHours', String(filters.maxHours));
   if (filters.favoritesOnly) params.set('favoritesOnly', 'true');
   if (filters.hiddenOnly) params.set('hiddenOnly', 'true');
   return params;
@@ -717,7 +902,7 @@ function populateFilterOptionsFromServer(filterOptions = {}) {
   } else {
     els.filterOwner.value = '';
   }
-  els.filterOwnerWrap?.classList.toggle('hidden', currentPlatform !== 'steam' || owners.length <= 1);
+  els.filterOwnerWrap?.classList.toggle('hidden', owners.length <= 1);
 
   const collectionVal = els.filterCollection.value;
   els.filterCollection.innerHTML = '<option value="">全部收藏夹</option>' +
@@ -727,53 +912,266 @@ function populateFilterOptionsFromServer(filterOptions = {}) {
   } else {
     els.filterCollection.value = '';
   }
-  els.filterCollectionWrap?.classList.toggle('hidden', currentPlatform !== 'steam' || !collections.length);
+  els.filterCollectionWrap?.classList.toggle('hidden', !collections.length);
 }
 
 function renderPagination() {
   const { page, totalPages, total } = libraryPagination;
   const show = libraryLoaded && totalPages > 1;
   els.pagination?.classList.toggle('hidden', !show);
-  if (!show) return;
+  if (!show) {
+    requestAnimationFrame(() => relayoutGridIfNeeded());
+    return;
+  }
 
   els.pageInfo.textContent = `第 ${page} / ${totalPages} 页 · 共 ${total} 款`;
-  els.btnPagePrev.disabled = page <= 1 || gamesLoading;
-  els.btnPageNext.disabled = page >= totalPages || gamesLoading;
+  els.btnPagePrev.disabled = page <= 1 || isPaginationBlocked();
+  els.btnPageNext.disabled = page >= totalPages || isPaginationBlocked();
+  requestAnimationFrame(() => relayoutGridIfNeeded());
+}
+
+function gameCardGenreText(game) {
+  return (game.genres || []).slice(0, 2).join(' · ');
+}
+
+function gameCardTagText(game) {
+  return (game.tags || []).slice(0, 3).join(' · ');
+}
+
+const INPUT_METHOD_KM_ICON = '<svg class="input-method-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm2 4v2h2v-2H6zm3 0v2h2v-2H9zm3 0v2h2v-2h-2zm3 0v2h2v-2h-2zM6 13v2h12v-2H6z"/><path fill="currentColor" d="M10 18h4v2h-4z" opacity=".85"/></svg>';
+const INPUT_METHOD_CONTROLLER_ICON = '<svg class="input-method-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 6a5 5 0 0 0-5 5v2a5 5 0 0 0 5 5h8a5 5 0 0 0 5-5v-2a5 5 0 0 0-5-5H8zm2.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM7 13.5a1 1 0 0 1 2 0 1 1 0 0 1-2 0zm8 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/></svg>';
+
+function gameInputMethodsHtml(game) {
+  const methods = game.input_methods || [];
+  let icon = INPUT_METHOD_KM_ICON;
+  let title = '键鼠';
+  if (methods.includes('controller_full')) {
+    icon = INPUT_METHOD_CONTROLLER_ICON;
+    title = '完全支持控制器';
+  } else if (methods.includes('controller_partial') || methods.includes('controller')) {
+    icon = INPUT_METHOD_CONTROLLER_ICON;
+    title = '部分支持控制器';
+  }
+  return `<span class="game-input-methods"><span class="input-method-badge" title="${title}">${icon}</span></span>`;
+}
+
+function gameCardHtml(game, options = {}) {
+  const random = options.random === true;
+  const subtitle = gameSubtitle(game);
+  const genreText = gameCardGenreText(game);
+  const tagText = gameCardTagText(game);
+  const coverMarkup = gameCoverMarkup(game);
+  const cardClass = `game-card${game.installed ? ' is-installed' : ''}${random ? ' game-card--random' : ''}`;
+  return `
+      <article class="${cardClass}" data-appid="${game.appid}" data-platform="steam" data-source-name="${escapeHtml(game.source_name || game.name || '')}">
+        <div class="game-cover-wrap">
+          ${coverMarkup}
+          ${game.installed ? '<span class="game-installed-badge" title="已安装">已安装</span>' : ''}
+        </div>
+        <div class="game-body">
+          <div class="game-body-content">
+            <h3 class="game-name">${gameTitle(game)}</h3>
+            ${subtitle ? `<div class="game-subtitle">${subtitle}</div>` : ''}
+            ${genreText ? `<div class="game-genres">${escapeHtml(genreText)}</div>` : ''}
+            ${tagText ? `<div class="game-tags">${escapeHtml(tagText)}</div>` : ''}
+            ${steamOwnerRowHtml(game)}
+          </div>
+          <div class="game-meta">
+            ${gameInputMethodsHtml(game)}
+            <span>${formatHours(game.playtime_forever)}</span>
+            ${game.from_family ? '<span class="badge badge-family">家庭</span>' : ''}
+            ${game.shareable === false ? '<span class="badge badge-warn">非共享</span>' : ''}
+          </div>
+        </div>
+        ${gameCoverActionsHtml(game)}
+      </article>`;
 }
 
 function renderGameCards(games) {
+  hideGameGridLoading();
   if (!games.length) {
     els.gameGrid.innerHTML = '<div class="empty-state">没有符合筛选条件的游戏</div>';
     return;
   }
 
-  els.gameGrid.innerHTML = games
-    .map((g) => {
-      const subtitle = gameSubtitle(g);
-      const genreText = (g.genres || []).slice(0, 2).join(' · ');
-      const coverMarkup = gameCoverMarkup(g);
-      const isSteam = gamePlatform(g) === 'steam';
-      return `
-      <article class="game-card" data-appid="${g.appid}" data-platform="${gamePlatform(g)}" data-source-name="${escapeHtml(g.source_name || g.name || '')}">
-        <div class="game-cover-wrap">
-          ${coverMarkup}
-          ${gameCoverActionsHtml(g)}
-        </div>
-        <div class="game-body">
-          <h3 class="game-name">${gameTitle(g)}</h3>
-          ${subtitle ? `<div class="game-subtitle">${subtitle}</div>` : ''}
-          ${isSteam && genreText ? `<div class="game-genres">${genreText}</div>` : ''}
-          ${isSteam ? steamOwnerRowHtml(g) : ''}
-          ${isSteam ? `<div class="game-meta">
-            <span>${formatHours(g.playtime_forever)}</span>
-            ${g.from_family ? '<span class="badge badge-family">家庭库</span>' : ''}
-            ${g.shareable === false ? '<span class="badge badge-warn">不可共享</span>' : ''}
-            ${g.playtime_forever === 0 ? '<span class="badge">未游玩</span>' : ''}
-          </div>` : ''}
-        </div>
-      </article>`;
-    })
-    .join('');
+  els.gameGrid.innerHTML = games.map((g) => gameCardHtml(g)).join('');
+  syncUpdatingCardOverlays();
+}
+
+function gameCardKey(appid, platform) {
+  return `${platform}:${String(appid || '')}`;
+}
+
+function findGameCard(appid, platform) {
+  return els.gameGrid?.querySelector(
+    `.game-card[data-appid="${CSS.escape(String(appid))}"][data-platform="${platform}"]`,
+  );
+}
+
+function setGameCardUpdating(appid, platform, updating = true) {
+  const key = gameCardKey(appid, platform);
+  if (updating) updatingCards.add(key);
+  else updatingCards.delete(key);
+
+  const card = findGameCard(appid, platform);
+  if (!card) return;
+
+  card.classList.toggle('is-updating', updating);
+  let overlay = card.querySelector(':scope > .game-cover-loading');
+  if (updating) {
+    if (!overlay) {
+      card.insertAdjacentHTML(
+        'beforeend',
+        '<div class="game-cover-loading" aria-hidden="true"><span class="game-cover-spinner"></span></div>',
+      );
+    }
+  } else {
+    overlay?.remove();
+  }
+}
+
+function syncUpdatingCardOverlays() {
+  for (const key of updatingCards) {
+    const sep = key.indexOf(':');
+    if (sep <= 0) continue;
+    setGameCardUpdating(key.slice(sep + 1), key.slice(0, sep), true);
+  }
+}
+
+function markCurrentPageCoverUpdates(platform, predicate = () => true) {
+  for (const game of currentPageGames) {
+    if (gamePlatform(game) !== platform) continue;
+    if (!predicate(game)) continue;
+    setGameCardUpdating(game.appid, platform, true);
+  }
+}
+
+function clearPlatformUpdatingCards(platform) {
+  for (const key of [...updatingCards]) {
+    if (!key.startsWith(`${platform}:`)) continue;
+    setGameCardUpdating(key.slice(platform.length + 1), platform, false);
+  }
+}
+
+function releaseLibraryLoadingUi() {
+  gamesLoading = false;
+  els.btnRefresh.disabled = !libraryLoaded;
+  els.btnRefresh.textContent = '刷新数据';
+  updateMetaContinueUi();
+  renderPagination();
+}
+
+function cancelPendingLibraryFetch() {
+  libraryFetchToken += 1;
+  if (libraryFetchController) {
+    libraryFetchController.abort();
+    libraryFetchController = null;
+  }
+  gamesLoading = false;
+  updatingCards.clear();
+  els.gameGrid?.querySelectorAll('.game-card.is-updating').forEach((card) => {
+    card.classList.remove('is-updating');
+    card.querySelector('.game-cover-loading')?.remove();
+  });
+}
+
+function isStaleLibraryFetch(token) {
+  return token !== libraryFetchToken;
+}
+
+function holdTopProgress() {
+  progressHoldCount += 1;
+}
+
+function releaseTopProgress() {
+  progressHoldCount = Math.max(0, progressHoldCount - 1);
+  if (progressHoldCount === 0) hideLoadProgressInternal();
+}
+
+function resetTopProgressHold() {
+  progressHoldCount = 0;
+  hideLoadProgressInternal();
+}
+
+function isTopProgressHeld() {
+  return progressHoldCount > 0;
+}
+
+function isPaginationBlocked() {
+  return gamesLoading && !isTopProgressHeld();
+}
+
+function formatLibrarySourceText(meta) {
+  if (meta.source === 'cache') {
+    return meta.sessionExpired ? '来自缓存·连接已过期' : '来自本地缓存';
+  }
+  if (meta.source === 'remote-refresh') return '已手动更新';
+  if (meta.source === 'remote') return '已从 Steam 获取';
+  return '';
+}
+
+function syncLibraryMeta(data = {}) {
+  if (data.source !== undefined) libraryMeta.source = data.source;
+  if (data.cachedAt !== undefined) libraryMeta.cachedAt = data.cachedAt;
+  if (data.sessionExpired !== undefined) libraryMeta.sessionExpired = data.sessionExpired;
+  if (data.tokenExpired) libraryMeta.sessionExpired = true;
+  if (data.installedCount !== undefined) libraryMeta.installedCount = data.installedCount || 0;
+  if (data.metaPending !== undefined) libraryMeta.metaPending = data.metaPending || 0;
+}
+
+function updateMetaContinueUi() {
+  const btn = els.btnContinueMetaEnrich;
+  if (!btn) return;
+  const pending = libraryMeta.metaPending || 0;
+  const show = libraryLoaded && pending > 0;
+  btn.classList.toggle('hidden', !show);
+  btn.disabled = !libraryLoaded || gamesLoading || metaEnriching;
+  if (metaEnriching) {
+    btn.textContent = '补全中...';
+    return;
+  }
+  btn.textContent = pending > 0 ? `继续补全 (${pending})` : '继续补全';
+}
+
+async function refreshMetaPendingCount() {
+  if (!currentSteamId) return;
+  try {
+    const steamId = currentSteamId.split(',')[0].trim();
+    const res = await fetch(
+      `/api/games/meta-pending?steamId=${encodeURIComponent(steamId)}&includeFamily=true`,
+      { headers: buildHeaders() },
+    );
+    if (!res.ok) return;
+    const data = await res.json();
+    libraryMeta.metaPending = data.pending || 0;
+    updateMetaContinueUi();
+  } catch (err) {
+    debugLog('刷新 metaPending 失败', { message: err.message });
+  }
+}
+
+async function continueMetaEnrichment() {
+  if (!currentSteamId || metaEnriching || gamesLoading) return;
+  const steamId = currentSteamId.split(',')[0].trim();
+  await enrichGamesMeta(steamId, { forceAll: false, reloadAfter: true });
+}
+
+function updateStatsBar(overrideText = '') {
+  if (overrideText) {
+    els.statsBar.textContent = overrideText;
+    return;
+  }
+  const familyText = includeFamilyLoaded ? ' · 含家庭' : '';
+  const accountText = loadedAccountCount > 1 ? ` · ${loadedAccountCount} 个账号` : '';
+  const favCount = favoriteByPlatform.steam?.size || 0;
+  const hiddenCount = hiddenByPlatform.steam?.size || 0;
+  const favText = favCount ? ` · 收藏 ${favCount}` : '';
+  const hiddenText = hiddenCount ? ` · 隐藏 ${hiddenCount}` : '';
+  const sourceText = formatLibrarySourceText(libraryMeta);
+  const time = libraryMeta.cachedAt ? new Date(libraryMeta.cachedAt).toLocaleString('zh-CN') : '';
+  const cachePart = sourceText ? ` · ${sourceText}${time ? ` · ${time}` : ''}` : '';
+  const installedPart = libraryMeta.installedCount ? ` · 已安装 ${libraryMeta.installedCount}` : '';
+  els.statsBar.textContent = `共 ${libraryGameCount} 款，显示 ${libraryFilteredCount} 款${cachePart}${installedPart}${accountText}${familyText}${favText}${hiddenText}`;
 }
 
 function applyLibraryResponse(data) {
@@ -784,176 +1182,378 @@ function applyLibraryResponse(data) {
   populateFilterOptionsFromServer(data.filterOptions);
   currentPageGames = data.games || [];
   renderGameCards(currentPageGames);
-  if (currentPlatform === 'epic') {
-    loadEpicPageCovers(data.games || []).catch(() => {});
-  }
-
-  const familyText = currentPlatform === 'steam' && includeFamilyLoaded ? ' · 含家庭库' : '';
-  const accountText = currentPlatform === 'steam' && loadedAccountCount > 1 ? ` · ${loadedAccountCount} 个账号` : '';
-  const favCount = favoriteByPlatform[currentPlatform]?.size || 0;
-  const hiddenCount = hiddenByPlatform[currentPlatform]?.size || 0;
-  const favText = favCount ? ` · 收藏 ${favCount}` : '';
-  const hiddenText = hiddenCount ? ` · 隐藏 ${hiddenCount}` : '';
-  els.statsBar.textContent = `共 ${libraryGameCount} 款，显示 ${libraryFilteredCount} 款${accountText}${familyText}${favText}${hiddenText}`;
+  syncLibraryMeta(data);
+  updateStatsBar();
+  updateMetaContinueUi();
 
   renderPagination();
   setControlsEnabled(libraryLoaded);
   updateModeUi();
-  requestAnimationFrame(() => layoutGameGrid());
 }
 
 function scheduleLibraryReload() {
-  if (!libraryLoaded || gamesLoading) return;
+  if (!libraryLoaded || isPaginationBlocked()) return;
   clearTimeout(filterReloadTimer);
   filterReloadTimer = setTimeout(() => {
-    fetchLibraryPage(false, 1, { quiet: true }).catch((err) => showToast(err.message, true));
+    fetchLibraryPage(false, 1, { quiet: true, preserveProgress: true, nested: true })
+      .catch((err) => showToast(err.message, true));
   }, 250);
 }
 
-function getLibraryApiUrl(refresh, page) {
-  const params = buildFilterQueryParams(page);
-  if (refresh) params.set('refresh', 'true');
-
-  if (currentPlatform === 'steam') {
-    const user = getActiveUser();
-    const steamId = (user?.steamId || '').trim();
-    if (steamId) params.set('steamId', steamId);
-    params.set('includeFamily', 'true');
-    return `/api/games?${params.toString()}`;
-  }
-  if (currentPlatform === 'epic') {
-    return `/api/epic/games?${params.toString()}`;
-  }
-  return `/api/ubisoft/games?${params.toString()}`;
+function buildRefreshPartsParam(parts = {}) {
+  const list = [];
+  if (parts.library) list.push('library');
+  if (parts.meta) list.push('meta');
+  if (parts.metaAll) list.push('metaAll');
+  if (parts.covers || parts.coversAll) list.push(parts.coversAll ? 'coversAll' : 'covers');
+  if (parts.localizeCovers) list.push('localizeCovers');
+  return list.join(',');
 }
 
-async function fetchLibraryPage(refresh = false, page = 1, options = {}) {
-  const { quiet = false, autoFetchIfNoCache = false } = options;
+function isRefreshPartsActive(parts = {}) {
+  return !!(parts.library || parts.meta || parts.metaAll || parts.covers || parts.coversAll || parts.localizeCovers);
+}
 
-  if (currentPlatform === 'steam') {
-    const user = getActiveUser();
-    const steamId = (user?.steamId || '').trim();
-    if (!steamId && !envHasSteamId) {
-      if (!quiet) showToast('请先添加用户', true);
+function isCoversRefreshActive(parts = {}) {
+  return !!(parts.covers || parts.coversAll);
+}
+
+function getLibraryApiUrl(refreshParts, page) {
+  const params = buildFilterQueryParams(page);
+  const refreshParam = buildRefreshPartsParam(refreshParts);
+  if (refreshParam) params.set('refreshParts', refreshParam);
+  if (refreshParts?.localizeRetryFailed) params.set('localizeRetryFailed', 'true');
+  if (refreshParts?.coversIncludeLocal) params.set('coversIncludeLocal', 'true');
+  if (refreshParts?.localizeIncludeLocal) params.set('localizeIncludeLocal', 'true');
+
+  const user = getActiveUser();
+  const steamId = (user?.steamId || '').trim();
+  if (steamId) params.set('steamId', steamId);
+  params.set('includeFamily', 'true');
+  return `/api/games?${params.toString()}`;
+}
+
+function getLibraryStreamUrl(parts) {
+  const streamParts = {
+    library: true,
+    localizeCovers: !!parts.localizeCovers,
+  };
+  const params = new URLSearchParams();
+  const refreshParam = buildRefreshPartsParam(streamParts);
+  if (refreshParam) params.set('refreshParts', refreshParam);
+  if (parts.localizeRetryFailed) params.set('localizeRetryFailed', 'true');
+  if (parts.localizeIncludeLocal) params.set('localizeIncludeLocal', 'true');
+
+  const user = getActiveUser();
+  const steamId = (user?.steamId || '').trim();
+  if (steamId) params.set('steamId', steamId);
+  params.set('includeFamily', 'true');
+  return `/api/games/library-stream?${params.toString()}`;
+}
+
+async function readSseFetch(res, onPayload) {
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let lastPayload = null;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const chunks = buffer.split('\n\n');
+    buffer = chunks.pop() || '';
+
+    for (const chunk of chunks) {
+      const line = chunk.split('\n').find((row) => row.startsWith('data: '));
+      if (!line) continue;
+      const payload = JSON.parse(line.slice(6));
+      lastPayload = payload;
+      if (payload.error) {
+        const err = new Error(payload.error);
+        if (payload.needAuth) err.needAuth = true;
+        throw err;
+      }
+      onPayload(payload);
+    }
+  }
+
+  return lastPayload;
+}
+
+async function pullLibraryWithProgress(parts, page, options = {}) {
+  const {
+    headers,
+    fetchOpts,
+    refreshStages = [],
+    staleFetch = () => false,
+  } = options;
+  const libIdx = stageIndexOf(refreshStages, 'library');
+  const stageTotal = refreshStages.length || 1;
+  const defaultLabel = refreshStages[libIdx]?.label || '拉取游戏库';
+
+  abortEnrichStream();
+  enrichAbortController = new AbortController();
+  const signal = fetchOpts?.signal || enrichAbortController.signal;
+  const fetchInit = headers ? { headers, signal } : { signal };
+
+  let localizedCovers = null;
+  const streamRes = await fetch(getLibraryStreamUrl(parts), fetchInit);
+  if (!streamRes.ok) {
+    const data = await readApiJson(streamRes);
+    const err = new Error(data.error || '拉取游戏库失败');
+    if (data.needAuth) err.needAuth = true;
+    throw err;
+  }
+
+  await readSseFetch(streamRes, (payload) => {
+    if (staleFetch()) return;
+    if (payload.complete) {
+      localizedCovers = payload.localizedCovers || null;
       return;
     }
-    if (refresh) await ensureTokenReady();
-  } else if (currentPlatform === 'epic') {
-    if (refresh) {
-      const valid = await refreshEpicAuthStatus();
-      if (!valid) {
-        openEpicDialog();
-        throw new Error('Epic 连接已过期，请重新连接后再刷新');
-      }
-    } else {
-      await refreshEpicAuthStatus();
+    updateTopProgress({
+      label: payload.label || defaultLabel,
+      current: payload.current || 0,
+      total: payload.total || 0,
+      stageIndex: libIdx,
+      stageTotal,
+      progressKind: payload.progressKind || 'count',
+    });
+  });
+
+  if (staleFetch()) return null;
+
+  const listRes = await fetch(
+    getLibraryApiUrl(null, page),
+    headers ? { headers, ...fetchOpts } : fetchOpts,
+  );
+  if (staleFetch()) return null;
+  const data = await readApiJson(listRes);
+  if (!listRes.ok) throw new Error(data.error || '加载失败');
+  if (localizedCovers) data.localizedCovers = localizedCovers;
+  return data;
+}
+
+async function fetchLibraryPage(refreshParts = null, page = 1, options = {}) {
+  const {
+    quiet = false,
+    autoFetchIfNoCache = false,
+    suppressProgress = false,
+    nested = false,
+    preserveProgress = false,
+  } = options;
+  const parts = refreshParts || {
+    library: false,
+    meta: false,
+    metaAll: false,
+    covers: false,
+    coversAll: false,
+    coversIncludeLocal: false,
+    localizeCovers: false,
+  };
+  const refreshActive = isRefreshPartsActive(parts);
+  const refreshStages = refreshActive && !suppressProgress
+    ? buildRefreshStages(parts)
+    : [];
+
+  const user = getActiveUser();
+  const steamId = (user?.steamId || '').trim();
+  if (!steamId) {
+    if (!quiet) showToast('请先添加用户', true);
+    return;
+  }
+  if (parts.library) await ensureTokenReady();
+
+  if (!nested) {
+    if (refreshActive) {
+      abortEnrichStream();
+      resetTopProgressHold();
     }
-  } else if (currentPlatform === 'ubisoft') {
-    if (refresh) {
-      const valid = await refreshUbisoftAuthStatus();
-      if (!valid) {
-        openUbisoftDialog();
-        throw new Error('育碧连接已过期，请重新登录后再刷新');
-      }
-    } else {
-      await refreshUbisoftAuthStatus();
+    cancelPendingLibraryFetch();
+    libraryFetchController = new AbortController();
+    gamesLoading = true;
+    layoutGameGrid();
+    els.btnRefresh.disabled = true;
+    els.btnRefresh.textContent = refreshActive ? '更新中...' : '加载中...';
+    updateMetaContinueUi();
+    const skipGridLoading = preserveProgress && isTopProgressHeld();
+    if (!refreshStages.length && !skipGridLoading) {
+      showGameGridLoading(refreshActive ? '正在更新...' : '正在加载...');
     }
+    renderPagination();
   }
 
-  if (gamesLoading) return;
-  if (refresh) {
-    abortEnrichStream();
-    resetEpicCoverState();
-  }
-  gamesLoading = true;
-  els.btnRefresh.disabled = true;
-  els.btnRefresh.textContent = refresh ? '更新中...' : '加载中...';
-  renderPagination();
+  const fetchToken = nested ? null : libraryFetchToken;
+  const fetchSignal = nested ? undefined : libraryFetchController?.signal;
+  const staleFetch = () => !nested && isStaleLibraryFetch(fetchToken);
 
-  const cacheInfoEl = currentPlatform === 'steam'
-    ? els.cacheInfo
-    : currentPlatform === 'epic'
-      ? els.epicCacheInfo
-      : els.ubisoftCacheInfo;
-  cacheInfoEl.textContent = refresh ? '正在拉取最新数据...' : '正在加载...';
+  if (!nested) {
+    updateStatsBar(refreshActive ? '正在拉取最新数据...' : '正在加载...');
+  }
+
+  if (refreshStages.length) {
+    holdTopProgress();
+    renderPagination();
+    updateTopProgress({
+      label: refreshStages[0].label,
+      indeterminate: true,
+      stageIndex: 0,
+      stageTotal: refreshStages.length,
+    });
+  }
 
   try {
-    const headers = currentPlatform === 'steam' ? buildHeaders() : undefined;
+    const headers = buildHeaders();
     const startedAt = performance.now();
-    let res = await fetch(getLibraryApiUrl(refresh, page), headers ? { headers } : undefined);
-    let data = await readApiJson(res);
+    const fetchOpts = fetchSignal ? { signal: fetchSignal } : undefined;
+    let data;
 
-    if (res.status === 401 && data.needAuth) {
-      if (currentPlatform === 'steam') openTokenDialog('update');
-      if (currentPlatform === 'epic') openEpicDialog();
-      if (currentPlatform === 'ubisoft') openUbisoftDialog();
-      throw new Error(data.error || '请先完成账号连接');
-    }
-    if (!res.ok) throw new Error(data.error || '加载失败');
-
-    if (autoFetchIfNoCache && !refresh && data.fromCache === true && data.gameCount === 0) {
-      if (currentPlatform === 'steam') await ensureTokenReady();
-      cacheInfoEl.textContent = '缓存为空，正在拉取...';
-      res = await fetch(getLibraryApiUrl(true, page), headers ? { headers } : undefined);
-      data = await readApiJson(res);
-      if (!res.ok) throw new Error(data.error || '加载失败');
-    }
-
-    if (currentPlatform === 'steam') {
-      currentSteamId = data.steamId || currentSteamId;
-      includeFamilyLoaded = !!data.includeFamily;
-      loadedAccountCount = data.accountCount || 1;
-      await loadSteamUserPrefs();
-      if (data.tokenExpired) {
-        els.authStatus.className = 'auth-status warn';
-        els.authStatus.textContent = 'Token 已过期 · 显示缓存';
-      }
+    if (parts.library) {
+      data = await pullLibraryWithProgress(parts, page, {
+        headers,
+        fetchOpts,
+        refreshStages,
+        staleFetch,
+      });
+      if (staleFetch() || !data) return;
     } else {
-      includeFamilyLoaded = false;
-      loadedAccountCount = 1;
-      if (currentPlatform === 'ubisoft' && data.sessionExpired) {
-        els.ubisoftAuthStatus.className = 'auth-status warn';
-        els.ubisoftAuthStatus.textContent = '育碧连接已过期 · 显示缓存';
+      let res = await fetch(
+        getLibraryApiUrl(parts, page),
+        headers ? { headers, ...fetchOpts } : fetchOpts,
+      );
+      if (staleFetch()) return;
+      data = await readApiJson(res);
+
+      if (res.status === 401 && data.needAuth) {
+        openTokenDialog('update');
+        throw new Error(data.error || '请先完成账号连接');
       }
+      if (!res.ok) throw new Error(data.error || '加载失败');
+
+      if (autoFetchIfNoCache && !refreshActive && data.fromCache === true && data.gameCount === 0) {
+        await ensureTokenReady();
+        updateStatsBar('缓存为空，正在拉取...');
+        data = await pullLibraryWithProgress({
+          library: true,
+          meta: false,
+          covers: false,
+          localizeCovers: false,
+        }, page, {
+          headers,
+          fetchOpts,
+          refreshStages: [{ id: 'library', label: '拉取 Steam 游戏库' }],
+          staleFetch,
+        });
+        if (staleFetch() || !data) return;
+      }
+    }
+
+    currentSteamId = data.steamId || currentSteamId;
+    includeFamilyLoaded = !!data.includeFamily;
+    loadedAccountCount = data.accountCount || 1;
+    await loadSteamUserPrefs();
+    if (data.tokenExpired) {
+      refreshAuthStatus();
     }
 
     applyLibraryResponse(data);
-
-    const time = data.cachedAt ? new Date(data.cachedAt).toLocaleString('zh-CN') : '';
-    const sourceText = data.source === 'cache'
-      ? (data.sessionExpired ? '来自缓存 · 连接已过期' : '来自本地缓存')
-      : data.source === 'remote-refresh'
-        ? '已手动更新'
-        : `已从 ${currentPlatform === 'steam' ? 'Steam' : currentPlatform === 'epic' ? 'Epic' : '育碧'} 获取`;
-    cacheInfoEl.textContent = `${sourceText}${time ? ` · ${time}` : ''} · ${data.gameCount} 款`;
-    if (currentPlatform === 'ubisoft' && data.fromCache && els.ubisoftAuthStatus.classList.contains('warn')) {
-      els.ubisoftAuthStatus.textContent = '育碧连接已过期 · 显示缓存';
-      if (!data.sessionExpired) {
-        cacheInfoEl.textContent = `来自缓存 · 连接已过期${time ? ` · ${time}` : ''} · ${data.gameCount} 款`;
-      }
-    }
+    if (staleFetch()) return;
+    if (!nested) releaseLibraryLoadingUi();
 
     debugLog('游戏库分页加载', {
-      platform: currentPlatform,
       page: data.pagination?.page,
       ms: Math.round(performance.now() - startedAt),
       gameCount: data.gameCount,
       filteredCount: data.filteredCount,
     });
 
-    if (!quiet) {
+    if (!quiet && !parts.localizeCovers && !staleFetch()) {
       showToast(data.fromCache ? '已加载缓存' : '游戏库已更新');
     }
 
-    if (currentPlatform === 'steam' && (data.metaPending || 0) > 0) {
-      enrichGamesMeta((data.steamId || currentSteamId).split(',')[0].trim()).catch(() => {});
+    if (staleFetch()) return;
+
+    if (parts.meta || parts.metaAll) {
+      const forceAll = !!parts.metaAll;
+      const pending = data.metaPending || 0;
+      if (forceAll || pending > 0) {
+        await enrichGamesMeta((data.steamId || currentSteamId).split(',')[0].trim(), {
+          forceAll,
+          stageIndex: stageIndexOf(refreshStages, 'meta'),
+          stageTotal: refreshStages.length || 1,
+          keepProgress: refreshStages.length > 0,
+        });
+      }
     }
+
+    if (staleFetch()) return;
+
+    if (parts.localizeCovers && data.localizedCovers) {
+      activeLocalizeRefreshOpts = {
+        retryFailed: !!parts.localizeRetryFailed,
+        overwriteLocal: !!parts.localizeIncludeLocal,
+      };
+      if (refreshStages.length) {
+        updateLocalizeCoverProgress(data.localizedCovers, refreshStages);
+      }
+      if (data.localizedCovers.remaining > 0) {
+        data = await runCoverLocalizationBatches(page, refreshStages, data, { suppressProgress });
+      } else {
+        try {
+          const reloaded = await reloadLibraryPageAfterLocalize(page, headers);
+          if (reloaded) {
+            data = { ...reloaded, localizedCovers: data.localizedCovers };
+          }
+        } catch (err) {
+          debugLog('本地化后刷新列表失败', { message: err.message });
+        }
+      }
+      if (!quiet && data?.localizedCovers) {
+        const stats = summarizeLocalizedCovers(data.localizedCovers);
+        if (stats.total > 0 || stats.processed > 0) {
+          showToast(formatLocalizeCoverToast(stats), stats.failed > 0 && stats.processed === stats.failed);
+        } else {
+          showToast('没有需要本地化的封面', true);
+        }
+      }
+    }
+
+    if (staleFetch()) return;
+
+    if (isCoversRefreshActive(parts)) {
+      const covIdx = stageIndexOf(refreshStages, 'covers');
+      await refetchCoversStream({
+        forceAll: !!parts.coversAll,
+        includeLocal: !!parts.coversIncludeLocal,
+        stageIndex: covIdx,
+        stageTotal: refreshStages.length || 1,
+        keepProgress: refreshStages.length > 0,
+      });
+    }
+
+    if (staleFetch()) return;
+
+    if (refreshStages.length) {
+      updateTopProgress({
+        label: '刷新完成',
+        current: 1,
+        total: 1,
+        stageIndex: refreshStages.length - 1,
+        stageTotal: refreshStages.length,
+      });
+      releaseTopProgress();
+    }
+
+    return data;
   } catch (err) {
+    if (err.name === 'AbortError' || staleFetch()) return;
+    if (refreshStages.length) resetTopProgressHold();
     debugLog('游戏库加载失败', { message: err.message });
-    if (!quiet && ![
-      'Epic 连接已过期，请重新连接后再刷新',
-      '育碧连接已过期，请重新登录后再刷新',
-    ].includes(err.message)) {
+    if (err.needAuth) {
+      openTokenDialog('update');
+    }
+    if (!quiet) {
       showToast(err.message, true);
     }
     if (!libraryLoaded) {
@@ -963,10 +1563,14 @@ async function fetchLibraryPage(refresh = false, page = 1, options = {}) {
     }
     throw err;
   } finally {
-    gamesLoading = false;
-    els.btnRefresh.disabled = !libraryLoaded;
-    els.btnRefresh.textContent = '刷新数据';
-    renderPagination();
+    if (!nested && fetchToken === libraryFetchToken) {
+      gamesLoading = false;
+      els.btnRefresh.disabled = !libraryLoaded;
+      els.btnRefresh.textContent = '刷新数据';
+      updateMetaContinueUi();
+      renderPagination();
+      if (libraryFetchController?.signal?.aborted) libraryFetchController = null;
+    }
   }
 }
 
@@ -1008,104 +1612,326 @@ function steamOwnerRowHtml(game) {
 }
 
 function createEmptyPlatformSets() {
-  return { steam: new Set(), epic: new Set(), ubisoft: new Set() };
+  return { steam: new Set() };
 }
 
-function normalizePrefPlatform(platform) {
-  const value = String(platform || currentPlatform || 'steam').trim().toLowerCase();
-  return ['steam', 'epic', 'ubisoft'].includes(value) ? value : 'steam';
-}
-
-function normalizePrefAppId(platform, appid) {
-  const p = normalizePrefPlatform(platform);
+function normalizePrefAppId(appid) {
   const raw = String(appid ?? '').trim();
   if (!raw) return '';
-  if (p === 'steam') {
-    const id = Number(raw);
-    return id > 0 ? String(Math.trunc(id)) : '';
-  }
-  return raw;
+  const id = Number(raw);
+  return id > 0 ? String(Math.trunc(id)) : '';
 }
 
 function applyPlatformPrefSets(target, platforms) {
   if (!platforms) return;
   target.steam = new Set((platforms.steam || []).map((id) => String(Number(id))).filter(Boolean));
-  target.epic = new Set(platforms.epic || []);
-  target.ubisoft = new Set(platforms.ubisoft || []);
 }
 
-function isFavorite(appid, platform = currentPlatform) {
-  const p = normalizePrefPlatform(platform);
-  const id = normalizePrefAppId(p, appid);
-  return id ? favoriteByPlatform[p]?.has(id) : false;
+function isFavorite(appid) {
+  const id = normalizePrefAppId(appid);
+  return id ? favoriteByPlatform.steam.has(id) : false;
 }
 
-function favoriteButtonHtml(appid, platform = currentPlatform, extraClass = '') {
-  const p = normalizePrefPlatform(platform);
-  const id = normalizePrefAppId(p, appid);
-  const active = isFavorite(id, p);
+function favoriteButtonHtml(appid, extraClass = '') {
+  const id = normalizePrefAppId(appid);
+  const active = isFavorite(id);
   const cls = `btn-favorite${active ? ' is-favorite' : ''}${extraClass ? ` ${extraClass}` : ''}`;
   const label = active ? '取消收藏' : '收藏';
-  return `<button type="button" class="${cls}" data-appid="${escapeHtml(id)}" data-platform="${p}" aria-label="${label}" title="${label}">${active ? '★' : '☆'}</button>`;
+  return `<button type="button" class="${cls}" data-appid="${escapeHtml(id)}" data-platform="steam" aria-label="${label}" title="${label}">${active ? '★' : '☆'}</button>`;
 }
 
-function isHidden(appid, platform = currentPlatform) {
-  const p = normalizePrefPlatform(platform);
-  const id = normalizePrefAppId(p, appid);
-  return id ? hiddenByPlatform[p]?.has(id) : false;
+function isHidden(appid) {
+  const id = normalizePrefAppId(appid);
+  return id ? hiddenByPlatform.steam.has(id) : false;
 }
 
-function hiddenButtonHtml(appid, platform = currentPlatform, extraClass = '') {
-  const p = normalizePrefPlatform(platform);
-  const id = normalizePrefAppId(p, appid);
-  const active = isHidden(id, p);
+function hiddenButtonHtml(appid, extraClass = '') {
+  const id = normalizePrefAppId(appid);
+  const active = isHidden(id);
   const cls = `btn-hidden${active ? ' is-hidden' : ''}${extraClass ? ` ${extraClass}` : ''}`;
   const label = active ? '取消隐藏' : '隐藏';
-  return `<button type="button" class="${cls}" data-appid="${escapeHtml(id)}" data-platform="${p}" aria-label="${label}" title="${label}">${active ? '🙈' : '👁'}</button>`;
+  return `<button type="button" class="${cls}" data-appid="${escapeHtml(id)}" data-platform="steam" aria-label="${label}" title="${label}">${active ? '🙈' : '👁'}</button>`;
 }
 
 const STEAM_ICON_SVG = `<svg class="btn-steam-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2a9.99 9.99 0 0 0-9.91 8.68l5.66 2.34a2.89 2.89 0 0 1 1.64-.51c.08 0 .16.01.24.02l2.53-3.67V9.9c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4h-.09l-3.67 2.53c.01.08.02.16.02.24 0 .58-.18 1.12-.51 1.64l2.34 5.66A9.99 9.99 0 1 0 12 2zm-1.18 14.58l-1.47-3.55 2.12-1.54.9 2.17-1.55 2.92zm7.06-2.65a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>`;
-const EPIC_ICON_SVG = `<svg class="btn-steam-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M4 4h16v16H4V4zm3.2 4.8v6.4h2.4l1.6-4 1.6 4h2.4V8.8H12l-1.4 3.6L9.2 8.8H7.2z"/></svg>`;
-const UBI_ICON_SVG = `<svg class="btn-steam-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" d="M8 12h8v2H8z"/></svg>`;
 
 function storeButtonHtml(game) {
-  const platform = gamePlatform(game);
   const url = gameStoreUrl(game);
-  const labels = { steam: 'Steam', epic: 'Epic', ubisoft: '育碧' };
-  const icons = { steam: STEAM_ICON_SVG, epic: EPIC_ICON_SVG, ubisoft: UBI_ICON_SVG };
-  const label = labels[platform] || '商店';
-  return `<button type="button" class="btn-platform-store btn-platform-store-${platform}" data-store-url="${url}" aria-label="在 ${label} 商店查看" title="${label} 商店">${icons[platform] || ''}</button>`;
+  return `<button type="button" class="btn-platform-store btn-platform-store-steam" data-store-url="${url}" aria-label="在 Steam 商店查看" title="Steam 商店">${STEAM_ICON_SVG}</button>`;
+}
+
+const PLAY_ICON_SVG = '<svg class="btn-play-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>';
+const DOWNLOAD_ICON_SVG = '<svg class="btn-download-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zm-14 9v2h14v-2H5z"/></svg>';
+
+function launchButtonHtml(game) {
+  if (!game.installed) return '';
+  return `<button type="button" class="btn-game-launch" data-appid="${escapeHtml(game.appid)}" data-platform="steam" title="启动游戏" aria-label="启动游戏">${PLAY_ICON_SVG}</button>`;
+}
+
+function downloadButtonHtml(game) {
+  if (game.installed) return '';
+  return `<button type="button" class="btn-game-download" data-appid="${escapeHtml(game.appid)}" data-platform="steam" title="下载游戏" aria-label="下载游戏">${DOWNLOAD_ICON_SVG}</button>`;
+}
+
+function centerActionButtonHtml(game) {
+  return game.installed ? launchButtonHtml(game) : downloadButtonHtml(game);
 }
 
 function gameCoverActionsHtml(game) {
-  const platform = gamePlatform(game);
-  return `<div class="game-cover-actions">${gameEditButtonHtml(game)}${storeButtonHtml(game)}${hiddenButtonHtml(game.appid, platform)}${favoriteButtonHtml(game.appid, platform)}</div>`;
+  const center = centerActionButtonHtml(game);
+  const title = escapeHtml(gameTitle(game));
+  return `<div class="game-cover-actions">
+    <div class="game-cover-actions-corner">
+      ${gameEditButtonHtml(game)}${hiddenButtonHtml(game.appid)}${favoriteButtonHtml(game.appid)}
+    </div>
+    <div class="game-cover-actions-store-tl">${storeButtonHtml(game)}</div>
+    <div class="game-cover-actions-primary">
+      <div class="game-cover-actions-icon">${center}</div>
+      <div class="game-cover-actions-title-wrap">
+        <span class="game-cover-actions-title">${title}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function blurGameCardFocus() {
+  const active = document.activeElement;
+  if (active instanceof HTMLElement && active.closest('.game-card')) {
+    active.blur();
+  }
+}
+
+function gameNameForAction(appid, platform) {
+  const game = findGameForCardAction(appid, platform);
+  if (game) return gameTitle(game);
+  const card = document.querySelector(
+    `.game-card[data-appid="${CSS.escape(String(appid))}"][data-platform="${platform}"]`,
+  );
+  const fromDom = card?.querySelector('.game-name')?.textContent?.trim();
+  return fromDom || `App ${appid}`;
+}
+
+let gameActionConfirmResolve = null;
+
+function finishGameActionConfirm(confirmed) {
+  const resolve = gameActionConfirmResolve;
+  if (!resolve) return;
+  gameActionConfirmResolve = null;
+  els.gameActionConfirmDialog?.close();
+  resolve(confirmed);
+}
+
+function showGameActionConfirm({ title, message, confirmText = '确定', confirmClass = 'btn-primary' }) {
+  return new Promise((resolve) => {
+    gameActionConfirmResolve = resolve;
+    els.gameActionConfirmTitle.textContent = title;
+    els.gameActionConfirmMessage.textContent = message;
+    els.btnConfirmGameAction.textContent = confirmText;
+    els.btnConfirmGameAction.className = `btn ${confirmClass}`;
+    els.gameActionConfirmDialog.showModal();
+    els.btnConfirmGameAction.focus();
+  });
+}
+
+function confirmLaunchGame(appid, platform = 'steam') {
+  const name = gameNameForAction(appid, platform);
+  return showGameActionConfirm({
+    title: '启动游戏',
+    message: `确定启动「${name}」？`,
+    confirmText: '启动',
+    confirmClass: 'btn-confirm-launch',
+  });
+}
+
+function confirmDownloadGame(appid, platform = 'steam') {
+  const name = gameNameForAction(appid, platform);
+  return showGameActionConfirm({
+    title: '安装游戏',
+    message: `确定安装「${name}」？将打开 Steam 客户端。`,
+    confirmText: '安装',
+    confirmClass: 'btn-confirm-download',
+  });
+}
+
+async function launchGame(appid, platform = 'steam') {
+  const res = await fetch(`/api/games/${platform}/${encodeURIComponent(appid)}/launch`, {
+    method: 'POST',
+    headers: buildHeaders(),
+  });
+  const data = await readApiJson(res);
+  if (!res.ok) throw new Error(data.error || '启动失败');
+  showToast('正在启动游戏');
+}
+
+async function downloadGame(appid, platform = 'steam') {
+  const res = await fetch(`/api/games/${platform}/${encodeURIComponent(appid)}/install`, {
+    method: 'POST',
+    headers: buildHeaders(),
+  });
+  const data = await readApiJson(res);
+  if (!res.ok) {
+    const storeUrl = String(data.storeUrl || '').trim();
+    if (storeUrl) {
+      window.open(storeUrl, '_blank', 'noopener');
+      throw new Error(`${data.error || '无法打开 Steam'}，已在浏览器打开商店页`);
+    }
+    throw new Error(data.error || '无法打开 Steam 下载页');
+  }
+  showToast('正在打开 Steam 下载…');
 }
 
 function gameEditButtonHtml(game) {
-  const platform = gamePlatform(game);
   const locked = game.lock_from_refresh ? ' is-locked' : '';
-  return `<button type="button" class="btn-game-edit${locked}" data-appid="${escapeHtml(game.appid)}" data-platform="${platform}" title="编辑资料" aria-label="编辑资料">✎</button>`;
+  return `<button type="button" class="btn-game-edit${locked}" data-appid="${escapeHtml(game.appid)}" data-platform="steam" title="编辑资料" aria-label="编辑资料">✎</button>`;
 }
 
 function listToInputValue(list) {
   return Array.isArray(list) ? list.filter(Boolean).join(', ') : '';
 }
 
-function setGameEditPreview(url) {
-  els.gameEditPreview.innerHTML = url
-    ? `<img src="${escapeHtml(url)}" alt="封面预览">`
-    : '<div class="empty-state">暂无封面</div>';
+function revokeGameEditPreviewObjectUrl() {
+  if (!gameEditPreviewObjectUrl) return;
+  URL.revokeObjectURL(gameEditPreviewObjectUrl);
+  gameEditPreviewObjectUrl = '';
+}
+
+function renderGameEditPreview(src) {
+  if (!src) {
+    els.gameEditPreview.innerHTML = '<div class="empty-state">暂无封面</div>';
+    return;
+  }
+  els.gameEditPreview.innerHTML = `<img src="${escapeHtml(src)}" alt="封面预览">`;
+  const img = els.gameEditPreview.querySelector('img');
+  if (!img) return;
+  img.addEventListener('error', () => {
+    els.gameEditPreview.innerHTML = '<div class="empty-state">封面无法加载</div>';
+  }, { once: true });
+}
+
+function setGameEditPreview(url, bustCache = false) {
+  revokeGameEditPreviewObjectUrl();
+  const src = url && bustCache
+    ? `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`
+    : url;
+  renderGameEditPreview(src);
+}
+
+function setGameEditPreviewFromFile(file) {
+  revokeGameEditPreviewObjectUrl();
+  if (!file) {
+    renderGameEditPreview('');
+    return;
+  }
+  gameEditPreviewObjectUrl = URL.createObjectURL(file);
+  renderGameEditPreview(gameEditPreviewObjectUrl);
+}
+
+function updateGameEditCoverPreview() {
+  const file = els.inputCoverFile.files?.[0];
+  if (file) {
+    setGameEditPreviewFromFile(file);
+    return;
+  }
+  const url = els.inputCoverUrl.value.trim();
+  if (url) {
+    setGameEditPreview(url);
+    return;
+  }
+  renderGameEditPreview('');
+}
+
+function applyMetaToGameEditForm(meta = {}, options = {}) {
+  const { onlyEmpty = false } = options;
+  const setValue = (input, value) => {
+    if (!input) return;
+    if (onlyEmpty && input.value.trim()) return;
+    input.value = value || '';
+  };
+  setValue(els.inputNameCn, meta.name_cn);
+  setValue(els.inputNameEn, meta.name_en);
+  setValue(els.inputGenres, listToInputValue(meta.genres));
+  setValue(els.inputTags, listToInputValue(meta.tags));
+  setValue(els.inputAliases, listToInputValue(meta.aliases));
+}
+
+async function refreshGameEditMeta() {
+  if (!gameEditTarget) return;
+  const { appid, platform } = gameEditTarget;
+  els.btnRefreshGameMeta.disabled = true;
+  els.btnRefreshGameMeta.textContent = '刷新中...';
+  try {
+    const res = await fetch(
+      `/api/games/${platform}/${encodeURIComponent(appid)}/refresh-meta`,
+      { method: 'POST', headers: { ...buildHeaders(), 'Content-Type': 'application/json' }, body: '{}' },
+    );
+    const data = await readApiJson(res);
+    if (!res.ok) throw new Error(data.error || '刷新失败');
+    if (data.meta) applyMetaToGameEditForm(data.meta);
+    if (data.cover_url) {
+      els.inputCoverUrl.value = data.cover_url.startsWith('http') ? data.cover_url : els.inputCoverUrl.value;
+      setGameEditPreview(data.cover_url);
+    }
+    showToast(platform === 'steam' ? '已从 Steam 拉取最新资料' : '已从平台拉取最新资料');
+  } catch (err) {
+    showToast(err.message, true);
+  } finally {
+    els.btnRefreshGameMeta.disabled = false;
+    els.btnRefreshGameMeta.textContent = '从平台刷新资料';
+  }
+}
+
+async function refetchGameEditCover() {
+  if (!gameEditTarget) return;
+  const { appid, platform } = gameEditTarget;
+  els.btnRefetchCover.disabled = true;
+  els.btnRefetchCover.textContent = '获取中...';
+  try {
+    const res = await fetch(
+      `/api/games/${platform}/${encodeURIComponent(appid)}/cover/refetch`,
+      {
+        method: 'POST',
+        headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ localize: !!els.inputCoverLocalize?.checked }),
+      },
+    );
+    const data = await readApiJson(res);
+    if (!res.ok) throw new Error(data.error || '获取封面失败');
+    const coverUrl = data.resolved_cover_url || data.cover_url || '';
+    if (coverUrl.startsWith('http')) els.inputCoverUrl.value = coverUrl;
+    else els.inputCoverUrl.value = '';
+    els.inputCoverFile.value = '';
+    setGameEditPreview(coverUrl, true);
+    applyGameEditToCard(appid, platform, { cover_url: coverUrl });
+    const pageIdx = currentPageGames.findIndex(
+      (item) => String(item.appid) === String(appid) && gamePlatform(item) === platform,
+    );
+    if (pageIdx >= 0) {
+      currentPageGames[pageIdx] = { ...currentPageGames[pageIdx], cover_url: coverUrl, cover_custom: true };
+    }
+    showToast(data.cover_local ? '已替换为平台封面并保存到本地' : '已替换为平台封面');
+  } catch (err) {
+    showToast(err.message, true);
+  } finally {
+    els.btnRefetchCover.disabled = false;
+    els.btnRefetchCover.textContent = '重新获取封面';
+  }
+}
+
+function resolveGameEditPreviewUrl(game) {
+  return gameCoverImage(game) || gameCoverFallback(game) || '';
 }
 
 async function openGameEditDialog(game) {
   const platform = gamePlatform(game);
+  const targetAppid = String(game.appid);
   gameEditTarget = {
     appid: game.appid,
     platform,
     source_name: game.source_name || game.name || '',
     source_name_cn: game.source_name_cn || game.name_cn || '',
   };
+
+  setGameEditPreview(resolveGameEditPreviewUrl(game), true);
 
   const isSteam = platform === 'steam';
   els.gameEditGenresWrap?.classList.toggle('hidden', !isSteam);
@@ -1114,13 +1940,13 @@ async function openGameEditDialog(game) {
   els.gameEditSourceInfo.textContent = `平台原名：${gameEditTarget.source_name_cn || gameEditTarget.source_name || '—'} · ${platform}`;
   els.inputDisplayName.value = game.display_name || '';
   els.inputNameCn.value = game.custom_name_cn || game.name_cn || '';
-  els.inputNameEn.value = game.custom_name_en || game.source_name || game.name || '';
+  els.inputNameEn.value = game.custom_name_en || gameSourceName(game) || game.name || '';
   els.inputGenres.value = listToInputValue(game.genres);
   els.inputTags.value = listToInputValue(game.tags);
   els.inputAliases.value = listToInputValue(game.aliases);
   els.inputCoverUrl.value = game.cover_url?.startsWith('http') ? game.cover_url : '';
   els.inputCoverFile.value = '';
-  els.inputCoverLookup.value = game.custom_name_cn || game.name_cn || game.name || '';
+  els.inputCoverLookup.value = resolveCoverLookupQuery(game);
   els.coverLookupResults.innerHTML = '';
   els.inputCoverLocalize.checked = true;
   els.inputLockFromRefresh.checked = !!game.lock_from_refresh;
@@ -1131,7 +1957,13 @@ async function openGameEditDialog(game) {
       { headers: buildHeaders() },
     );
     const data = await readApiJson(res);
-    if (res.ok && data.override) {
+    if (
+      gameEditTarget
+      && String(gameEditTarget.appid) === targetAppid
+      && gameEditTarget.platform === platform
+      && res.ok
+      && data.override
+    ) {
       const o = data.override;
       els.inputDisplayName.value = o.display_name || els.inputDisplayName.value;
       els.inputNameCn.value = o.name_cn || els.inputNameCn.value;
@@ -1143,21 +1975,21 @@ async function openGameEditDialog(game) {
       if (o.cover_url && o.cover_url.startsWith('http')) {
         els.inputCoverUrl.value = o.cover_url;
       }
-      if (o.resolved_cover_url) setGameEditPreview(o.resolved_cover_url);
+      if (o.resolved_cover_url) setGameEditPreview(o.resolved_cover_url, true);
+      else setGameEditPreview(resolveGameEditPreviewUrl(game), true);
     }
   } catch {
     /* ignore */
   }
 
-  if (!els.gameEditPreview.querySelector('img')) {
-    setGameEditPreview(gameCoverImage(game));
-  }
   els.gameEditDialog?.showModal();
 }
 
 function closeGameEditDialog() {
   els.gameEditDialog?.close();
   gameEditTarget = null;
+  revokeGameEditPreviewObjectUrl();
+  els.gameEditPreview.innerHTML = '<div class="empty-state">暂无封面</div>';
 }
 
 function renderCoverLookupResults(results) {
@@ -1199,15 +2031,20 @@ async function lookupCoverCandidates() {
   }
 }
 
+function withCacheBust(url) {
+  if (!url) return url;
+  return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+}
+
 function applyGameEditToCard(appid, platform, patch = {}) {
   const selector = `.game-card[data-appid="${CSS.escape(String(appid))}"][data-platform="${platform}"]`;
   const card = document.querySelector(selector);
-  if (!card) return;
+  if (!card) return false;
 
   if (patch.cover_url) {
-    const img = card.querySelector('.game-cover');
+    const img = card.querySelector('img.game-cover');
     if (img) {
-      img.src = patch.cover_url;
+      img.src = withCacheBust(patch.cover_url);
       img.classList.remove('is-hidden');
       img.dataset.fallbackTried = '';
       const wrap = img.closest('.game-cover-wrap');
@@ -1216,23 +2053,57 @@ function applyGameEditToCard(appid, platform, patch = {}) {
   }
 
   const titleEl = card.querySelector('.game-name');
-  if (titleEl && patch.title) titleEl.textContent = patch.title;
+  if (titleEl && patch.title !== undefined) titleEl.textContent = patch.title;
 
   const subtitleEl = card.querySelector('.game-subtitle');
-  if (patch.subtitle) {
-    if (subtitleEl) subtitleEl.textContent = patch.subtitle;
-    else if (titleEl) {
-      const sub = document.createElement('div');
-      sub.className = 'game-subtitle';
-      sub.textContent = patch.subtitle;
-      titleEl.insertAdjacentElement('afterend', sub);
+  if (patch.subtitle !== undefined) {
+    if (patch.subtitle) {
+      if (subtitleEl) subtitleEl.textContent = patch.subtitle;
+      else if (titleEl) {
+        const sub = document.createElement('div');
+        sub.className = 'game-subtitle';
+        sub.textContent = patch.subtitle;
+        titleEl.insertAdjacentElement('afterend', sub);
+      }
+    } else if (subtitleEl) {
+      subtitleEl.remove();
     }
-  } else if (subtitleEl && patch.subtitle === '') {
-    subtitleEl.remove();
+  }
+
+  const genreEl = card.querySelector('.game-genres');
+  if (patch.genres !== undefined) {
+    const genreText = gameCardGenreText({ genres: patch.genres });
+    if (genreEl) {
+      genreEl.textContent = genreText;
+      genreEl.classList.toggle('hidden', !genreText);
+    } else if (genreText && titleEl) {
+      const el = document.createElement('div');
+      el.className = 'game-genres';
+      el.textContent = genreText;
+      titleEl.insertAdjacentElement('afterend', el);
+    }
+  }
+
+  const tagEl = card.querySelector('.game-tags');
+  if (patch.tags !== undefined) {
+    const tagText = gameCardTagText({ tags: patch.tags });
+    if (tagEl) {
+      tagEl.textContent = tagText;
+      tagEl.classList.toggle('hidden', !tagText);
+    } else if (tagText) {
+      const anchor = card.querySelector('.game-genres') || titleEl;
+      if (anchor) {
+        const el = document.createElement('div');
+        el.className = 'game-tags';
+        el.textContent = tagText;
+        anchor.insertAdjacentElement('afterend', el);
+      }
+    }
   }
 
   const editBtn = card.querySelector('.btn-game-edit');
   if (editBtn) editBtn.classList.toggle('is-locked', !!patch.lock_from_refresh);
+  return true;
 }
 
 async function saveGameEditDialog() {
@@ -1243,6 +2114,7 @@ async function saveGameEditDialog() {
   els.btnSaveGameEdit.disabled = true;
   els.btnSaveGameEdit.textContent = '保存中...';
   try {
+    let uploadedCoverUrl = '';
     if (file) {
       const form = new FormData();
       form.append('cover', file);
@@ -1253,6 +2125,7 @@ async function saveGameEditDialog() {
       });
       const uploadData = await readApiJson(uploadRes);
       if (!uploadRes.ok) throw new Error(uploadData.error || '上传失败');
+      uploadedCoverUrl = uploadData.cover_url || '';
     }
 
     const body = {
@@ -1275,9 +2148,7 @@ async function saveGameEditDialog() {
     const data = await readApiJson(res);
     if (!res.ok) throw new Error(data.error || '保存失败');
 
-    const coverUrl = data.override?.resolved_cover_url
-      || data.override?.cover_url
-      || els.inputCoverUrl.value.trim();
+    const coverUrl = uploadedCoverUrl || data.override?.resolved_cover_url || '';
 
     const merged = {
       display_name: body.display_name,
@@ -1289,6 +2160,7 @@ async function saveGameEditDialog() {
       source_name_cn: gameEditTarget.source_name_cn,
       lock_from_refresh: body.lock_from_refresh,
       genres: body.genres.split(/[,，;；\n]+/).map((s) => s.trim()).filter(Boolean),
+      tags: body.tags.split(/[,，;；\n]+/).map((s) => s.trim()).filter(Boolean),
       aliases: body.aliases.split(/[,，;；\n]+/).map((s) => s.trim()).filter(Boolean),
       cover_url: coverUrl,
     };
@@ -1304,9 +2176,12 @@ async function saveGameEditDialog() {
       cover_url: coverUrl,
       title: gameTitle(merged),
       subtitle: gameSubtitle(merged),
+      genres: merged.genres,
+      tags: merged.tags,
       lock_from_refresh: merged.lock_from_refresh,
     });
     closeGameEditDialog();
+    await fetchLibraryPage(null, libraryPagination.page, { quiet: true });
     showToast(body.lock_from_refresh ? '已保存并锁定' : '游戏资料已更新');
   } catch (err) {
     showToast(err.message, true);
@@ -1353,10 +2228,9 @@ async function loadHidden() {
   }
 }
 
-function syncHiddenButton(appid, platform, hidden) {
-  const p = normalizePrefPlatform(platform);
-  const id = normalizePrefAppId(p, appid);
-  document.querySelectorAll(`.btn-hidden[data-appid="${CSS.escape(id)}"][data-platform="${p}"]`).forEach((btn) => {
+function syncHiddenButton(appid, hidden) {
+  const id = normalizePrefAppId(appid);
+  document.querySelectorAll(`.btn-hidden[data-appid="${CSS.escape(id)}"][data-platform="steam"]`).forEach((btn) => {
     btn.classList.toggle('is-hidden', hidden);
     btn.textContent = hidden ? '🙈' : '👁';
     btn.title = hidden ? '取消隐藏' : '隐藏';
@@ -1364,7 +2238,7 @@ function syncHiddenButton(appid, platform, hidden) {
   });
 }
 
-async function toggleHidden(appid, platform = currentPlatform) {
+async function toggleHidden(appid) {
   if (!activeUserId) {
     showToast('请先添加用户', true);
     return;
@@ -1372,20 +2246,19 @@ async function toggleHidden(appid, platform = currentPlatform) {
   const res = await fetch('/api/hidden/toggle', {
     method: 'POST',
     headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ appid, platform: normalizePrefPlatform(platform) }),
+    body: JSON.stringify({ appid, platform: 'steam' }),
   });
   const data = await readApiJson(res);
   if (!res.ok) throw new Error(data.error || '操作失败');
 
   applyPlatformPrefSets(hiddenByPlatform, data.platforms);
-  syncHiddenButton(appid, platform, data.hidden);
+  syncHiddenButton(appid, data.hidden);
   await fetchLibraryPage(false, libraryPagination.page, { quiet: true });
 }
 
-function syncFavoriteButton(appid, platform, favorited) {
-  const p = normalizePrefPlatform(platform);
-  const id = normalizePrefAppId(p, appid);
-  document.querySelectorAll(`.btn-favorite[data-appid="${CSS.escape(id)}"][data-platform="${p}"]`).forEach((btn) => {
+function syncFavoriteButton(appid, favorited) {
+  const id = normalizePrefAppId(appid);
+  document.querySelectorAll(`.btn-favorite[data-appid="${CSS.escape(id)}"][data-platform="steam"]`).forEach((btn) => {
     btn.classList.toggle('is-favorite', favorited);
     btn.textContent = favorited ? '★' : '☆';
     btn.title = favorited ? '取消收藏' : '收藏';
@@ -1393,7 +2266,7 @@ function syncFavoriteButton(appid, platform, favorited) {
   });
 }
 
-async function toggleFavorite(appid, platform = currentPlatform) {
+async function toggleFavorite(appid) {
   if (!activeUserId) {
     showToast('请先添加用户', true);
     return;
@@ -1401,13 +2274,13 @@ async function toggleFavorite(appid, platform = currentPlatform) {
   const res = await fetch('/api/favorites/toggle', {
     method: 'POST',
     headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ appid, platform: normalizePrefPlatform(platform) }),
+    body: JSON.stringify({ appid, platform: 'steam' }),
   });
   const data = await readApiJson(res);
   if (!res.ok) throw new Error(data.error || '操作失败');
 
   applyPlatformPrefSets(favoriteByPlatform, data.platforms);
-  syncFavoriteButton(appid, platform, data.favorited);
+  syncFavoriteButton(appid, data.favorited);
   if (els.filterFavoritesOnly.checked) {
     await fetchLibraryPage(false, libraryPagination.page, { quiet: true });
   }
@@ -1424,39 +2297,97 @@ function userCardLabel(user) {
   return user.name || '未命名';
 }
 
-function userAvatarMarkup(user) {
-  const avatar = (user.avatar || '').trim();
-  if (avatar) {
-    return `<img class="user-card-avatar" src="${avatar}" alt="">`;
+function userMenuItemAvatarMarkup(user, isAdd = false) {
+  if (isAdd) {
+    return '<span class="user-menu-item-avatar" aria-hidden="true">+</span>';
   }
-  return '<div class="user-card-avatar user-card-avatar-default" aria-hidden="true"></div>';
+  const avatar = (user?.avatar || '').trim();
+  if (avatar) {
+    return `<img class="user-menu-item-avatar" src="${escapeHtml(avatar)}" alt="">`;
+  }
+  return '<span class="user-menu-item-avatar user-menu-avatar-default" aria-hidden="true"></span>';
 }
 
-function renderUserCards() {
-  if (!users.length) {
-    els.userCards.innerHTML = '<div class="user-cards-empty">暂无用户，请添加</div>';
+function setUserMenuTriggerAvatar(el, user, isAddOnly) {
+  if (!el) return;
+  el.replaceChildren();
+  if (isAddOnly) {
+    el.className = 'user-menu-avatar user-menu-avatar-add';
+    el.textContent = '+';
     return;
   }
+  const avatar = (user?.avatar || '').trim();
+  if (avatar) {
+    el.className = 'user-menu-avatar';
+    const img = document.createElement('img');
+    img.src = avatar;
+    img.alt = '';
+    img.draggable = false;
+    el.appendChild(img);
+    return;
+  }
+  el.className = 'user-menu-avatar user-menu-avatar-default';
+}
 
-  els.userCards.innerHTML = users
-    .map((u) => {
-      const active = u.id === activeUserId ? ' active' : '';
-      return `
-        <div class="user-card-wrap">
-          <button type="button" class="user-card${active}" data-user-id="${u.id}">
-            ${userAvatarMarkup(u)}
-            <span class="user-card-name">${userCardLabel(u)}</span>
-          </button>
-          <button type="button" class="user-card-delete" data-user-id="${u.id}" title="删除用户" aria-label="删除用户">×</button>
-          <button type="button" class="user-card-edit" data-user-id="${u.id}" title="编辑用户" aria-label="编辑用户">✎</button>
-        </div>`;
-    })
-    .join('');
+function renderUserMenu() {
+  if (!els.userMenuList) return;
+  const addItem = `
+    <button type="button" class="user-menu-item user-menu-item-add" data-action="add-user" role="menuitem">
+      ${userMenuItemAvatarMarkup(null, true)}
+      <span class="user-menu-item-name">添加用户</span>
+    </button>`;
+  const userItems = users.map((u) => {
+    const active = u.id === activeUserId ? ' active' : '';
+    return `
+      <div class="user-menu-item${active}" role="menuitem" data-user-id="${u.id}">
+        <span class="user-menu-item-avatar-wrap">${userMenuItemAvatarMarkup(u)}</span>
+        <span class="user-menu-item-body">
+          <span class="user-menu-item-name">${escapeHtml(userCardLabel(u))}</span>
+        </span>
+        <span class="user-menu-item-actions">
+          <button type="button" class="user-menu-mini-btn" data-action="edit-user" data-user-id="${u.id}" title="编辑用户" aria-label="编辑用户">✎</button>
+          <button type="button" class="user-menu-mini-btn danger" data-action="delete-user" data-user-id="${u.id}" title="删除用户" aria-label="删除用户">×</button>
+        </span>
+      </div>`;
+  }).join('');
+  els.userMenuList.innerHTML = addItem + userItems;
+}
+
+function closeUserMenuDropdown() {
+  els.userMenuDropdown?.classList.add('hidden');
+  els.btnUserMenu?.setAttribute('aria-expanded', 'false');
+}
+
+function toggleUserMenuDropdown() {
+  if (!users.length) return;
+  const isOpen = !els.userMenuDropdown?.classList.contains('hidden');
+  if (isOpen) closeUserMenuDropdown();
+  else {
+    renderUserMenu();
+    els.userMenuDropdown?.classList.remove('hidden');
+    els.btnUserMenu?.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function updateUserMenuTrigger() {
+  const isAddOnly = !users.length;
+  const active = getActiveUser();
+  els.btnUserMenu?.classList.toggle('is-add-only', isAddOnly);
+  setUserMenuTriggerAvatar(els.userMenuAvatar, isAddOnly ? null : (active || users[0]), isAddOnly);
+  if (els.userMenuName) {
+    if (isAddOnly) {
+      els.userMenuName.textContent = '';
+      els.userMenuName.classList.add('hidden');
+    } else {
+      els.userMenuName.textContent = userCardLabel(active || users[0]);
+      els.userMenuName.classList.remove('hidden');
+    }
+  }
 }
 
 function refreshUserUi() {
-  renderUserCards();
-  els.btnTokenModal.disabled = !getActiveUser();
+  renderUserMenu();
+  updateUserMenuTrigger();
   updateModeUi();
 }
 
@@ -1579,27 +2510,258 @@ async function deleteUser(userId) {
     await fetchSteamGames(false, { quiet: false });
     showToast('用户已删除');
   } else {
-    resetGamesView();
-    els.cacheInfo.textContent = '暂无用户，请添加';
+    resetGamesView('暂无用户，请添加');
     await refreshAuthStatus();
     showToast('用户已删除');
   }
 }
 
-function hideLoadProgress() {
-  els.loadProgress.classList.add('hidden');
+function buildRefreshStages(parts) {
+  const stages = [];
+  if (parts.library) {
+    stages.push({ id: 'library', label: '拉取 Steam 游戏库' });
+  }
+  if (parts.meta || parts.metaAll) {
+    stages.push({
+      id: 'meta',
+      label: parts.metaAll ? '全部更新分类 / 标签' : '获取分类标签',
+    });
+  }
+  if (parts.covers || parts.coversAll) {
+    stages.push({
+      id: 'covers',
+      label: parts.coversAll ? '全部刷新封面' : '补全封面',
+    });
+  }
+  if (parts.localizeCovers) stages.push({ id: 'localize', label: '本地化封面' });
+  return stages;
+}
+
+function stageIndexOf(stages, id) {
+  const idx = stages.findIndex((item) => item.id === id);
+  return idx >= 0 ? idx : 0;
+}
+
+function formatProgressCountText(current, total, progressKind = 'count') {
+  if (total <= 0) return '';
+  if (progressKind === 'step') return ` · ${current}/${total}`;
+  return ` · ${current}/${total}`;
+}
+
+function updateTopProgress(options = {}) {
+  const {
+    label = '处理中',
+    current = 0,
+    total = 0,
+    failed = null,
+    indeterminate = false,
+    stageIndex = 0,
+    stageTotal = 1,
+    progressKind = 'count',
+  } = options;
+  const track = els.loadProgress?.querySelector('.load-progress-track');
+
+  els.loadProgress?.classList.remove('hidden');
+  els.loadProgressFill?.classList.toggle('is-indeterminate', indeterminate);
+  track?.classList.toggle('is-indeterminate', indeterminate);
+
+  const stageHint = stageTotal > 1 ? `（${stageIndex + 1}/${stageTotal}）` : '';
+  const showCoverStats = failed !== null && failed !== undefined;
+
+  if (indeterminate) {
+    els.loadProgressFill.style.width = '';
+    const statsText = showCoverStats
+      ? ` · ${current}/${total} · 失败 ${failed}`
+      : formatProgressCountText(current, total, progressKind);
+    els.loadProgressText.textContent = `${label}${stageHint}${statsText}`;
+    return;
+  }
+
+  let pct = 0;
+  if (stageTotal > 0) {
+    const slice = 100 / stageTotal;
+    const inner = total > 0 ? (current / total) * slice : slice * 0.5;
+    pct = stageIndex * slice + inner;
+  } else if (total > 0) {
+    pct = (current / total) * 100;
+  }
+  els.loadProgressFill.style.width = `${Math.min(100, Math.round(pct))}%`;
+
+  if (showCoverStats) {
+    els.loadProgressText.textContent = `${label}${stageHint} · ${current}/${total} · 失败 ${failed}`;
+    return;
+  }
+
+  const countText = formatProgressCountText(current, total, progressKind);
+  els.loadProgressText.textContent = `${label}${stageHint}${countText}`;
+}
+
+function summarizeLocalizedCovers(localizedCovers, cumulative = {}) {
+  const total = Number(cumulative.total ?? localizedCovers?.pending ?? 0) || 0;
+  const done = Number(cumulative.done ?? localizedCovers?.done ?? 0) || 0;
+  const failed = Number(cumulative.failed ?? localizedCovers?.failed ?? 0) || 0;
+  const processed = done + failed;
+  return { total, failed, processed };
+}
+
+function updateLocalizeCoverProgress(localizedCovers, refreshStages, cumulative = {}) {
+  const stats = summarizeLocalizedCovers(localizedCovers, cumulative);
+  const locIdx = stageIndexOf(refreshStages, 'localize');
+  updateTopProgress({
+    label: '本地化封面',
+    current: stats.processed,
+    total: stats.total,
+    failed: stats.failed,
+    stageIndex: refreshStages.length ? locIdx : 0,
+    stageTotal: refreshStages.length || 1,
+    indeterminate: stats.total === 0 && stats.processed === 0,
+  });
+}
+
+function formatLocalizeCoverToast(stats) {
+  return `封面本地化 · 已处理 ${stats.processed} · 全部 ${stats.total} · 失败 ${stats.failed}`;
+}
+
+function hideLoadProgressInternal() {
+  const track = els.loadProgress?.querySelector('.load-progress-track');
+  els.loadProgress?.classList.add('hidden');
+  els.loadProgressFill?.classList.remove('is-indeterminate');
+  track?.classList.remove('is-indeterminate');
   els.loadProgressFill.style.width = '0%';
   els.loadProgressText.textContent = '';
 }
 
-function showLoadProgress(current, total, label = '正在补全中文信息') {
-  els.loadProgress.classList.remove('hidden');
-  const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
-  els.loadProgressFill.style.width = `${pct}%`;
-  els.loadProgressText.textContent = total > 0 ? `${label} ${current}/${total}` : label;
+function hideLoadProgress() {
+  if (progressHoldCount > 0) return;
+  hideLoadProgressInternal();
 }
 
-function applyGameCardPatches(updates, platform = currentPlatform) {
+function showLoadProgress(current, total, label = '正在补全中文信息', progressOptions = {}) {
+  updateTopProgress({
+    label,
+    current,
+    total,
+    stageIndex: progressOptions.stageIndex ?? 0,
+    stageTotal: progressOptions.stageTotal ?? 1,
+  });
+}
+
+let activeLocalizeRefreshOpts = { retryFailed: false, overwriteLocal: false };
+
+function getCoverLocalizeApiUrl(opts = activeLocalizeRefreshOpts) {
+  const params = new URLSearchParams();
+  params.set('platform', 'steam');
+  const user = getActiveUser();
+  const steamId = (user?.steamId || '').trim();
+  if (steamId) params.set('steamId', steamId);
+  params.set('includeFamily', 'true');
+  if (opts.retryFailed) params.set('localizeRetryFailed', 'true');
+  if (opts.overwriteLocal) params.set('localizeIncludeLocal', 'true');
+  return `/api/covers/localize?${params.toString()}`;
+}
+
+async function fetchCoverLocalizeBatch() {
+  const headers = buildHeaders();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120000);
+  try {
+    const res = await fetch(getCoverLocalizeApiUrl(), {
+      method: 'POST',
+      headers,
+      signal: controller.signal,
+    });
+    const data = await readApiJson(res);
+    if (!res.ok) throw new Error(data.error || '封面本地化失败');
+    return data;
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error('封面本地化超时，请稍后重试');
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function reloadLibraryPageAfterLocalize(page, headers) {
+  const res = await fetch(getLibraryApiUrl({
+    library: false,
+    meta: false,
+    covers: false,
+    localizeCovers: false,
+  }, page), headers ? { headers } : undefined);
+  const data = await readApiJson(res);
+  if (!res.ok) throw new Error(data.error || '刷新游戏列表失败');
+  applyLibraryResponse(data);
+  return data;
+}
+
+async function runCoverLocalizationBatches(page, refreshStages, firstData, options = {}) {
+  let data = firstData;
+  if (!data?.localizedCovers) return data;
+
+  const totalPending = data.localizedCovers.pending || 0;
+  let cumulativeDone = data.localizedCovers.done || 0;
+  let cumulativeFailed = data.localizedCovers.failed || 0;
+  const headers = buildHeaders();
+  const maxIterations = Math.max(1, Math.ceil(totalPending / 80) + 3);
+  let iterations = 0;
+  let lastRemaining = Infinity;
+
+  while (data.localizedCovers.remaining > 0 && iterations < maxIterations) {
+    iterations += 1;
+    if (!options.suppressProgress) {
+      updateLocalizeCoverProgress(data.localizedCovers, refreshStages, {
+        total: totalPending,
+        done: cumulativeDone,
+        failed: cumulativeFailed,
+      });
+    }
+
+    const batchData = await fetchCoverLocalizeBatch();
+    if (!batchData?.localizedCovers) break;
+    data = { ...data, localizedCovers: batchData.localizedCovers };
+
+    const batchDone = batchData.localizedCovers.done || 0;
+    const batchFailed = batchData.localizedCovers.failed || 0;
+    if (batchDone === 0 && batchFailed === 0) break;
+
+    cumulativeDone += batchDone;
+    cumulativeFailed += batchFailed;
+
+    if (batchData.localizedCovers.remaining >= lastRemaining) break;
+    lastRemaining = batchData.localizedCovers.remaining;
+  }
+
+  if (data?.localizedCovers) {
+    data.localizedCovers = {
+      ...data.localizedCovers,
+      pending: totalPending,
+      done: cumulativeDone,
+      failed: cumulativeFailed,
+      remaining: data.localizedCovers.remaining || 0,
+    };
+  }
+
+  try {
+    const reloaded = await reloadLibraryPageAfterLocalize(page, headers);
+    if (reloaded) {
+      data = { ...reloaded, localizedCovers: data.localizedCovers };
+    }
+  } catch (err) {
+    debugLog('本地化后刷新列表失败', { message: err.message });
+  }
+
+  if (!options.suppressProgress && data?.localizedCovers) {
+    updateLocalizeCoverProgress(data.localizedCovers, refreshStages, {
+      total: totalPending,
+      done: cumulativeDone,
+      failed: cumulativeFailed,
+    });
+  }
+
+  return data;
+}
+
+function applyGameCardPatches(updates, platform = 'steam') {
   if (!updates?.length) return;
   for (const item of updates) {
     const appid = String(item.appid || '');
@@ -1611,7 +2773,6 @@ function applyGameCardPatches(updates, platform = currentPlatform) {
 
     if (item.cover_url) {
       const wrap = card.querySelector('.game-cover-wrap');
-      const actions = wrap?.querySelector('.game-cover-actions');
       let img = wrap?.querySelector('img.game-cover');
       if (img) {
         img.classList.remove('is-hidden');
@@ -1623,7 +2784,7 @@ function applyGameCardPatches(updates, platform = currentPlatform) {
         img.src = item.cover_url;
         img.alt = item.name_cn || item.name || '';
         img.loading = 'lazy';
-        wrap.insertBefore(img, actions || null);
+        wrap.insertBefore(img, wrap.firstChild);
       }
       wrap?.querySelector('.game-cover-placeholder:not(.is-fallback)')?.remove();
       if (img && !wrap?.querySelector('.game-cover-placeholder.is-fallback')) {
@@ -1643,55 +2804,170 @@ function applyGameCardPatches(updates, platform = currentPlatform) {
     if (title) {
       const nameEl = card.querySelector('.game-name');
       if (nameEl) nameEl.textContent = title;
+      const idx = currentPageGames.findIndex(
+        (game) => String(game.appid) === appid && gamePlatform(game) === (item.platform || platform),
+      );
+      if (idx >= 0) {
+        currentPageGames[idx] = {
+          ...currentPageGames[idx],
+          name: item.name || currentPageGames[idx].name,
+          name_cn: item.name_cn || currentPageGames[idx].name_cn,
+          store_url: item.store_url || currentPageGames[idx].store_url,
+        };
+      }
+      if (item.store_url) {
+        card.dataset.sourceName = item.name || item.name_cn || card.dataset.sourceName || '';
+      }
     }
+
+    if (item.genres?.length) {
+      const genreText = gameCardGenreText(item);
+      let genreEl = card.querySelector('.game-genres');
+      if (genreText) {
+        if (!genreEl) {
+          genreEl = document.createElement('div');
+          genreEl.className = 'game-genres';
+          card.querySelector('.game-name')?.insertAdjacentElement('afterend', genreEl);
+        }
+        genreEl.textContent = genreText;
+        genreEl.classList.remove('hidden');
+      } else if (genreEl) {
+        genreEl.remove();
+      }
+    }
+
+    if (item.tags?.length) {
+      const tagText = gameCardTagText(item);
+      let tagEl = card.querySelector('.game-tags');
+      if (tagText) {
+        if (!tagEl) {
+          tagEl = document.createElement('div');
+          tagEl.className = 'game-tags';
+          const anchor = card.querySelector('.game-genres') || card.querySelector('.game-name');
+          anchor?.insertAdjacentElement('afterend', tagEl);
+        }
+        tagEl.textContent = tagText;
+        tagEl.classList.remove('hidden');
+      } else if (tagEl) {
+        tagEl.remove();
+      }
+    }
+
+    if (item.cover_url) {
+      const idx = currentPageGames.findIndex(
+        (game) => String(game.appid) === appid && gamePlatform(game) === (item.platform || platform),
+      );
+      if (idx >= 0) {
+        currentPageGames[idx] = {
+          ...currentPageGames[idx],
+          cover_url: item.cover_url,
+          img_icon_url: item.cover_url,
+        };
+      }
+    }
+
+    setGameCardUpdating(appid, item.platform || platform, false);
   }
 }
 
 function applyMetaUpdates(updates) {
   if (!updates?.length) return;
-  fetchLibraryPage(false, libraryPagination.page, { quiet: true }).catch(() => {});
-}
-
-function resetEpicCoverState() {
-  epicCoverRequested.clear();
-}
-
-async function loadEpicPageCovers(games) {
-  if (currentPlatform !== 'epic' || !games?.length) return;
-
-  const pending = games.filter((game) => {
-    const id = String(game.appid || '');
-    if (!id || game.cover_url) return false;
-    return !epicCoverRequested.has(id);
-  });
-  if (!pending.length) return;
-
-  for (const game of pending) {
-    epicCoverRequested.add(String(game.appid));
+  for (const item of updates) {
+    const appid = String(item.appid || '');
+    if (!appid) continue;
+    const idx = currentPageGames.findIndex(
+      (game) => String(game.appid) === appid && gamePlatform(game) === 'steam',
+    );
+    if (idx >= 0) {
+      currentPageGames[idx] = {
+        ...currentPageGames[idx],
+        name_cn: item.name_cn || currentPageGames[idx].name_cn,
+        genres: item.genres?.length ? item.genres : currentPageGames[idx].genres,
+        tags: item.tags?.length ? item.tags : currentPageGames[idx].tags,
+        aliases: item.aliases?.length ? item.aliases : currentPageGames[idx].aliases,
+        input_methods: item.input_methods?.length ? item.input_methods : currentPageGames[idx].input_methods,
+      };
+    }
+    applyGameEditToCard(appid, 'steam', {
+      genres: item.genres || [],
+      tags: item.tags || [],
+    });
   }
+  scheduleFilterOptionsReload();
+}
+
+let filterOptionsReloadTimer = null;
+function scheduleFilterOptionsReload() {
+  clearTimeout(filterOptionsReloadTimer);
+  filterOptionsReloadTimer = setTimeout(() => {
+    fetchLibraryPage(false, libraryPagination.page, { quiet: true, suppressProgress: true, nested: true }).catch(() => {});
+  }, 2000);
+}
+
+async function refetchCoversStream(options = {}) {
+  const forceAll = !!options.forceAll;
+  abortEnrichStream();
+  enrichAbortController = new AbortController();
+  const { signal } = enrichAbortController;
+  const platform = 'steam';
+  const progressOptions = {
+    stageIndex: options.stageIndex ?? 0,
+    stageTotal: options.stageTotal ?? 1,
+  };
+  const progressLabel = forceAll ? '全部刷新封面' : '补全封面';
+
+  const user = getActiveUser();
+  const steamId = (user?.steamId || '').trim();
+  const params = new URLSearchParams();
+  if (steamId) params.set('steamId', steamId);
+  params.set('includeFamily', 'true');
+  if (forceAll) params.set('forceAll', '1');
+  if (options.includeLocal) params.set('includeLocal', 'true');
+  const url = `/api/games/covers/refetch-stream?${params.toString()}`;
+
+  markCurrentPageCoverUpdates(platform, forceAll ? () => true : (game) => !game.cover_url);
 
   try {
-    const res = await fetch('/api/epic/games/covers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ appids: pending.map((game) => game.appid) }),
-    });
-    const data = await readApiJson(res);
-    if (!res.ok) throw new Error(data.error || '封面加载失败');
-    if (data.updates?.length) applyGameCardPatches(data.updates, 'epic');
-    const updatedIds = new Set(
-      (data.updates || []).filter((item) => item.cover_url).map((item) => String(item.appid)),
-    );
-    for (const game of pending) {
-      if (!updatedIds.has(String(game.appid))) {
-        epicCoverRequested.delete(String(game.appid));
+    const res = await fetch(url, { headers: buildHeaders(), signal });
+    if (!res.ok) {
+      const data = await readApiJson(res);
+      throw new Error(data.error || '封面刷新失败');
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const chunks = buffer.split('\n\n');
+      buffer = chunks.pop() || '';
+
+      for (const chunk of chunks) {
+        const line = chunk.split('\n').find((row) => row.startsWith('data: '));
+        if (!line) continue;
+        const payload = JSON.parse(line.slice(6));
+        if (payload.error) throw new Error(payload.error);
+        if (payload.updates?.length) applyGameCardPatches(payload.updates, platform);
+        if (payload.total > 0) {
+          showLoadProgress(
+            payload.current || 0,
+            payload.total,
+            progressLabel,
+            { ...progressOptions, failed: payload.failed ?? null },
+          );
+        }
       }
     }
+    await fetchLibraryPage(null, libraryPagination.page, { quiet: true, suppressProgress: true, nested: true, preserveProgress: true });
   } catch (err) {
-    for (const game of pending) {
-      epicCoverRequested.delete(String(game.appid));
-    }
-    debugLog('Epic 页封面加载失败', { message: err.message });
+    if (err.name !== 'AbortError') debugLog('刷新封面失败', { message: err.message });
+  } finally {
+    clearPlatformUpdatingCards(platform);
+    if (enrichAbortController?.signal === signal) enrichAbortController = null;
+    if (!options.keepProgress) releaseTopProgress();
   }
 }
 
@@ -1700,16 +2976,27 @@ function abortEnrichStream() {
     enrichAbortController.abort();
     enrichAbortController = null;
   }
-  hideLoadProgress();
 }
 
-async function enrichGamesMeta(steamId) {
+async function enrichGamesMeta(steamId, options = {}) {
   abortEnrichStream();
   enrichAbortController = new AbortController();
   const { signal } = enrichAbortController;
+  const silent = !!options.silent;
+  const progressOptions = {
+    stageIndex: options.stageIndex ?? 0,
+    stageTotal: options.stageTotal ?? 1,
+  };
 
-  const url = `/api/games/enrich-stream?steamId=${encodeURIComponent(steamId)}&includeFamily=true`;
-  debugLog('开始补全游戏中文信息', { steamId });
+  const forceAll = !!options.forceAll;
+  const progressLabel = forceAll ? '全部更新分类 / 标签' : '获取分类标签';
+  const url = `/api/games/enrich-stream?steamId=${encodeURIComponent(steamId)}&includeFamily=true${forceAll ? '&forceAll=true' : ''}`;
+  debugLog('开始获取游戏分类标签', { steamId, forceAll });
+
+  metaEnriching = true;
+  updateMetaContinueUi();
+  let streamCompleted = false;
+  let interrupted = false;
 
   try {
     const res = await fetch(url, { headers: buildHeaders(), signal });
@@ -1735,22 +3022,44 @@ async function enrichGamesMeta(steamId) {
         const payload = JSON.parse(line.slice(6));
         if (payload.error) throw new Error(payload.error);
         if (payload.updates?.length) applyMetaUpdates(payload.updates);
-        if (payload.total > 0) {
-          showLoadProgress(payload.current || 0, payload.total, '正在补全中文信息');
+        if (!silent && payload.total > 0) {
+          showLoadProgress(payload.current || 0, payload.total, progressLabel, progressOptions);
+        }
+        if (payload.total > 0 && payload.current !== undefined) {
+          libraryMeta.metaPending = Math.max(0, payload.total - payload.current);
+          updateMetaContinueUi();
         }
         if (payload.complete) {
-          debugLog('游戏中文信息补全完成', { total: payload.total });
+          streamCompleted = true;
+          debugLog('游戏分类标签获取完成', { total: payload.total, forceAll });
         }
       }
     }
+    if (!streamCompleted && !signal.aborted) interrupted = true;
   } catch (err) {
-    if (err.name === 'AbortError') return;
-    debugLog('补全中文信息失败', { message: err.message });
+    if (err.name === 'AbortError') {
+      interrupted = true;
+    } else {
+      debugLog('补全中文信息失败', { message: err.message });
+    }
   } finally {
+    metaEnriching = false;
     if (enrichAbortController?.signal === signal) {
       enrichAbortController = null;
     }
-    hideLoadProgress();
+    if (!options.keepProgress) releaseTopProgress();
+    await refreshMetaPendingCount();
+    if (interrupted && libraryMeta.metaPending > 0 && !silent && !gamesLoading) {
+      showToast(`标签补全已暂停，还有 ${libraryMeta.metaPending} 款未完成，可点「继续补全」`);
+    } else if (streamCompleted && !silent && !options.keepProgress && libraryMeta.metaPending === 0) {
+      showToast('分类标签补全完成');
+    } else if (streamCompleted && !silent && !options.keepProgress && libraryMeta.metaPending > 0) {
+      showToast(`本轮已处理，还有 ${libraryMeta.metaPending} 款未能获取，可点「继续补全」`);
+    }
+    if (streamCompleted && options.reloadAfter) {
+      fetchLibraryPage(false, libraryPagination.page, { quiet: true, preserveProgress: true, nested: true })
+        .catch((err) => debugLog('补全后刷新列表失败', { message: err.message }));
+    }
   }
 }
 
@@ -1931,7 +3240,7 @@ async function saveTokenFromDialog() {
     await loadSteamUserPrefs();
     showToast(profileName ? `${isAdd ? '用户已添加' : 'Token 已更新'}：${profileName}` : (isAdd ? '用户已添加' : 'Token 已更新'));
 
-    els.gameGrid.innerHTML = '<div class="empty-state">正在加载游戏库...</div>';
+    showGameGridLoading('正在加载游戏库...');
     els.statsBar.textContent = '正在加载游戏库...';
     await fetchSteamGames(false, { quiet: false, autoFetchIfNoCache: true });
   } finally {
@@ -1957,13 +3266,13 @@ async function switchUser(userId, options = {}) {
     refreshUserUi();
     libraryLoaded = false;
     setControlsEnabled(false);
-    els.gameGrid.innerHTML = '<div class="empty-state">正在加载...</div>';
+    showGameGridLoading('正在加载...');
     els.statsBar.textContent = '正在加载游戏库...';
     await refreshAuthStatus();
     await loadSteamUserPrefs();
   }
 
-  if (loadGames && currentPlatform === 'steam') {
+  if (loadGames) {
     await fetchSteamGames(refresh, { quiet });
   }
 }
@@ -1972,23 +3281,32 @@ async function refreshAuthStatus() {
   try {
     const res = await fetch('/api/auth/status', { headers: buildHeaders() });
     const status = await readApiJson(res);
-    els.authStatus.className = 'auth-status';
+    let title = 'Token 未配置';
+    let isOk = false;
 
     if (status.valid) {
-      els.authStatus.classList.add('ok');
-      els.authStatus.textContent = 'Token 有效';
-      return true;
+      title = 'Token 有效';
+      isOk = true;
+    } else if (status.hasToken) {
+      title = 'Token 已过期';
     }
 
-    els.authStatus.classList.add('warn');
-    if (status.hasToken) {
-      els.authStatus.textContent = 'Token 已过期';
-    } else {
-      els.authStatus.textContent = 'Token 未配置';
+    if (els.tokenStatusDot) {
+      els.tokenStatusDot.classList.toggle('ok', isOk);
+      els.tokenStatusDot.classList.toggle('warn', !isOk);
     }
-    return false;
+    if (els.btnTokenStatus) {
+      els.btnTokenStatus.title = title;
+    }
+    return isOk;
   } catch {
-    els.authStatus.textContent = 'Token 状态未知';
+    if (els.tokenStatusDot) {
+      els.tokenStatusDot.classList.remove('ok');
+      els.tokenStatusDot.classList.add('warn');
+    }
+    if (els.btnTokenStatus) {
+      els.btnTokenStatus.title = 'Token 状态未知';
+    }
     return false;
   }
 }
@@ -2001,26 +3319,9 @@ async function ensureTokenReady() {
 }
 
 function renderRandomGame(game) {
-  const subtitle = gameSubtitle(game);
-  const platform = gamePlatform(game);
-  const storeLabel = platform === 'epic' ? 'Epic 商店' : platform === 'ubisoft' ? 'Ubisoft 商店' : 'Steam 商店';
-  const cover = gameCoverImage(game) || (platform === 'steam' ? coverUrl(game.appid) : '');
-  const fallback = gameCoverFallback(game);
-  const coverMarkup = cover
-    ? `<img class="random-cover" src="${escapeHtml(cover)}" alt="${escapeHtml(gameTitle(game))}"${fallback ? ` data-fallback="${escapeHtml(fallback)}"` : ''}>${gameCoverPlaceholderHtml(game, { fallback: true })}`
-    : `<div class="random-cover-wrap">${gameCoverPlaceholderHtml(game)}</div>`;
-  els.randomBody.innerHTML = `
-    <div class="random-cover-wrap">${coverMarkup}</div>
-    <h2 class="random-title">${gameTitle(game)}</h2>
-    ${subtitle ? `<div class="random-subtitle">${subtitle}</div>` : ''}
-    ${platform === 'steam' ? `<div class="random-meta">累计游玩：${formatHours(game.playtime_forever)}</div>` : ''}
-    <div class="random-actions">
-      ${hiddenButtonHtml(game.appid, platform, 'btn-hidden-lg')}${favoriteButtonHtml(game.appid, platform, 'btn-favorite-lg')}
-      <a class="btn btn-primary" href="${gameStoreUrl(game)}" target="_blank" rel="noopener">
-        在 ${storeLabel} 查看
-      </a>
-    </div>
-  `;
+  currentRandomGame = game;
+  els.randomBody.innerHTML = gameCardHtml(game, { random: true });
+  finalizeCoverImage(els.randomBody.querySelector('img.game-cover'));
   els.randomDialog.showModal();
 }
 
@@ -2030,9 +3331,13 @@ async function openHiddenImportDialog() {
     return;
   }
   els.hiddenImportHint.textContent = '正在检测本机 Steam 路径...';
-  els.inputSteamPath.value = els.inputSteamPath.dataset.savedPath || '';
+  els.inputSteamPath.value = els.inputSteamPath.dataset.savedPath || appSettings.steamPath || '';
   els.hiddenImportDialog.showModal();
   try {
+    await loadAppSettings().catch(() => appSettings);
+    if (!els.inputSteamPath.value && appSettings.steamPath) {
+      els.inputSteamPath.value = appSettings.steamPath;
+    }
     const res = await fetch('/api/hidden', { headers: buildHeaders() });
     const data = await readApiJson(res);
     if (!res.ok) throw new Error(data.error || '读取配置失败');
@@ -2087,6 +3392,74 @@ async function confirmHiddenImport() {
   }
 }
 
+async function openCollectionsImportDialog() {
+  if (!activeUserId) {
+    showToast('请先添加用户', true);
+    return;
+  }
+  els.collectionsImportHint.textContent = '正在检测本机 Steam 路径...';
+  els.inputCollectionsSteamPath.value = els.inputCollectionsSteamPath.dataset.savedPath || appSettings.steamPath || '';
+  els.collectionsImportDialog.showModal();
+  try {
+    await loadAppSettings().catch(() => appSettings);
+    if (!els.inputCollectionsSteamPath.value && appSettings.steamPath) {
+      els.inputCollectionsSteamPath.value = appSettings.steamPath;
+    }
+    const res = await fetch('/api/collections', { headers: buildHeaders() });
+    const data = await readApiJson(res);
+    if (!res.ok) throw new Error(data.error || '读取配置失败');
+    if (!els.inputCollectionsSteamPath.value && data.steamPath) {
+      els.inputCollectionsSteamPath.value = data.steamPath;
+    }
+    const detected = (data.detectedPaths || []).join('；');
+    const updatedAt = data.updatedAt
+      ? `上次更新：${new Date(data.updatedAt).toLocaleString()}`
+      : '尚未导入收藏夹';
+    els.collectionsImportHint.textContent = detected
+      ? `${updatedAt}。已检测到：${detected}`
+      : `${updatedAt}。未自动检测到 Steam 安装路径，请手动填写。`;
+  } catch (err) {
+    els.collectionsImportHint.textContent = err.message;
+  }
+}
+
+function closeCollectionsImportDialog() {
+  els.collectionsImportDialog.close();
+}
+
+async function confirmCollectionsImport() {
+  const steamPath = els.inputCollectionsSteamPath.value.trim();
+  els.btnConfirmCollectionsImport.disabled = true;
+  els.btnConfirmCollectionsImport.textContent = '更新中...';
+  try {
+    const res = await fetch('/api/collections/import-local', {
+      method: 'POST',
+      headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ steamPath }),
+    });
+    const data = await readApiJson(res);
+    if (!res.ok) {
+      const detected = (data.detectedPaths || []).join('；');
+      const extra = detected ? ` 已检测：${detected}` : '';
+      throw new Error((data.error || '导入失败') + extra);
+    }
+    if (steamPath || data.steamPath) {
+      els.inputCollectionsSteamPath.dataset.savedPath = data.steamPath || steamPath;
+    }
+    closeCollectionsImportDialog();
+    if (libraryLoaded) {
+      await fetchLibraryPage(false, libraryPagination.page, { quiet: true });
+    }
+    showToast(`已更新 ${data.imported} 个收藏夹`);
+  } catch (err) {
+    els.collectionsImportHint.textContent = err.message;
+    showToast(err.message, true);
+  } finally {
+    els.btnConfirmCollectionsImport.disabled = false;
+    els.btnConfirmCollectionsImport.textContent = '更新收藏夹';
+  }
+}
+
 async function pickRandomGame() {
   if (!libraryLoaded) {
     showToast('请先加载游戏库', true);
@@ -2094,12 +3467,10 @@ async function pickRandomGame() {
   }
   try {
     const params = buildFilterQueryParams(1);
-    params.set('platform', currentPlatform);
-    if (currentPlatform === 'steam') {
-      const user = getActiveUser();
-      if (user?.steamId) params.set('steamId', user.steamId);
-      params.set('includeFamily', 'true');
-    }
+    params.set('platform', 'steam');
+    const user = getActiveUser();
+    if (user?.steamId) params.set('steamId', user.steamId);
+    params.set('includeFamily', 'true');
     const res = await fetch(`/api/random?${params.toString()}`, { headers: buildHeaders() });
     const data = await readApiJson(res);
     if (!res.ok) throw new Error(data.error || '随机抽取失败');
@@ -2113,398 +3484,168 @@ function resetGamesView(message = '请先加载游戏库') {
   libraryLoaded = false;
   libraryGameCount = 0;
   libraryFilteredCount = 0;
+  libraryMeta = { source: '', cachedAt: null, sessionExpired: false, installedCount: 0 };
   libraryPagination = { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 };
   favoriteByPlatform = createEmptyPlatformSets();
   hiddenByPlatform = createEmptyPlatformSets();
   setControlsEnabled(false);
-  els.statsBar.textContent = message;
+  updateStatsBar(message);
   els.gameGrid.innerHTML = '';
   els.pagination?.classList.add('hidden');
   updateModeUi();
 }
 
-function updatePlatformPanels() {
-  for (const panel of [els.steamPanel, els.epicPanel, els.ubisoftPanel]) {
-    if (!panel) continue;
-    panel.classList.toggle('hidden', panel.dataset.platform !== currentPlatform);
+function updateRefreshSubOptions() {
+  const metaShow = !!els.refreshOptMeta?.checked;
+  els.refreshOptMetaSubWrap?.classList.toggle('hidden', !metaShow);
+  if (!metaShow && els.refreshOptMetaModeAll) {
+    els.refreshOptMetaModeAll.checked = false;
   }
-  els.platformTabs?.querySelectorAll('.platform-tab').forEach((tab) => {
-    tab.classList.toggle('active', tab.dataset.platform === currentPlatform);
-  });
-  updateModeUi();
-}
 
-async function refreshEpicAuthStatus() {
-  try {
-    const res = await fetch('/api/epic/auth/status');
-    const status = await readApiJson(res);
-    els.epicAuthStatus.className = 'auth-status';
-    if (status.valid && status.account) {
-      els.epicAuthStatus.classList.add('ok');
-      els.epicAuthStatus.textContent = `已连接 · ${status.account.displayName || status.account.accountId}`;
-      els.btnEpicConnect.textContent = '更新 Token';
-      return true;
-    }
-    els.epicAuthStatus.classList.add('warn');
-    els.epicAuthStatus.textContent = status.account ? 'Epic Token 可能已过期' : '未连接 Epic';
-    els.btnEpicConnect.textContent = '连接 Epic';
-    return false;
-  } catch {
-    els.epicAuthStatus.textContent = 'Epic 状态未知';
-    return false;
+  const coversShow = !!els.refreshOptCoversRefresh?.checked;
+  els.refreshOptCoversSubWrap?.classList.toggle('hidden', !coversShow);
+  if (!coversShow) {
+    if (els.refreshOptCoversModeAll) els.refreshOptCoversModeAll.checked = false;
+    if (els.refreshOptCoversOverwriteLocal) els.refreshOptCoversOverwriteLocal.checked = false;
+  }
+
+  const localizeShow = !!els.refreshOptLocalize?.checked;
+  els.refreshOptLocalizeSubWrap?.classList.toggle('hidden', !localizeShow);
+  if (!localizeShow) {
+    if (els.refreshOptLocalizeOverwriteLocal) els.refreshOptLocalizeOverwriteLocal.checked = false;
+    if (els.refreshOptLocalizeRetry) els.refreshOptLocalizeRetry.checked = false;
   }
 }
 
-async function refreshUbisoftAuthStatus() {
-  try {
-    const res = await fetch('/api/ubisoft/auth/status');
-    const status = await readApiJson(res);
-    els.ubisoftAuthStatus.className = 'auth-status';
-    if (status.valid && status.account) {
-      els.ubisoftAuthStatus.classList.add('ok');
-      els.ubisoftAuthStatus.textContent = `已连接 · ${status.account.displayName || status.account.email || status.account.profileId}`;
-      els.btnUbisoftConnect.textContent = '更新连接';
-      return true;
-    }
-    els.ubisoftAuthStatus.classList.add('warn');
-    els.ubisoftAuthStatus.textContent = status.expired ? '育碧连接已过期' : '未连接育碧';
-    els.btnUbisoftConnect.textContent = '连接育碧';
-    return false;
-  } catch {
-    els.ubisoftAuthStatus.textContent = '育碧状态未知';
-    return false;
+function openRefreshDialog() {
+  if (els.refreshOptLibrary) els.refreshOptLibrary.checked = false;
+  if (els.refreshOptMeta) els.refreshOptMeta.checked = false;
+  if (els.refreshOptMetaModeAll) els.refreshOptMetaModeAll.checked = false;
+  if (els.refreshOptCoversRefresh) els.refreshOptCoversRefresh.checked = false;
+  if (els.refreshOptCoversModeAll) els.refreshOptCoversModeAll.checked = false;
+  if (els.refreshOptCoversOverwriteLocal) els.refreshOptCoversOverwriteLocal.checked = false;
+  if (els.refreshOptLocalize) els.refreshOptLocalize.checked = false;
+  if (els.refreshOptLocalizeOverwriteLocal) els.refreshOptLocalizeOverwriteLocal.checked = false;
+  if (els.refreshOptLocalizeRetry) els.refreshOptLocalizeRetry.checked = false;
+  updateRefreshSubOptions();
+  const pending = libraryMeta.metaPending || 0;
+  if (els.refreshDialogHint) {
+    const base = '选择要从 Steam 远程更新的内容（未勾选项保持本地缓存不变）';
+    els.refreshDialogHint.textContent = pending > 0
+      ? `${base}。尚有 ${pending} 款标签未补全；勾选「获取分类标签」将只处理未完成项（勾选「全部刷新」才会重来）。也可直接点顶栏「继续补全」。`
+      : base;
   }
+  els.refreshDialog?.showModal();
 }
 
-let epicLoginState = '';
-let epicTwoFactorMethod = '';
-
-function resetEpicVerificationUi() {
-  epicLoginState = '';
-  epicTwoFactorMethod = '';
-  if (els.inputEpicVerificationCode) els.inputEpicVerificationCode.value = '';
-  els.epicVerificationField?.classList.add('hidden');
+function closeRefreshDialog() {
+  els.refreshDialog?.close();
 }
 
-function showEpicVerificationUi(loginState, twoFactorMethod) {
-  epicLoginState = loginState || '';
-  epicTwoFactorMethod = twoFactorMethod || '';
-  els.epicVerificationField?.classList.remove('hidden');
-  els.inputEpicVerificationCode?.focus();
-  showToast('Epic 需要验证码，请查收邮件或验证器');
+function getRefreshPartsFromDialog() {
+  const localizeCovers = !!els.refreshOptLocalize?.checked;
+  const coversRefresh = !!els.refreshOptCoversRefresh?.checked;
+  const coversAll = coversRefresh && !!els.refreshOptCoversModeAll?.checked;
+  const metaRefresh = !!els.refreshOptMeta?.checked;
+  const metaAll = metaRefresh && !!els.refreshOptMetaModeAll?.checked;
+  return {
+    library: !!els.refreshOptLibrary?.checked,
+    meta: metaRefresh && !metaAll,
+    metaAll: metaRefresh && metaAll,
+    covers: coversRefresh && !coversAll,
+    coversAll: coversRefresh && coversAll,
+    coversIncludeLocal: coversRefresh && !!els.refreshOptCoversOverwriteLocal?.checked,
+    localizeCovers,
+    localizeIncludeLocal: localizeCovers && !!els.refreshOptLocalizeOverwriteLocal?.checked,
+    localizeRetryFailed: localizeCovers && !!els.refreshOptLocalizeRetry?.checked,
+  };
 }
 
-function openEpicDialog() {
-  if (els.inputEpicPassword) els.inputEpicPassword.value = '';
-  resetEpicVerificationUi();
-  els.epicDialog.showModal();
-}
-
-function closeEpicDialog() {
-  if (els.inputEpicPassword) els.inputEpicPassword.value = '';
-  resetEpicVerificationUi();
-  els.epicDialog.close();
-}
-
-function showEpicCaptchaUi() {
-  els.epicAuthCodeField?.setAttribute('open', '');
-  els.inputEpicAuthCode?.focus();
-  showToast('Epic 要求人机验证，请使用浏览器授权码连接', true);
-}
-
-function extractEpicAuthCodeFromPaste(text) {
-  const raw = String(text || '').trim().replace(/^\uFEFF/, '');
-  if (!raw) return '';
-
-  const patterns = [
-    /"authorizationCode"\s*:\s*"([^"\\]+)"/i,
-    /"authorization_code"\s*:\s*"([^"\\]+)"/i,
-    /"exchangeCode"\s*:\s*"([^"\\]+)"/i,
-  ];
-  for (const pattern of patterns) {
-    const match = raw.match(pattern);
-    if (match?.[1]) return match[1].trim();
-  }
-
-  try {
-    const json = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] || raw);
-    return String(json.authorizationCode || json.exchangeCode || json.code || '').trim();
-  } catch {
-    return raw;
-  }
-}
-
-async function saveEpicAuthCode(rawInput) {
-  const code = extractEpicAuthCodeFromPaste(rawInput ?? els.inputEpicAuthCode?.value ?? '');
-  if (!code) {
-    showToast('请粘贴 authorizationCode 或整段 JSON', true);
+async function confirmRefreshDialog() {
+  const parts = getRefreshPartsFromDialog();
+  if (!isRefreshPartsActive(parts)) {
+    showToast('请至少选择一项要刷新的内容', true);
     return;
   }
-  if (els.inputEpicAuthCode) els.inputEpicAuthCode.value = code;
-  els.btnSaveEpicAuthCode.disabled = true;
-  els.btnSaveEpicAuthCode.textContent = '连接中...';
-  try {
-    const res = await fetch('/api/epic/auth/code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code }),
-    });
-    const data = await readApiJson(res);
-    if (!res.ok) throw new Error(data.error || '连接失败');
-    closeEpicDialog();
-    await refreshEpicAuthStatus();
-    showToast(`Epic 已连接：${data.displayName || data.accountId}`);
-    if (currentPlatform === 'epic') {
-      await fetchEpicGames(false, { quiet: false, autoFetchIfNoCache: true });
-    }
-  } finally {
-    els.btnSaveEpicAuthCode.disabled = false;
-    els.btnSaveEpicAuthCode.textContent = '使用授权码连接';
-  }
-}
-
-async function saveEpicLogin() {
-  const email = els.inputEpicEmail?.value.trim() || '';
-  const password = els.inputEpicPassword?.value || '';
-  const verificationCode = els.inputEpicVerificationCode?.value.trim() || '';
-  if (!email || !password) {
-    showToast('请填写邮箱和密码', true);
-    return;
-  }
-  if (epicLoginState && !verificationCode) {
-    showToast('请填写验证码', true);
-    els.inputEpicVerificationCode?.focus();
-    return;
-  }
-  els.btnSaveEpic.disabled = true;
-  els.btnSaveEpic.textContent = '登录中...';
-  try {
-    const body = { email, password };
-    if (verificationCode && epicLoginState) {
-      body.verificationCode = verificationCode;
-      body.loginState = epicLoginState;
-      body.twoFactorMethod = epicTwoFactorMethod;
-    }
-    const res = await fetch('/api/epic/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const data = await readApiJson(res);
-    if (res.status === 428 && data.needVerification) {
-      showEpicVerificationUi(data.loginState, data.twoFactorMethod);
-      throw new Error(data.error || '需要验证码');
-    }
-    if (res.status === 429 && data.needCaptcha) {
-      showEpicCaptchaUi();
-      throw new Error(data.error || '需要人机验证');
-    }
-    if (!res.ok) throw new Error(data.error || '登录失败');
-    closeEpicDialog();
-    await refreshEpicAuthStatus();
-    showToast(`Epic 已连接：${data.displayName || email}`);
-    if (currentPlatform === 'epic') {
-      await fetchEpicGames(false, { quiet: false, autoFetchIfNoCache: true });
-    }
-  } catch (err) {
-    if (/captcha/i.test(err.message)) {
-      showEpicCaptchaUi();
-    }
-    if (err.message !== '需要验证码'
-      && err.message !== '请输入 Epic 邮箱或双重验证码'
-      && err.message !== '需要人机验证'
-      && !/captcha/i.test(err.message)) {
-      throw err;
-    }
-  } finally {
-    els.btnSaveEpic.disabled = false;
-    els.btnSaveEpic.textContent = epicLoginState ? '提交验证码' : '登录';
-  }
-}
-
-let ubisoftTwoFactorTicket = '';
-
-function resetUbisoftVerificationUi() {
-  ubisoftTwoFactorTicket = '';
-  if (els.inputUbisoftVerificationCode) els.inputUbisoftVerificationCode.value = '';
-  els.ubisoftVerificationField?.classList.add('hidden');
-}
-
-function showUbisoftVerificationUi(ticket) {
-  ubisoftTwoFactorTicket = ticket || '';
-  els.ubisoftVerificationField?.classList.remove('hidden');
-  els.inputUbisoftVerificationCode?.focus();
-  showToast('育碧需要验证码，请查收邮件或验证器');
-}
-
-function openUbisoftDialog() {
-  els.inputUbisoftPassword.value = '';
-  resetUbisoftVerificationUi();
-  els.ubisoftDialog.showModal();
-}
-
-function closeUbisoftDialog() {
-  els.inputUbisoftPassword.value = '';
-  resetUbisoftVerificationUi();
-  els.ubisoftDialog.close();
-}
-
-async function saveUbisoftLogin() {
-  const email = els.inputUbisoftEmail.value.trim();
-  const password = els.inputUbisoftPassword.value;
-  const verificationCode = els.inputUbisoftVerificationCode?.value.trim() || '';
-  if (!email || !password) {
-    showToast('请填写邮箱和密码', true);
-    return;
-  }
-  if (ubisoftTwoFactorTicket && !verificationCode) {
-    showToast('请填写验证码', true);
-    els.inputUbisoftVerificationCode?.focus();
-    return;
-  }
-  els.btnSaveUbisoft.disabled = true;
-  els.btnSaveUbisoft.textContent = '登录中...';
-  try {
-    const body = { email, password };
-    if (verificationCode && ubisoftTwoFactorTicket) {
-      body.verificationCode = verificationCode;
-      body.twoFactorAuthenticationTicket = ubisoftTwoFactorTicket;
-    }
-    const res = await fetch('/api/ubisoft/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const data = await readApiJson(res);
-    if (res.status === 428 && data.needVerification) {
-      showUbisoftVerificationUi(data.twoFactorAuthenticationTicket);
-      throw new Error(data.error || '需要验证码');
-    }
-    if (!res.ok) throw new Error(data.error || '登录失败');
-    closeUbisoftDialog();
-    await refreshUbisoftAuthStatus();
-    showToast(`育碧已连接：${data.displayName || email}`);
-    if (currentPlatform === 'ubisoft') {
-      await fetchUbisoftGames(false, { quiet: false, autoFetchIfNoCache: true });
-    }
-  } catch (err) {
-    if (err.message !== '需要验证码' && err.message !== '请输入邮箱或双重验证码') {
-      throw err;
-    }
-  } finally {
-    els.btnSaveUbisoft.disabled = false;
-    els.btnSaveUbisoft.textContent = ubisoftTwoFactorTicket ? '提交验证码' : '登录';
-  }
-}
-
-async function fetchEpicGames(refresh = false, options = {}) {
-  return fetchLibraryPage(refresh, 1, options);
-}
-
-async function fetchUbisoftGames(refresh = false, options = {}) {
-  return fetchLibraryPage(refresh, 1, options);
-}
-
-async function fetchCurrentPlatformGames(refresh = false, options = {}) {
-  const page = refresh ? 1 : libraryPagination.page || 1;
-  return fetchLibraryPage(refresh, page, options);
-}
-
-async function switchPlatform(platform) {
-  if (platform === currentPlatform) return;
-  if (platform !== 'steam') clearSteamOnlyFilterValues();
-  abortEnrichStream();
-  resetEpicCoverState();
-  currentPlatform = platform;
-  updatePlatformPanels();
-  libraryLoaded = false;
-  setControlsEnabled(false);
-  els.gameGrid.innerHTML = '<div class="empty-state">正在加载...</div>';
-  els.statsBar.textContent = '正在加载游戏库...';
-  els.pagination?.classList.add('hidden');
-
-  if (platform === 'steam') {
-    els.cacheInfo.textContent = '正在加载...';
-    if (!activeUserId) {
-      resetGamesView('请先添加 Steam 用户');
-      return;
-    }
-    await refreshAuthStatus();
-    await loadSteamUserPrefs();
-    await fetchSteamGames(false, { quiet: false, autoFetchIfNoCache: true });
-    return;
-  }
-
-  if (platform === 'epic') {
-    els.epicCacheInfo.textContent = '正在加载...';
-    await fetchEpicGames(false, { quiet: false, autoFetchIfNoCache: true });
-    return;
-  }
-
-  if (platform === 'ubisoft') {
-    els.ubisoftCacheInfo.textContent = '正在加载...';
-    await fetchUbisoftGames(false, { quiet: false, autoFetchIfNoCache: true });
-  }
+  closeRefreshDialog();
+  const page = isRefreshPartsActive(parts) ? 1 : libraryPagination.page || 1;
+  await fetchLibraryPage(parts, page, { quiet: false });
 }
 
 async function loadEnvConfig() {
-  try {
-    const res = await fetch('/api/config');
-    const config = await readApiJson(res);
-    envHasSteamId = !!config.hasEnvSteamId;
-  } catch {
-    /* ignore */
-  }
-  updatePlatformPanels();
-  await refreshEpicAuthStatus();
-  await refreshUbisoftAuthStatus();
+  await loadAppSettings().catch(() => {});
   await loadUsers();
-  await loadSteamUserPrefs();
+  await refreshAuthStatus();
 
   if (!activeUserId) {
     resetGamesView('请先添加 Steam 用户');
     return;
   }
 
+  await loadSteamUserPrefs();
   setControlsEnabled(false);
-  els.gameGrid.innerHTML = '<div class="empty-state">正在加载游戏库...</div>';
-  els.statsBar.textContent = '正在加载游戏库...';
-  els.cacheInfo.textContent = '正在加载...';
-  await refreshAuthStatus();
+  showGameGridLoading('正在加载游戏库...');
+  updateStatsBar('正在加载游戏库...');
   await fetchSteamGames(false, { quiet: false, autoFetchIfNoCache: true });
 }
 
 async function fetchSteamGames(refresh = false, options = {}) {
-  return fetchLibraryPage(refresh, 1, options);
+  const parts = refresh
+    ? { library: true, meta: false, covers: false, localizeCovers: false }
+    : null;
+  return fetchLibraryPage(parts, 1, options);
 }
 
-els.userCards.addEventListener('click', (e) => {
-  const deleteBtn = e.target.closest('.user-card-delete');
-  if (deleteBtn) {
-    e.preventDefault();
-    e.stopPropagation();
-    deleteUser(deleteBtn.dataset.userId).catch((err) => showToast(err.message, true));
+els.btnUserMenu?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (!users.length) {
+    openTokenDialog('add');
     return;
   }
-  const editBtn = e.target.closest('.user-card-edit');
+  toggleUserMenuDropdown();
+});
+
+els.userMenuList?.addEventListener('click', (e) => {
+  const addBtn = e.target.closest('[data-action="add-user"]');
+  if (addBtn) {
+    closeUserMenuDropdown();
+    openTokenDialog('add');
+    return;
+  }
+  const editBtn = e.target.closest('[data-action="edit-user"]');
   if (editBtn) {
-    e.preventDefault();
     e.stopPropagation();
+    closeUserMenuDropdown();
     openUserEditDialog(editBtn.dataset.userId);
     return;
   }
-  const favBtn = e.target.closest('.btn-favorite');
-  if (favBtn) return;
-  const card = e.target.closest('.user-card');
-  if (!card) return;
-  const userId = card.dataset.userId;
+  const deleteBtn = e.target.closest('[data-action="delete-user"]');
+  if (deleteBtn) {
+    e.stopPropagation();
+    closeUserMenuDropdown();
+    deleteUser(deleteBtn.dataset.userId).catch((err) => showToast(err.message, true));
+    return;
+  }
+  const row = e.target.closest('.user-menu-item[data-user-id]');
+  if (!row || e.target.closest('.user-menu-item-actions')) return;
+  const userId = row.dataset.userId;
   if (!userId) return;
+  closeUserMenuDropdown();
   switchUser(userId, { loadGames: true, refresh: false, quiet: userId === activeUserId })
     .catch((err) => showToast(err.message, true));
 });
 
-els.btnAddUser.addEventListener('click', () => openTokenDialog('add'));
-els.btnTokenModal.addEventListener('click', () => openTokenDialog('update'));
+document.addEventListener('click', (e) => {
+  if (!els.userMenuDropdown?.classList.contains('hidden')
+    && !e.target.closest('#userMenu')) {
+    closeUserMenuDropdown();
+  }
+});
+
+els.btnTokenStatus?.addEventListener('click', () => {
+  openTokenDialog(getActiveUser() ? 'update' : 'add');
+});
+
 els.btnCloseToken.addEventListener('click', closeTokenDialog);
 els.btnCancelToken.addEventListener('click', closeTokenDialog);
 els.btnOpenTokenPage.addEventListener('click', () => {
@@ -2538,49 +3679,26 @@ els.btnEditOpenApiKeyPage.addEventListener('click', () => {
   window.open('https://steamcommunity.com/dev/apikey', '_blank');
 });
 
-els.platformTabs?.addEventListener('click', (e) => {
-  const tab = e.target.closest('.platform-tab');
-  if (!tab?.dataset.platform) return;
-  switchPlatform(tab.dataset.platform).catch((err) => showToast(err.message, true));
-});
-
-els.btnEpicConnect.addEventListener('click', () => openEpicDialog());
-els.btnCloseEpic.addEventListener('click', closeEpicDialog);
-els.btnCancelEpic.addEventListener('click', closeEpicDialog);
-els.btnSaveEpic.addEventListener('click', () => {
-  saveEpicLogin().catch((err) => showToast(err.message, true));
-});
-els.btnSaveEpicAuthCode?.addEventListener('click', () => {
-  saveEpicAuthCode().catch((err) => showToast(err.message, true));
-});
-els.inputEpicAuthCode?.addEventListener('paste', (event) => {
-  const text = event.clipboardData?.getData('text') || '';
-  const code = extractEpicAuthCodeFromPaste(text);
-  if (!code || code === text.trim()) return;
-  event.preventDefault();
-  if (els.inputEpicAuthCode) els.inputEpicAuthCode.value = code;
-  saveEpicAuthCode(code).catch((err) => showToast(err.message, true));
-});
-
-els.btnUbisoftConnect.addEventListener('click', () => openUbisoftDialog());
-els.btnCloseUbisoft.addEventListener('click', closeUbisoftDialog);
-els.btnCancelUbisoft.addEventListener('click', closeUbisoftDialog);
-els.btnSaveUbisoft.addEventListener('click', () => {
-  saveUbisoftLogin().catch((err) => showToast(err.message, true));
-});
-
-function confirmRefreshLibrary() {
-  const label = PLATFORM_TITLES[currentPlatform] || '游戏库';
-  return window.confirm(`确定刷新${label}吗？\n将从远程重新拉取数据，可能需要一些时间。`);
-}
-
 els.btnRefresh.addEventListener('click', () => {
-  if (currentPlatform === 'steam' && !activeUserId) {
+  if (!activeUserId) {
     showToast('请先添加 Steam 用户', true);
     return;
   }
-  if (!confirmRefreshLibrary()) return;
-  fetchCurrentPlatformGames(true, { quiet: false }).catch((err) => showToast(err.message, true));
+  openRefreshDialog();
+});
+
+els.btnContinueMetaEnrich?.addEventListener('click', () => {
+  continueMetaEnrichment().catch((err) => showToast(err.message, true));
+});
+
+els.refreshOptCoversRefresh?.addEventListener('change', updateRefreshSubOptions);
+els.refreshOptMeta?.addEventListener('change', updateRefreshSubOptions);
+els.refreshOptLocalize?.addEventListener('change', updateRefreshSubOptions);
+
+els.btnCloseRefresh?.addEventListener('click', closeRefreshDialog);
+els.btnCancelRefresh?.addEventListener('click', closeRefreshDialog);
+els.btnConfirmRefresh?.addEventListener('click', () => {
+  confirmRefreshDialog().catch((err) => showToast(err.message, true));
 });
 
 els.btnRandom.addEventListener('click', () => {
@@ -2591,68 +3709,119 @@ els.btnRandomAgain.addEventListener('click', () => {
 });
 els.btnCloseRandom.addEventListener('click', () => els.randomDialog.close());
 
+els.btnCancelGameActionConfirm?.addEventListener('click', () => finishGameActionConfirm(false));
+els.btnConfirmGameAction?.addEventListener('click', () => finishGameActionConfirm(true));
+els.gameActionConfirmDialog?.addEventListener('cancel', (e) => {
+  e.preventDefault();
+  finishGameActionConfirm(false);
+});
+
+els.gameGrid.addEventListener('load', (event) => {
+  const img = event.target;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains('game-cover') || img.classList.contains('game-cover-placeholder')) return;
+  handleGameCoverLoad(img);
+}, true);
+
 els.gameGrid.addEventListener('error', (event) => {
   const img = event.target;
   if (!(img instanceof HTMLImageElement) || !img.classList.contains('game-cover')) return;
   handleGameCoverError(img);
 }, true);
 
+els.randomBody?.addEventListener('load', (event) => {
+  const img = event.target;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains('game-cover') || img.classList.contains('game-cover-placeholder')) return;
+  handleGameCoverLoad(img);
+}, true);
+
 els.randomBody?.addEventListener('error', (event) => {
   const img = event.target;
-  if (!(img instanceof HTMLImageElement) || !img.classList.contains('random-cover')) return;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains('game-cover')) return;
   handleGameCoverError(img);
 }, true);
 
-els.gameGrid.addEventListener('click', (e) => {
+function findGameForCardAction(appid, platform) {
+  const fromPage = currentPageGames.find(
+    (item) => String(item.appid) === String(appid) && gamePlatform(item) === platform,
+  );
+  if (fromPage) return fromPage;
+  if (
+    currentRandomGame
+    && String(currentRandomGame.appid) === String(appid)
+    && gamePlatform(currentRandomGame) === platform
+  ) {
+    return currentRandomGame;
+  }
+  return null;
+}
+
+async function handleGameCardClick(e) {
+  const launchBtn = e.target.closest('.btn-game-launch');
+  if (launchBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const appid = launchBtn.dataset.appid;
+    const platform = launchBtn.dataset.platform;
+    blurGameCardFocus();
+    if (!(await confirmLaunchGame(appid, platform))) return;
+    launchGame(appid, platform).catch((err) => showToast(err.message, true));
+    return;
+  }
+  const downloadBtn = e.target.closest('.btn-game-download');
+  if (downloadBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const appid = downloadBtn.dataset.appid;
+    const platform = downloadBtn.dataset.platform;
+    blurGameCardFocus();
+    if (!(await confirmDownloadGame(appid, platform))) return;
+    downloadGame(appid, platform).catch((err) => showToast(err.message, true));
+    return;
+  }
   const storeBtn = e.target.closest('.btn-platform-store');
   if (storeBtn) {
     e.preventDefault();
     e.stopPropagation();
     openGameStore(storeBtn.dataset.storeUrl);
+    blurGameCardFocus();
     return;
   }
   const editBtn = e.target.closest('.btn-game-edit');
   if (editBtn) {
     e.preventDefault();
     e.stopPropagation();
-    const appid = editBtn.dataset.appid;
-    const platform = editBtn.dataset.platform;
-    const game = currentPageGames.find(
-      (item) => String(item.appid) === String(appid) && gamePlatform(item) === platform,
-    );
+    const game = findGameForCardAction(editBtn.dataset.appid, editBtn.dataset.platform);
     if (game) openGameEditDialog(game);
+    blurGameCardFocus();
     return;
   }
   const favBtn = e.target.closest('.btn-favorite');
   if (favBtn) {
     e.preventDefault();
     e.stopPropagation();
-    toggleFavorite(favBtn.dataset.appid, favBtn.dataset.platform).catch((err) => showToast(err.message, true));
+    toggleFavorite(favBtn.dataset.appid).catch((err) => showToast(err.message, true));
+    blurGameCardFocus();
     return;
   }
   const hideBtn = e.target.closest('.btn-hidden');
   if (!hideBtn) return;
   e.preventDefault();
   e.stopPropagation();
-  toggleHidden(hideBtn.dataset.appid, hideBtn.dataset.platform).catch((err) => showToast(err.message, true));
-});
+  toggleHidden(hideBtn.dataset.appid).catch((err) => showToast(err.message, true));
+  blurGameCardFocus();
+}
 
-els.randomBody.addEventListener('click', (e) => {
-  const favBtn = e.target.closest('.btn-favorite');
-  if (favBtn) {
-    e.preventDefault();
-    toggleFavorite(favBtn.dataset.appid, favBtn.dataset.platform).catch((err) => showToast(err.message, true));
-    return;
-  }
-  const hideBtn = e.target.closest('.btn-hidden');
-  if (!hideBtn) return;
-  e.preventDefault();
-  toggleHidden(hideBtn.dataset.appid, hideBtn.dataset.platform).catch((err) => showToast(err.message, true));
-});
+els.gameGrid.addEventListener('click', handleGameCardClick);
+
+window.addEventListener('blur', blurGameCardFocus);
+
+els.randomBody?.addEventListener('click', handleGameCardClick);
 
 els.btnCloseGameEdit?.addEventListener('click', closeGameEditDialog);
 els.btnCancelGameEdit?.addEventListener('click', closeGameEditDialog);
 els.btnSaveGameEdit?.addEventListener('click', () => saveGameEditDialog().catch((err) => showToast(err.message, true)));
+els.btnRefreshGameMeta?.addEventListener('click', () => refreshGameEditMeta().catch((err) => showToast(err.message, true)));
+els.btnRefetchCover?.addEventListener('click', () => refetchGameEditCover().catch((err) => showToast(err.message, true)));
 els.btnCoverLookup?.addEventListener('click', () => lookupCoverCandidates().catch((err) => showToast(err.message, true)));
 els.coverLookupResults?.addEventListener('click', (e) => {
   const item = e.target.closest('.cover-lookup-item');
@@ -2668,11 +3837,37 @@ els.coverLookupResults?.addEventListener('click', (e) => {
   }
   if (name && !els.inputNameEn.value.trim()) els.inputNameEn.value = name;
   if (genres && !els.inputGenres.value.trim()) els.inputGenres.value = genres;
-  if (url) setGameEditPreview(url);
+  if (url) {
+    els.inputCoverFile.value = '';
+    setGameEditPreview(url);
+  }
 });
 els.inputCoverUrl?.addEventListener('input', () => {
   const url = els.inputCoverUrl.value.trim();
-  if (url) setGameEditPreview(url);
+  if (url) {
+    els.inputCoverFile.value = '';
+    setGameEditPreview(url);
+  } else {
+    updateGameEditCoverPreview();
+  }
+});
+els.inputCoverUrl?.addEventListener('change', () => {
+  const url = els.inputCoverUrl.value.trim();
+  if (url) {
+    els.inputCoverFile.value = '';
+    setGameEditPreview(url);
+  } else {
+    updateGameEditCoverPreview();
+  }
+});
+els.inputCoverFile?.addEventListener('change', () => {
+  const file = els.inputCoverFile.files?.[0];
+  if (file) {
+    els.inputCoverUrl.value = '';
+    setGameEditPreviewFromFile(file);
+    return;
+  }
+  updateGameEditCoverPreview();
 });
 
 els.btnImportHidden?.addEventListener('click', () => openHiddenImportDialog());
@@ -2680,6 +3875,13 @@ els.btnCloseHiddenImport?.addEventListener('click', closeHiddenImportDialog);
 els.btnCancelHiddenImport?.addEventListener('click', closeHiddenImportDialog);
 els.btnConfirmHiddenImport?.addEventListener('click', () => {
   confirmHiddenImport().catch((err) => showToast(err.message, true));
+});
+
+els.btnImportCollections?.addEventListener('click', () => openCollectionsImportDialog());
+els.btnCloseCollectionsImport?.addEventListener('click', closeCollectionsImportDialog);
+els.btnCancelCollectionsImport?.addEventListener('click', closeCollectionsImportDialog);
+els.btnConfirmCollectionsImport?.addEventListener('click', () => {
+  confirmCollectionsImport().catch((err) => showToast(err.message, true));
 });
 
 [
@@ -2695,6 +3897,8 @@ els.btnConfirmHiddenImport?.addEventListener('click', () => {
   els.filterShareable,
   els.filterNonShareable,
   els.filterFamilyOnly,
+  els.filterInstalledOnly,
+  els.filterInputMethod,
   els.filterFavoritesOnly,
   els.filterHiddenOnly,
 ].forEach((el) => {
@@ -2703,28 +3907,30 @@ els.btnConfirmHiddenImport?.addEventListener('click', () => {
 });
 
 els.btnPagePrev?.addEventListener('click', () => {
-  if (libraryPagination.page <= 1 || gamesLoading) return;
-  fetchLibraryPage(false, libraryPagination.page - 1, { quiet: true })
+  if (libraryPagination.page <= 1 || isPaginationBlocked()) return;
+  fetchLibraryPage(false, libraryPagination.page - 1, { quiet: true, preserveProgress: true, nested: true })
     .catch((err) => showToast(err.message, true));
 });
 
 els.btnPageNext?.addEventListener('click', () => {
-  if (libraryPagination.page >= libraryPagination.totalPages || gamesLoading) return;
-  fetchLibraryPage(false, libraryPagination.page + 1, { quiet: true })
+  if (libraryPagination.page >= libraryPagination.totalPages || isPaginationBlocked()) return;
+  fetchLibraryPage(false, libraryPagination.page + 1, { quiet: true, preserveProgress: true, nested: true })
     .catch((err) => showToast(err.message, true));
 });
 
-els.btnToggleSidebar?.addEventListener('click', toggleSidebar);
-els.btnExpandSidebar?.addEventListener('click', toggleSidebar);
+els.btnSettings?.addEventListener('click', () => openSettingsDialog());
+els.btnCloseSettings?.addEventListener('click', closeSettingsDialog);
+els.btnCancelSettings?.addEventListener('click', closeSettingsDialog);
+els.btnSaveSettings?.addEventListener('click', () => saveSettings().catch((err) => showToast(err.message, true)));
 els.btnToggleFilters?.addEventListener('click', toggleFilters);
 els.btnCloseFilters?.addEventListener('click', () => setFiltersExpanded(false));
 els.filtersBackdrop?.addEventListener('click', () => setFiltersExpanded(false));
 
 window.addEventListener('resize', () => {
   clearTimeout(gridLayoutTimer);
-  gridLayoutTimer = setTimeout(() => layoutGameGrid(), 100);
+  gridLayoutTimer = setTimeout(() => relayoutGridIfNeeded(), 100);
 });
 
-initSidebarState();
+initDialogBackdropClose();
 layoutGameGrid();
 loadEnvConfig();

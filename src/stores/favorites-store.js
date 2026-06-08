@@ -8,6 +8,7 @@ import {
   readPlatformAppIds,
   togglePlatformAppId,
 } from './game-prefs-store.js';
+import { createKeyedTinyCache } from '../services/tiny-cache.js';
 
 function writePlatformAppIdsToFile(path, platforms) {
   writeFileSync(
@@ -18,6 +19,8 @@ function writePlatformAppIdsToFile(path, platforms) {
 }
 
 export function createFavoritesStore(dataDir) {
+  const platformsCache = createKeyedTinyCache();
+
   function ensureDir() {
     if (!existsSync(dataDir)) mkdirSync(dataDir, { recursive: true });
   }
@@ -28,20 +31,32 @@ export function createFavoritesStore(dataDir) {
 
   function readPlatforms(userId) {
     if (!userId) return createEmptyPlatformAppIds();
+    const cached = platformsCache.get(userId);
+    if (cached) return cached;
+
     ensureDir();
     const path = storePath(userId);
-    if (!existsSync(path)) return createEmptyPlatformAppIds();
+    if (!existsSync(path)) {
+      const empty = createEmptyPlatformAppIds();
+      platformsCache.set(userId, empty);
+      return empty;
+    }
 
     try {
-      return readPlatformAppIds(JSON.parse(readFileSync(path, 'utf-8')));
+      const platforms = readPlatformAppIds(JSON.parse(readFileSync(path, 'utf-8')));
+      platformsCache.set(userId, platforms);
+      return platforms;
     } catch {
-      return createEmptyPlatformAppIds();
+      const empty = createEmptyPlatformAppIds();
+      platformsCache.set(userId, empty);
+      return empty;
     }
   }
 
   function writePlatforms(userId, platforms) {
     ensureDir();
     writePlatformAppIdsToFile(storePath(userId), platforms);
+    platformsCache.set(userId, platforms);
   }
 
   function list(userId) {

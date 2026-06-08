@@ -1,11 +1,12 @@
-import { existsSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import {
   buildSearchAliases,
   createGameMetaStore,
   hasChineseText,
+  isInvalidStoreName,
   normalizeMatchKey,
 } from '../services/game-meta.js';
+import { normalizeInputMethods } from '../services/input-methods.js';
 
 function parseJsonArray(raw, fallback = []) {
   try {
@@ -16,34 +17,26 @@ function parseJsonArray(raw, fallback = []) {
   }
 }
 
-function epicNameNeedsCn(game) {
-  if (!game?.name_cn) return true;
-  if (game.name_cn === game.name) return !hasChineseText(game.name_cn);
-  const value = String(game.name_cn || '').trim();
-  if (!value) return true;
-  if (/^[0-9a-f]{32}$/i.test(value)) return true;
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
-}
-
 export function createMetaStore(db, dataDir, debugLog = () => {}) {
   const metaDir = join(dataDir, 'meta');
   const fileEnricher = createGameMetaStore(metaDir, Number.MAX_SAFE_INTEGER);
 
   const selectMeta = db.prepare(`
-    SELECT platform, appid, name_en, name_cn, genres_json, tags_json, aliases_json, cover_url, permanent, cached_at
+    SELECT platform, appid, name_en, name_cn, genres_json, tags_json, aliases_json, input_methods_json, cover_url, permanent, cached_at
     FROM game_meta
     WHERE platform = ? AND appid = ?
   `);
 
   const upsertMeta = db.prepare(`
-    INSERT INTO game_meta (platform, appid, name_en, name_cn, genres_json, tags_json, aliases_json, cover_url, permanent, cached_at)
-    VALUES (@platform, @appid, @name_en, @name_cn, @genres_json, @tags_json, @aliases_json, @cover_url, @permanent, @cached_at)
+    INSERT INTO game_meta (platform, appid, name_en, name_cn, genres_json, tags_json, aliases_json, input_methods_json, cover_url, permanent, cached_at)
+    VALUES (@platform, @appid, @name_en, @name_cn, @genres_json, @tags_json, @aliases_json, @input_methods_json, @cover_url, @permanent, @cached_at)
     ON CONFLICT(platform, appid) DO UPDATE SET
       name_en = excluded.name_en,
       name_cn = excluded.name_cn,
       genres_json = excluded.genres_json,
       tags_json = excluded.tags_json,
       aliases_json = excluded.aliases_json,
+      input_methods_json = excluded.input_methods_json,
       cover_url = CASE WHEN excluded.cover_url != '' THEN excluded.cover_url ELSE game_meta.cover_url END,
       permanent = excluded.permanent,
       cached_at = excluded.cached_at
@@ -57,6 +50,7 @@ export function createMetaStore(db, dataDir, debugLog = () => {}) {
       genres: parseJsonArray(row.genres_json),
       tags: parseJsonArray(row.tags_json),
       aliases: parseJsonArray(row.aliases_json),
+      input_methods: normalizeInputMethods(parseJsonArray(row.input_methods_json)),
       cover_url: row.cover_url || '',
       permanent: !!row.permanent,
       cached_at: row.cached_at,
@@ -65,6 +59,7 @@ export function createMetaStore(db, dataDir, debugLog = () => {}) {
 
   function isUsableMeta(data) {
     if (!data) return false;
+    if (data.name_cn && isInvalidStoreName(data.name_cn)) return false;
     if (data.name_cn) return true;
     if (Array.isArray(data.genres) && data.genres.length) return true;
     if (Array.isArray(data.tags) && data.tags.length) return true;
@@ -82,14 +77,39 @@ export function createMetaStore(db, dataDir, debugLog = () => {}) {
     };
   }
 
-  function readMeta(appid, platform = 'steam') {
-    const row = selectMeta.get(platform, String(appid));
+  function finalizeMetaRow(row) {
     const data = rowToMeta(row);
     if (!isUsableMeta(data)) return null;
     if (!Array.isArray(data.aliases) || !data.aliases.length) {
-      data.aliases = buildSearchAliases(data.name_en, data.name_cn, appid);
+      data.aliases = buildSearchAliases(data.name_en, data.name_cn, row.appid);
     }
     return data;
+  }
+
+  function readMeta(appid, platform = 'steam') {
+    return finalizeMetaRow(selectMeta.get(platform, String(appid)));
+  }
+
+  function readMetaMap(appids, platform = 'steam') {
+    const map = new Map();
+    const ids = [...new Set(appids.map((id) => String(id)).filter(Boolean))];
+    if (!ids.length) return map;
+
+    const chunkSize = 400;
+    for (let i = 0; i < ids.length; i += chunkSize) {
+      const chunk = ids.slice(i, i + chunkSize);
+      const placeholders = chunk.map(() => '?').join(',');
+      const rows = db.prepare(`
+        SELECT platform, appid, name_en, name_cn, genres_json, tags_json, aliases_json, input_methods_json, cover_url, permanent, cached_at
+        FROM game_meta
+        WHERE platform = ? AND appid IN (${placeholders})
+      `).all(platform, ...chunk);
+      for (const row of rows) {
+        const data = finalizeMetaRow(row);
+        if (data) map.set(row.appid, data);
+      }
+    }
+    return map;
   }
 
   function writeMeta(appid, payload, nameEn = '', platform = 'steam') {
@@ -106,23 +126,39 @@ export function createMetaStore(db, dataDir, debugLog = () => {}) {
       genres_json: JSON.stringify(finalPayload.genres || []),
       tags_json: JSON.stringify(finalPayload.tags || []),
       aliases_json: JSON.stringify(finalPayload.aliases || []),
+      input_methods_json: JSON.stringify(normalizeInputMethods(finalPayload.input_methods)),
       cover_url: finalPayload.cover_url || '',
       permanent: finalPayload.permanent ? 1 : 0,
       cached_at: Date.now(),
     });
   }
 
+  function hasGenreOrTagMeta(data) {
+    if (!data) return false;
+    return !!(data.genres?.length || data.tags?.length);
+  }
+
+  function steamMetaNeedsEnrichment(appid, platform = 'steam') {
+    const cached = readMeta(appid, platform);
+    if (!cached) return true;
+    return !hasGenreOrTagMeta(cached);
+  }
+
   function applyCachedMetaWithStats(games, platform = 'steam') {
+    const metaMap = readMetaMap(games.map((game) => game.appid), platform);
     let metaPending = 0;
     const mapped = games.map((game) => {
-      const cached = readMeta(game.appid, platform);
-      if (!cached) metaPending += 1;
+      const cached = metaMap.get(String(game.appid));
+      if (!cached || !hasGenreOrTagMeta(cached)) metaPending += 1;
       return {
         ...game,
         name_cn: cached?.name_cn || game.name_cn || '',
         aliases: cached?.aliases || game.aliases || [],
         genres: cached?.genres || game.genres || [],
         tags: cached?.tags || game.tags || [],
+        input_methods: cached?.input_methods?.length
+          ? cached.input_methods
+          : (game.input_methods || []),
       };
     });
     return { games: mapped, metaPending };
@@ -133,7 +169,7 @@ export function createMetaStore(db, dataDir, debugLog = () => {}) {
   }
 
   function countMissingMeta(games, platform = 'steam') {
-    return games.filter((game) => !readMeta(game.appid, platform)).length;
+    return games.filter((game) => steamMetaNeedsEnrichment(game.appid, platform)).length;
   }
 
   function buildEnglishNameIndex() {
@@ -151,42 +187,35 @@ export function createMetaStore(db, dataDir, debugLog = () => {}) {
     return map;
   }
 
-  function applyEpicNameMatchFromSteam(epicGames, steamGames = []) {
-    const index = buildEnglishNameIndex();
-    for (const game of steamGames) {
-      const key = normalizeMatchKey(game.name);
-      if (key.length >= 3 && hasChineseText(game.name_cn) && !index.has(key)) {
-        index.set(key, game.name_cn);
-      }
-    }
-
-    return epicGames.map((game) => {
-      if (!epicNameNeedsCn(game)) return game;
-      const key = normalizeMatchKey(game.name);
-      const nameCn = index.get(key);
-      if (!nameCn) return game;
-      return {
-        ...game,
-        name_cn: nameCn,
-        aliases: game.aliases?.length ? game.aliases : buildSearchAliases(game.name, nameCn, game.appid),
-      };
-    });
-  }
-
   async function enrichGamesMissing(games, steamFetch, onProgress, options = {}) {
     const skipAppId = options.skipAppId || (() => false);
-    await fileEnricher.enrichGamesMissing(games, steamFetch, (progress) => {
+    const forceAll = !!options.forceAll;
+    const pending = games.filter(
+      (game) => !skipAppId(game.appid) && (forceAll || steamMetaNeedsEnrichment(game.appid)),
+    );
+    const total = pending.length;
+    if (!total) {
+      onProgress?.({ complete: true, current: 0, total: 0, updates: [] });
+      return;
+    }
+
+    const batchSize = 8;
+    let current = 0;
+    for (let i = 0; i < pending.length; i += batchSize) {
+      if (options.shouldAbort?.()) break;
+      const batch = pending.slice(i, i + batchSize);
+      const fetched = await fileEnricher.fetchMany(batch.map((game) => game.appid), steamFetch);
       const updates = [];
-      for (const update of progress.updates || []) {
-        if (skipAppId(update.appid)) continue;
-        writeMeta(update.appid, update, update.name_en || update.name_en);
-        updates.push(update);
+      for (const game of batch) {
+        const meta = fetched[game.appid] || fetched[String(game.appid)];
+        if (!meta) continue;
+        writeMeta(game.appid, meta, meta.name_en || game.name);
+        updates.push({ appid: game.appid, ...meta });
       }
-      onProgress?.({
-        ...progress,
-        updates: progress.updates ? updates : progress.updates,
-      });
-    });
+      current += batch.length;
+      onProgress?.({ current, total, updates });
+    }
+    onProgress?.({ complete: true, current: total, total, updates: [] });
   }
 
   async function enrichGames(games, steamFetch) {
@@ -195,36 +224,22 @@ export function createMetaStore(db, dataDir, debugLog = () => {}) {
     return applyCachedMeta(enriched);
   }
 
-  function importLegacyMeta(metaDir) {
-    const count = db.prepare('SELECT COUNT(*) AS c FROM game_meta').get().c;
-    if (count > 0 || !existsSync(metaDir)) return { imported: 0 };
-
-    let imported = 0;
-    for (const file of readdirSync(metaDir)) {
-      if (!file.endsWith('.json')) continue;
-      const appid = file.replace(/\.json$/, '');
-      try {
-        const data = JSON.parse(readFileSync(join(metaDir, file), 'utf-8'));
-        writeMeta(appid, data, data.name_en || '', 'steam');
-        imported += 1;
-      } catch {
-        /* ignore */
-      }
-    }
-    if (imported) debugLog('已从 JSON 迁移元数据到 SQLite', { imported });
-    return { imported };
+  async function refreshSingleGameMeta(appid, steamFetch, nameEn = '') {
+    const meta = await fileEnricher.fetchOneGameMeta(appid, steamFetch, nameEn);
+    if (!meta) throw new Error('未能从 Steam 获取游戏资料');
+    writeMeta(appid, meta, meta.name_en || nameEn, 'steam');
+    return { appid: String(appid), ...meta };
   }
 
   return {
     readMeta,
     writeMeta,
+    refreshSingleGameMeta,
     applyCachedMeta,
     applyCachedMetaWithStats,
-    applyEpicNameMatchFromSteam,
     buildEnglishNameIndex,
     countMissingMeta,
     enrichGamesMissing,
     enrichGames,
-    importLegacyMeta,
   };
 }

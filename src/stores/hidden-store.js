@@ -9,8 +9,11 @@ import {
   readPlatformAppIds,
   togglePlatformAppId,
 } from './game-prefs-store.js';
+import { createKeyedTinyCache } from '../services/tiny-cache.js';
 
 export function createHiddenStore(dataDir) {
+  const dataCache = createKeyedTinyCache();
+
   function ensureDir() {
     if (!existsSync(dataDir)) mkdirSync(dataDir, { recursive: true });
   }
@@ -23,21 +26,30 @@ export function createHiddenStore(dataDir) {
     if (!userId) {
       return { platforms: createEmptyPlatformAppIds(), steamPath: '', updatedAt: 0 };
     }
+    const cached = dataCache.get(userId);
+    if (cached) return cached;
+
     ensureDir();
     const path = storePath(userId);
     if (!existsSync(path)) {
-      return { platforms: createEmptyPlatformAppIds(), steamPath: '', updatedAt: 0 };
+      const empty = { platforms: createEmptyPlatformAppIds(), steamPath: '', updatedAt: 0 };
+      dataCache.set(userId, empty);
+      return empty;
     }
 
     try {
       const raw = JSON.parse(readFileSync(path, 'utf-8'));
-      return {
+      const data = {
         platforms: readPlatformAppIds(raw),
         steamPath: String(raw.steamPath || '').trim(),
         updatedAt: Number(raw.updatedAt) || 0,
       };
+      dataCache.set(userId, data);
+      return data;
     } catch {
-      return { platforms: createEmptyPlatformAppIds(), steamPath: '', updatedAt: 0 };
+      const empty = { platforms: createEmptyPlatformAppIds(), steamPath: '', updatedAt: 0 };
+      dataCache.set(userId, empty);
+      return empty;
     }
   }
 
@@ -49,6 +61,7 @@ export function createHiddenStore(dataDir) {
       updatedAt: Date.now(),
     };
     writeFileSync(storePath(userId), JSON.stringify(payload, null, 2), 'utf-8');
+    dataCache.set(userId, payload);
     return payload;
   }
 

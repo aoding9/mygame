@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { extractInputMethodsFromStoreData } from './input-methods.js';
 
 const STORE_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -7,8 +8,75 @@ const STORE_HEADERS = {
   Cookie: 'birthtime=568022401; wants_mature_content=1; lastagecheckage=1-January-1988; mature_content=1',
 };
 
-const CONCURRENCY = 4;
-const REQUEST_GAP_MS = 120;
+const CONCURRENCY = 8;
+const REQUEST_GAP_MS = 60;
+
+const STORE_REGION_TRIES = [
+  { cc: 'cn', l: 'schinese' },
+  { cc: 'hk', l: 'schinese' },
+  { cc: 'us', l: 'schinese' },
+  { cc: 'us', l: 'english' },
+];
+
+const INVALID_STORE_NAME_RES = [
+  /^steam$/i,
+  /^app\s*\d+$/i,
+  /站点错误/,
+  /无法访问/,
+  /当前无可/,
+  /不可用/,
+  /not available/i,
+  /unavailable/i,
+  /does not exist/i,
+  /您所在的国家/,
+  /不在您的地区/,
+  /访问.*出错/,
+  /^错误$/,
+  /在\s*Steam\s*上购买/i,
+  /立省\s*\d/,
+  /购买.*立省/,
+];
+
+function decodeHtmlEntities(text) {
+  return String(text || '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)));
+}
+
+/** 去掉 Steam 商店页促销标题，尽量提取真实游戏名 */
+export function sanitizeStoreGameName(name) {
+  let s = decodeHtmlEntities(String(name || '').trim());
+  if (!s) return '';
+
+  s = s
+    .replace(/^Steam 上的\s+/i, '')
+    .replace(/\s+on Steam$/i, '')
+    .replace(/\s*\/\s*Steam\s*$/i, '')
+    .trim();
+
+  const isPromo = /在\s*Steam\s*上购买/i.test(s)
+    || (/立省/.test(s) && /购买|Buy/i.test(s));
+
+  if (isPromo) {
+    const fromBook = s.match(/《([^》]+)》/);
+    if (fromBook?.[1]) return fromBook[1].trim();
+    const fromQuote = s.match(/[“"]([^”"]+)[”"]/);
+    if (fromQuote?.[1]) return fromQuote[1].trim();
+    return '';
+  }
+
+  return s;
+}
+
+export function isInvalidStoreName(name) {
+  const s = sanitizeStoreGameName(name);
+  if (!s || s.length < 2) return true;
+  return INVALID_STORE_NAME_RES.some((re) => re.test(s));
+}
 
 /** 常见游戏社区简称，补充自动生成的别名 */
 const POPULAR_ALIASES = {
@@ -39,19 +107,6 @@ export function normalizeMatchKey(name) {
     .replace(/[®™©]/g, '')
     .replace(/[^a-z0-9\u4e00-\u9fff]+/g, '')
     .trim();
-}
-
-function isUuidLike(text) {
-  const value = String(text || '').trim();
-  if (!value) return false;
-  if (/^[0-9a-f]{32}$/i.test(value)) return true;
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
-}
-
-function epicNameNeedsCn(game) {
-  if (!game?.name_cn) return true;
-  if (game.name_cn === game.name) return !hasChineseText(game.name_cn);
-  return isUuidLike(game.name_cn);
 }
 
 export function buildSearchAliases(nameEn, nameCn, appid) {
@@ -126,6 +181,7 @@ export function createGameMetaStore(metaDir, metaTtlMs = 7 * 24 * 60 * 60 * 1000
 
   function isUsableMeta(data) {
     if (!data) return false;
+    if (data.name_cn && isInvalidStoreName(data.name_cn)) return false;
     if (data.name_cn) return true;
     if (Array.isArray(data.genres) && data.genres.length) return true;
     if (Array.isArray(data.tags) && data.tags.length) return true;
@@ -212,21 +268,29 @@ export function createGameMetaStore(metaDir, metaTtlMs = 7 * 24 * 60 * 60 * 1000
     return tags;
   }
 
+  function parseAppHubName(html) {
+    const match = String(html || '').match(/class="apphub_AppName"[^>]*>([\s\S]*?)<\//i);
+    if (!match?.[1]) return '';
+    const raw = match[1].replace(/<[^>]+>/g, '').trim();
+    return sanitizeStoreGameName(raw);
+  }
+
   function parseStorePageTitle(html) {
+    const hubName = parseAppHubName(html);
+    if (hubName && !isInvalidStoreName(hubName)) return hubName;
+
     const og = String(html || '').match(/property="og:title"\s+content="([^"]+)"/);
     if (!og?.[1]) return '';
 
-    let title = og[1]
-      .replace(/^Steam 上的\s+/i, '')
-      .replace(/\s+on Steam$/i, '')
-      .replace(/\s*\/\s*Steam\s*$/i, '')
-      .trim();
-    if (!title || /^Steam$/i.test(title)) return '';
+    const title = sanitizeStoreGameName(og[1]);
+    if (!title || isInvalidStoreName(title)) return '';
     return title;
   }
 
-  async function fetchOneAppDetails(appid, steamFetch) {
-    const url = `https://store.steampowered.com/api/appdetails?appids=${appid}&l=schinese&cc=cn`;
+  async function fetchOneAppDetails(appid, steamFetch, region = {}) {
+    const cc = region.cc || 'cn';
+    const l = region.l || 'schinese';
+    const url = `https://store.steampowered.com/api/appdetails?appids=${appid}&l=${l}&cc=${cc}`;
     const text = await storeFetch(url, steamFetch);
     if (!text || text.trim() === 'null') return null;
 
@@ -241,15 +305,20 @@ export function createGameMetaStore(metaDir, metaTtlMs = 7 * 24 * 60 * 60 * 1000
     if (!entry?.success || !entry.data) return null;
 
     const data = entry.data;
+    const name = sanitizeStoreGameName(data.name || '');
+    if (isInvalidStoreName(name)) return null;
     return {
-      name_cn: data.name || '',
+      name_cn: name,
       genres: (data.genres || []).map((g) => g.description).filter(Boolean),
       tags: [],
+      input_methods: extractInputMethodsFromStoreData(data),
     };
   }
 
-  async function fetchOneStorePage(appid, steamFetch) {
-    const url = `https://store.steampowered.com/app/${appid}/?l=schinese&cc=cn`;
+  async function fetchOneStorePage(appid, steamFetch, region = {}) {
+    const cc = region.cc || 'cn';
+    const l = region.l || 'schinese';
+    const url = `https://store.steampowered.com/app/${appid}/?l=${l}&cc=${cc}`;
     const html = await storeFetch(url, steamFetch);
     if (!html || !html.trimStart().startsWith('<')) return null;
 
@@ -264,27 +333,46 @@ export function createGameMetaStore(metaDir, metaTtlMs = 7 * 24 * 60 * 60 * 1000
   }
 
   async function fetchOne(appid, steamFetch) {
-    const pageUrl = `https://store.steampowered.com/app/${appid}/?l=schinese&cc=cn`;
-    const [fromApi, html] = await Promise.all([
-      fetchOneAppDetails(appid, steamFetch),
-      storeFetch(pageUrl, steamFetch).catch(() => ''),
-    ]);
-    const storeTags = extractStoreTagsFromHtml(html);
+    let fallback = null;
 
-    if (fromApi) {
-      return {
-        ...fromApi,
-        tags: storeTags.length ? storeTags : fromApi.tags,
-      };
+    for (const region of STORE_REGION_TRIES) {
+      const pageUrl = `https://store.steampowered.com/app/${appid}/?l=${region.l}&cc=${region.cc}`;
+      const [fromApi, html] = await Promise.all([
+        fetchOneAppDetails(appid, steamFetch, region),
+        storeFetch(pageUrl, steamFetch).catch(() => ''),
+      ]);
+      const storeTags = extractStoreTagsFromHtml(html);
+      const pageTitle = parseStorePageTitle(html);
+
+      let candidate = null;
+      if (fromApi) {
+        candidate = {
+          ...fromApi,
+          tags: storeTags.length ? storeTags : fromApi.tags,
+        };
+      } else if (pageTitle) {
+        candidate = {
+          name_cn: pageTitle,
+          genres: [],
+          tags: storeTags,
+          input_methods: ['keyboard_mouse'],
+        };
+      }
+
+      if (!candidate) continue;
+
+      if (region.cc === 'cn' && hasChineseText(candidate.name_cn)) return candidate;
+      if (hasChineseText(candidate.name_cn)) return candidate;
+
+      // 国区 API 已有类型/标签时不再尝试其他区服
+      if (fromApi && (candidate.genres?.length || candidate.tags?.length)) {
+        return candidate;
+      }
+
+      if (!fallback) fallback = candidate;
     }
 
-    const title = parseStorePageTitle(html);
-    if (!title) return null;
-    return {
-      name_cn: title,
-      genres: [],
-      tags: storeTags,
-    };
+    return fallback;
   }
 
   async function fetchMany(appids, steamFetch) {
@@ -326,6 +414,7 @@ export function createGameMetaStore(metaDir, metaTtlMs = 7 * 24 * 60 * 60 * 1000
         aliases: cached?.aliases || game.aliases || [],
         genres: cached?.genres || game.genres || [],
         tags: cached?.tags || game.tags || [],
+        input_methods: cached?.input_methods || game.input_methods || [],
       };
     });
     return { games: mapped, metaPending };
@@ -398,36 +487,21 @@ export function createGameMetaStore(metaDir, metaTtlMs = 7 * 24 * 60 * 60 * 1000
     return map;
   }
 
-  function applyEpicNameMatchFromSteam(epicGames, steamGames = []) {
-    const index = buildEnglishNameIndex();
-    for (const game of steamGames) {
-      const key = normalizeMatchKey(game.name);
-      if (key.length >= 3 && hasChineseText(game.name_cn) && !index.has(key)) {
-        index.set(key, game.name_cn);
-      }
-    }
-
-    return epicGames.map((game) => {
-      if (!epicNameNeedsCn(game)) return game;
-      const key = normalizeMatchKey(game.name);
-      const nameCn = index.get(key);
-      if (!nameCn) return game;
-      return {
-        ...game,
-        name_cn: nameCn,
-        aliases: game.aliases?.length ? game.aliases : buildSearchAliases(game.name, nameCn, game.appid),
-      };
-    });
+  async function fetchOneGameMeta(appid, steamFetch, nameEn = '') {
+    const meta = await fetchOne(appid, steamFetch);
+    if (!meta) return null;
+    return finalizeMeta(meta, nameEn, appid);
   }
 
   return {
     enrichGames,
     applyCachedMeta,
     applyCachedMetaWithStats,
-    applyEpicNameMatchFromSteam,
     buildEnglishNameIndex,
     countMissingMeta,
     enrichGamesMissing,
+    fetchMany,
+    fetchOneGameMeta,
     readMeta,
     writeMeta,
   };

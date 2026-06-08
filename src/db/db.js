@@ -10,6 +10,8 @@ export function initDatabase(dataDir) {
   const dbPath = join(dataDir, 'mygame.db');
   const db = new DatabaseSync(dbPath);
   db.exec('PRAGMA journal_mode = WAL;');
+  db.exec('PRAGMA busy_timeout = 10000;');
+  db.exec('PRAGMA synchronous = NORMAL;');
   db.exec('PRAGMA foreign_keys = ON;');
   runMigrations(db, join(__dirname, 'migrations'));
   return db;

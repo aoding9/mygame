@@ -1,7 +1,8 @@
-import { createWriteStream, existsSync, mkdirSync, unlinkSync } from 'fs';
+import { createWriteStream, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
 import { extname, join } from 'path';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
+import { isPortraitSteamCoverSource } from './steam-cover-urls.js';
 
 const ALLOWED_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
 
@@ -33,16 +34,76 @@ export function createCoverService(dataDir, fetchImpl, overrideStore) {
     return `/covers/${coverLocal.replace(/\\/g, '/')}`;
   }
 
+  function buildLocalCoverIndex(platform) {
+    const index = new Set();
+    const dir = join(coversDir, platform);
+    if (!existsSync(dir)) return index;
+    for (const name of readdirSync(dir)) {
+      const lower = name.toLowerCase();
+      const dot = lower.indexOf('.');
+      if (dot <= 0) continue;
+      if (!ALLOWED_EXT.has(extname(lower))) continue;
+      index.add(lower.slice(0, dot));
+    }
+    return index;
+  }
+
+  function hasLocalCoverInIndex(index, appid) {
+    return index.has(safeAppId(appid).toLowerCase());
+  }
+
+  function findLocalCoverRelative(platform, appid) {
+    const dir = join(coversDir, platform);
+    if (!existsSync(dir)) return '';
+    const base = safeAppId(appid);
+    const prefix = `${base}.`;
+    for (const name of readdirSync(dir)) {
+      const lower = name.toLowerCase();
+      if (!lower.startsWith(prefix)) continue;
+      const ext = extname(lower);
+      if (ALLOWED_EXT.has(ext)) return `${platform}/${name}`;
+    }
+    return '';
+  }
+
+  function hasProtectedLocalCover(platform, appid, userId = '') {
+    if (overrideStore.isLocked(platform, appid, userId)) return true;
+    const existing = overrideStore.get(platform, appid, userId);
+    if (existing?.cover_local && existsSync(join(coversDir, existing.cover_local))) return true;
+    return !!findLocalCoverRelative(platform, appid);
+  }
+
+  function clearAppCoverFiles(platform, appid) {
+    const dir = join(coversDir, platform);
+    if (!existsSync(dir)) return;
+    const base = safeAppId(appid);
+    const prefix = `${base}.`;
+    for (const name of readdirSync(dir)) {
+      if (!name.toLowerCase().startsWith(prefix)) continue;
+      try {
+        unlinkSync(join(dir, name));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
   async function downloadToLocal(platform, appid, remoteUrl, userId = '') {
     const url = String(remoteUrl || '').trim();
     if (!url) throw new Error('封面链接为空');
 
-    const res = await fetchImpl(url);
+    let res;
+    try {
+      res = await fetchImpl(url);
+    } catch (err) {
+      throw new Error(err.message || '下载封面失败');
+    }
     if (!res.ok) throw new Error(`下载封面失败 (${res.status})`);
 
     const contentType = res.headers.get('content-type') || '';
     const ext = guessExt(url, contentType);
     const relative = `${platform}/${safeAppId(appid)}${ext}`;
+    localDir(platform);
     const fullPath = join(coversDir, relative);
 
     const existing = overrideStore.get(platform, appid, userId);
@@ -87,11 +148,39 @@ export function createCoverService(dataDir, fetchImpl, overrideStore) {
     return { cover_url: remote, cover_local: '', source_url: remote };
   }
 
+  async function refetchCover(platform, appid, userId, remoteUrl, localize = false) {
+    const urls = (Array.isArray(remoteUrl) ? remoteUrl : [remoteUrl])
+      .map((item) => String(item || '').trim())
+      .filter(Boolean);
+    if (!urls.length) throw new Error('封面链接为空');
+
+    clearAppCoverFiles(platform, appid);
+
+    if (localize) {
+      return downloadToLocalWithFallback(platform, appid, urls, userId);
+    }
+
+    const url = urls[0];
+
+    overrideStore.updateCoverFields(platform, appid, userId, {
+      cover_url: url,
+      cover_local: '',
+      cover_source_url: url,
+    });
+
+    return {
+      cover_url: url,
+      cover_local: '',
+      source_url: url,
+    };
+  }
+
   async function saveUploadedFile(platform, appid, userId, buffer, originalName = '') {
     const ext = ALLOWED_EXT.has(extname(originalName).toLowerCase())
       ? extname(originalName).toLowerCase()
       : '.jpg';
     const relative = `${platform}/${safeAppId(appid)}${ext}`;
+    localDir(platform);
     const fullPath = join(coversDir, relative);
     await pipeline(Readable.from(buffer), createWriteStream(fullPath));
 
@@ -108,27 +197,164 @@ export function createCoverService(dataDir, fetchImpl, overrideStore) {
     };
   }
 
-  async function localizeDefaultCovers(games, platform, resolveDefaultUrl, shouldSkip = () => false) {
-    const pending = [];
-    for (const game of games || []) {
-      if (shouldSkip(game)) continue;
-      const existing = overrideStore.get(platform, game.appid, '');
-      if (existing?.cover_local || existing?.cover_url) continue;
-      const remote = resolveDefaultUrl(game);
-      if (!remote) continue;
-      pending.push({ game, remote });
-    }
+  async function downloadToLocalWithFallback(platform, appid, urls, userId = '') {
+    const list = (Array.isArray(urls) ? urls : [urls]).map((item) => String(item || '').trim()).filter(Boolean);
+    if (!list.length) throw new Error('封面链接为空');
 
-    let done = 0;
-    for (const item of pending.slice(0, 24)) {
+    let lastError = null;
+    for (const url of list) {
       try {
-        await downloadToLocal(platform, item.game.appid, item.remote, '');
-        done += 1;
-      } catch {
-        /* ignore single cover failure */
+        return await downloadToLocal(platform, appid, url, userId);
+      } catch (err) {
+        lastError = err;
+        const retryable = /下载封面失败 \(404\)|下载封面失败 \(403\)|下载封面失败 \(410\)/.test(err.message || '');
+        if (!retryable) throw err;
       }
     }
-    return done;
+    throw lastError || new Error('下载封面失败');
+  }
+
+  function needsLandscapeCoverReplace(platform, appid, userId = '', overrideMap = null) {
+    if (platform !== 'steam') return false;
+    const override = overrideMap?.get(String(appid)) ?? overrideStore.get(platform, appid, userId || '');
+    if (!override?.cover_local) return false;
+    return isPortraitSteamCoverSource(override.cover_source_url);
+  }
+
+  async function runConcurrent(items, concurrency, worker) {
+    if (!items.length) return;
+    let cursor = 0;
+    const limit = Math.max(1, Math.min(concurrency, items.length));
+    const workers = Array.from({ length: limit }, async () => {
+      while (cursor < items.length) {
+        const index = cursor;
+        cursor += 1;
+        await worker(items[index], index);
+      }
+    });
+    await Promise.all(workers);
+  }
+
+  async function localizeDefaultCovers(games, platform, resolveDefaultUrl, shouldSkip = () => false, options = {}) {
+    const batchSize = Math.max(1, Number(options.batchSize) || 80);
+    const concurrency = Math.max(1, Number(options.concurrency) || 10);
+    const onError = typeof options.onError === 'function' ? options.onError : () => {};
+    const onFail = typeof options.onFail === 'function' ? options.onFail : () => {};
+    const shouldSkipAppId = typeof options.shouldSkipAppId === 'function' ? options.shouldSkipAppId : () => false;
+    const overwriteLocal = !!options.overwriteLocal;
+    const localCoverIndex = buildLocalCoverIndex(platform);
+    const overrideMap = overrideStore.loadMap?.(platform, '') || new Map();
+    const skippedSet = options.skippedAppIds instanceof Set ? options.skippedAppIds : null;
+
+    const pending = [];
+    let skipped = 0;
+    for (const game of games || []) {
+      const appid = String(game?.appid || '').trim();
+      if (!appid) continue;
+      if (shouldSkip(game)) continue;
+      if (skippedSet ? skippedSet.has(appid) : shouldSkipAppId(appid)) {
+        skipped += 1;
+        continue;
+      }
+      const override = overrideMap.get(appid);
+      const locked = !!override?.lock_from_refresh;
+      const hasLocal = locked
+        || (override?.cover_local && hasLocalCoverInIndex(localCoverIndex, appid))
+        || hasLocalCoverInIndex(localCoverIndex, appid);
+      if (hasLocal && !needsLandscapeCoverReplace(platform, game.appid, '', overrideMap) && !overwriteLocal) continue;
+      const remote = resolveDefaultUrl(game);
+      const urls = Array.isArray(remote) ? remote : [remote].filter(Boolean);
+      if (!urls.length) continue;
+      pending.push({ game, urls });
+    }
+
+    const batch = pending.slice(0, batchSize);
+    let done = 0;
+    let failed = 0;
+    await runConcurrent(batch, concurrency, async (item) => {
+      try {
+        await downloadToLocalWithFallback(platform, item.game.appid, item.urls, '');
+        done += 1;
+      } catch (err) {
+        failed += 1;
+        onError(item.game.appid, err);
+        onFail(String(item.game.appid), err);
+      }
+    });
+
+    const processed = done + failed;
+    return {
+      done,
+      failed,
+      pending: pending.length,
+      remaining: Math.max(0, pending.length - processed),
+      skipped,
+    };
+  }
+
+  async function refetchAllCovers(games, platform, resolveRemoteUrls, options = {}) {
+    const userId = String(options.userId || '');
+    const includeLocal = !!options.includeLocal;
+    const fillOnly = !!options.fillOnly;
+    const concurrency = Math.max(1, Number(options.concurrency) || 6);
+    const shouldSkipAppId = typeof options.shouldSkipAppId === 'function' ? options.shouldSkipAppId : () => false;
+    const onProgress = typeof options.onProgress === 'function' ? options.onProgress : null;
+
+    const pending = [];
+    for (const game of games || []) {
+      const appid = String(game?.appid || '').trim();
+      if (!appid || shouldSkipAppId(appid)) continue;
+      if (overrideStore.isLocked(platform, appid, userId)) continue;
+      if (!includeLocal && hasProtectedLocalCover(platform, appid, userId)) continue;
+
+      const existing = overrideStore.get(platform, appid, userId);
+      const hadLocal = !!(existing?.cover_local || findLocalCoverRelative(platform, appid));
+      if (fillOnly && !needsLandscapeCoverReplace(platform, appid, userId)) {
+        const coverUrl = String(existing?.cover_url || game?.cover_url || '').trim();
+        if (coverUrl.startsWith('http') || coverUrl.startsWith('/covers/')) continue;
+        if (hadLocal && !includeLocal) continue;
+      }
+
+      const remote = resolveRemoteUrls(game);
+      const urls = Array.isArray(remote) ? remote : [remote].filter(Boolean);
+      if (!urls.length) continue;
+
+      pending.push({ appid, urls, localize: includeLocal && hadLocal });
+    }
+
+    const total = pending.length;
+    let current = 0;
+    let failed = 0;
+
+    if (!total) {
+      onProgress?.({ current: 0, total: 0, failed: 0, updates: [], complete: true });
+      return { total: 0, done: 0, failed: 0 };
+    }
+
+    await runConcurrent(pending, concurrency, async (item) => {
+      const updates = [];
+      try {
+        const result = await refetchCover(platform, item.appid, userId, item.urls, item.localize);
+        updates.push({
+          appid: item.appid,
+          cover_url: result.cover_url,
+          img_icon_url: result.cover_url,
+        });
+      } catch {
+        failed += 1;
+      } finally {
+        current += 1;
+        onProgress?.({
+          current,
+          total,
+          failed,
+          updates,
+          complete: current >= total,
+        });
+      }
+    });
+
+    return { total, done: total - failed, failed };
   }
 
   return {
@@ -138,5 +364,10 @@ export function createCoverService(dataDir, fetchImpl, overrideStore) {
     saveUploadedFile,
     localizeDefaultCovers,
     publicLocalUrl,
+    hasProtectedLocalCover,
+    findLocalCoverRelative,
+    clearAppCoverFiles,
+    refetchCover,
+    refetchAllCovers,
   };
 }

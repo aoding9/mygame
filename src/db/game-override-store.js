@@ -26,6 +26,12 @@ function hasOverrideContent(row) {
 }
 
 export function createGameOverrideStore(db, coversDir) {
+  const selectByPlatform = db.prepare(`
+    SELECT *
+    FROM game_overrides
+    WHERE platform = ? AND user_id = ?
+  `);
+
   const selectOne = db.prepare(`
     SELECT *
     FROM game_overrides
@@ -65,6 +71,12 @@ export function createGameOverrideStore(db, coversDir) {
     WHERE platform = ? AND appid = ? AND user_id = ?
   `);
 
+  const selectCoverLocals = db.prepare(`
+    SELECT DISTINCT cover_local
+    FROM game_overrides
+    WHERE cover_local != ''
+  `);
+
   function rowToOverride(row) {
     if (!row) return null;
     return {
@@ -94,12 +106,19 @@ export function createGameOverrideStore(db, coversDir) {
   }
 
   function get(platform, appid, userId = '') {
-    return rowToOverride(selectOne.get(platform, String(appid), userId || ''));
+    const id = String(appid);
+    const uid = userId || '';
+    const row = selectOne.get(platform, id, uid);
+    if (row) return rowToOverride(row);
+    if (uid) {
+      const global = selectOne.get(platform, id, '');
+      return rowToOverride(global);
+    }
+    return null;
   }
 
   function isLocked(platform, appid, userId = '') {
-    const row = selectOne.get(platform, String(appid), userId || '');
-    return !!row?.lock_from_refresh;
+    return !!get(platform, appid, userId)?.lock_from_refresh;
   }
 
   function save(platform, appid, userId, payload = {}) {
@@ -165,12 +184,26 @@ export function createGameOverrideStore(db, coversDir) {
     });
   }
 
-  function applyToGame(game, platform, userId = '') {
+  function loadMap(platform, userId = '') {
+    const map = new Map();
+    for (const row of selectByPlatform.all(platform, '')) {
+      map.set(String(row.appid), rowToOverride(row));
+    }
+    const uid = String(userId || '').trim();
+    if (uid) {
+      for (const row of selectByPlatform.all(platform, uid)) {
+        map.set(String(row.appid), rowToOverride(row));
+      }
+    }
+    return map;
+  }
+
+  function applyToGameWithMap(game, platform, overrideMap, userId = '') {
     const appid = String(game.appid ?? '');
     game.source_name = game.name || '';
     game.source_name_cn = game.name_cn || '';
 
-    const override = get(platform, appid, userId);
+    const override = overrideMap.get(appid);
     if (!override) {
       game.lock_from_refresh = false;
       return game;
@@ -196,8 +229,9 @@ export function createGameOverrideStore(db, coversDir) {
   }
 
   function applyToGames(games, platform, userId = '') {
+    const overrideMap = loadMap(platform, userId);
     for (const game of games || []) {
-      applyToGame(game, platform, userId);
+      applyToGameWithMap(game, platform, overrideMap, userId);
     }
     return games;
   }
@@ -225,15 +259,26 @@ export function createGameOverrideStore(db, coversDir) {
     };
   }
 
+  function listReferencedCoverLocals() {
+    const paths = new Set();
+    for (const row of selectCoverLocals.all()) {
+      const relative = String(row.cover_local || '').replace(/\\/g, '/').trim();
+      if (relative) paths.add(relative);
+    }
+    return paths;
+  }
+
   return {
     get,
     save,
+    loadMap,
     updateCoverFields,
-    applyToGame,
+    applyToGameWithMap,
     applyToGames,
     isLocked,
     shouldPreserveOnRefresh,
     buildPublicView,
     resolveCoverUrl,
+    listReferencedCoverLocals,
   };
 }

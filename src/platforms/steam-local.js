@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, readdirSync } from 'fs';
+import { spawn } from 'child_process';
 import { join } from 'path';
 import {
   detectSteamInstallPaths,
@@ -7,6 +8,7 @@ import {
   steamAccountId,
   walkPath,
 } from '../steam/hidden-games.js';
+import { getLocalPathOptions } from '../services/local-path-options.js';
 
 function normalizeAppId(raw) {
   const num = Number(raw);
@@ -47,6 +49,94 @@ function readAppManifestName(manifestPath) {
   } catch {
     return null;
   }
+}
+
+function collectInstalledAppIds(steamRoot) {
+  const ids = new Set();
+  for (const steamapps of collectLibraryPaths(steamRoot)) {
+    let files = [];
+    try {
+      files = readdirSync(steamapps);
+    } catch {
+      continue;
+    }
+    for (const file of files) {
+      if (!/^appmanifest_\d+\.acf$/i.test(file)) continue;
+      const appid = normalizeAppId(file.match(/(\d+)/)?.[1]);
+      if (appid) ids.add(appid);
+    }
+  }
+  return ids;
+}
+
+export function readSteamInstalledAppIds() {
+  const { steamPath } = getLocalPathOptions();
+  const roots = detectSteamInstallPaths(steamPath);
+  const ids = new Set();
+  for (const root of roots) {
+    for (const appid of collectInstalledAppIds(root)) ids.add(appid);
+  }
+  return ids;
+}
+
+export function steamStoreUrl(appid) {
+  const id = normalizeAppId(appid);
+  if (!id) return '';
+  return `https://store.steampowered.com/app/${id}`;
+}
+
+function hasSteamClient(steamPath = '') {
+  const roots = detectSteamInstallPaths(steamPath);
+  return roots.some((root) => existsSync(join(root, 'steam.exe')));
+}
+
+function openSteamProtocolUrl(url) {
+  if (process.platform === 'win32') {
+    spawn('cmd', ['/c', 'start', '', url], {
+      detached: true,
+      stdio: 'ignore',
+      shell: true,
+    }).unref();
+    return;
+  }
+
+  spawn('steam', [url], { detached: true, stdio: 'ignore' }).unref();
+}
+
+export function openSteamInstallPage(appid, steamPath = '') {
+  const id = normalizeAppId(appid);
+  if (!id) throw new Error('无效的游戏 ID');
+
+  const storeUrl = steamStoreUrl(id);
+  if (!hasSteamClient(steamPath)) {
+    const err = new Error('未检测到 Steam 客户端，请确认已安装 Steam');
+    err.storeUrl = storeUrl;
+    throw err;
+  }
+
+  openSteamProtocolUrl(`steam://install/${id}`);
+  return { method: 'steam-install', appid: id, storeUrl };
+}
+
+export function launchSteamGame(appid, steamPath = '') {
+  const id = normalizeAppId(appid);
+  if (!id) throw new Error('无效的游戏 ID');
+
+  if (!hasSteamClient(steamPath)) {
+    throw new Error('未检测到 Steam 客户端，请确认已安装 Steam');
+  }
+
+  const roots = detectSteamInstallPaths(steamPath);
+  for (const root of roots) {
+    const exe = join(root, 'steam.exe');
+    if (existsSync(exe)) {
+      spawn(exe, ['-applaunch', String(id)], { detached: true, stdio: 'ignore' }).unref();
+      return { method: 'steam.exe', appid: id };
+    }
+  }
+
+  openSteamProtocolUrl(`steam://run/${id}`);
+  return { method: 'steam-protocol', appid: id };
 }
 
 function collectManifestNames(steamRoot) {
@@ -106,7 +196,8 @@ export function readSteamLocalLibraryGames(steamId, logger) {
   const accountId = steamAccountId(steamId);
   if (!accountId) return [];
 
-  const roots = detectSteamInstallPaths();
+  const { steamPath } = getLocalPathOptions();
+  const roots = detectSteamInstallPaths(steamPath);
   const byAppId = new Map();
 
   for (const root of roots) {
@@ -136,11 +227,13 @@ export function readSteamLocalLibraryGames(steamId, logger) {
     }
   }
 
+  const installedIds = readSteamInstalledAppIds();
   const games = [...byAppId.values()]
     .map((game) => ({
       ...game,
       name: game.name || `App ${game.appid}`,
       source: 'local-steam',
+      installed: installedIds.has(game.appid),
     }))
     .sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
 
@@ -170,8 +263,9 @@ export function mergeSteamLibraryGames(localGames, remoteGames) {
         playtime_forever: Math.max(Number(game.playtime_forever || 0), Number(prev.playtime_forever || 0)),
         rtime_last_played: Math.max(Number(game.rtime_last_played || 0), Number(prev.rtime_last_played || 0)),
         img_icon_url: game.img_icon_url || prev.img_icon_url || '',
+        installed: !!(prev.installed || game.installed),
       }
-      : game);
+      : { ...game, installed: !!game.installed });
   }
 
   return [...byId.values()];

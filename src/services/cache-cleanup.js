@@ -1,5 +1,7 @@
 import { existsSync, readdirSync, readFileSync, rmSync, statSync, unlinkSync } from 'fs';
-import { join } from 'path';
+import { extname, join } from 'path';
+
+const COVER_IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
 
 function dirSize(root) {
   let bytes = 0;
@@ -120,4 +122,44 @@ export function deleteCacheFile(filePath) {
   if (!existsSync(filePath)) return false;
   unlinkSync(filePath);
   return true;
+}
+
+export function cleanOrphanCovers({
+  coversDir,
+  referencedPaths,
+  ttlMs,
+  debugLog = () => {},
+}) {
+  const removed = { covers: 0, bytes: 0 };
+  if (!existsSync(coversDir)) return removed;
+
+  const referenced = referencedPaths instanceof Set
+    ? referencedPaths
+    : new Set((referencedPaths || []).map((item) => String(item || '').replace(/\\/g, '/').trim()).filter(Boolean));
+
+  for (const entry of readdirSync(coversDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const platformDir = join(coversDir, entry.name);
+    for (const file of readdirSync(platformDir, { withFileTypes: true })) {
+      if (!file.isFile()) continue;
+      const ext = extname(file.name).toLowerCase();
+      if (!COVER_IMAGE_EXT.has(ext)) continue;
+
+      const relative = `${entry.name}/${file.name}`.replace(/\\/g, '/');
+      if (referenced.has(relative)) continue;
+
+      const fullPath = join(platformDir, file.name);
+      if (!fileExpired(0, ttlMs, fullPath)) continue;
+      removeFile(fullPath, removed, 'covers');
+    }
+  }
+
+  if (removed.covers) {
+    debugLog('已清理无引用封面', {
+      ...removed,
+      ttlDays: Math.round(ttlMs / (24 * 60 * 60 * 1000)),
+    });
+  }
+
+  return removed;
 }

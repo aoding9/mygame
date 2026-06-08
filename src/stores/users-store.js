@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, unlinkSync, writeFileSync 
 import { dirname, join } from 'path';
 
 import { randomUUID } from 'crypto';
+import { createTinyCache } from '../services/tiny-cache.js';
 
 
 
@@ -19,6 +20,7 @@ const DEFAULT_STORE = {
 export function createUsersStore(dataDir) {
 
   const storePath = join(dataDir, 'users.json');
+  const storeCache = createTinyCache();
 
 
 
@@ -32,9 +34,16 @@ export function createUsersStore(dataDir) {
 
   function readStore() {
 
+    const cached = storeCache.get();
+    if (cached) return cached;
+
     ensureDir();
 
-    if (!existsSync(storePath)) return { ...DEFAULT_STORE, users: [] };
+    if (!existsSync(storePath)) {
+      const empty = { ...DEFAULT_STORE, users: [] };
+      storeCache.set(empty);
+      return empty;
+    }
 
 
 
@@ -42,17 +51,21 @@ export function createUsersStore(dataDir) {
 
       const data = JSON.parse(readFileSync(storePath, 'utf-8'));
 
-      return {
+      const store = {
 
         activeUserId: data.activeUserId || '',
 
         users: Array.isArray(data.users) ? data.users : [],
 
       };
+      storeCache.set(store);
+      return store;
 
     } catch {
 
-      return { ...DEFAULT_STORE, users: [] };
+      const empty = { ...DEFAULT_STORE, users: [] };
+      storeCache.set(empty);
+      return empty;
 
     }
 
@@ -65,6 +78,10 @@ export function createUsersStore(dataDir) {
     ensureDir();
 
     writeFileSync(storePath, JSON.stringify(store, null, 2), 'utf-8');
+    storeCache.set({
+      activeUserId: store.activeUserId || '',
+      users: Array.isArray(store.users) ? store.users : [],
+    });
 
   }
 
@@ -285,36 +302,6 @@ export function createUsersStore(dataDir) {
 
 
 
-  function initFromEnv(env) {
-
-    const store = readStore();
-
-    if (store.users.length) return listUsers();
-
-
-
-    const steamId = String(env.STEAM_ID || '').trim();
-
-    if (!steamId) return listUsers();
-
-
-
-    const user = saveUser({
-
-      name: '默认用户',
-
-      steamId,
-
-    });
-
-    switchUser(user.id);
-
-    return listUsers();
-
-  }
-
-
-
   return {
 
     storePath,
@@ -334,8 +321,6 @@ export function createUsersStore(dataDir) {
     switchUser,
 
     deleteUser,
-
-    initFromEnv,
 
     sanitizeUser,
 

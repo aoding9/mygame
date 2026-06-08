@@ -39,9 +39,10 @@ export function createRuntimeLogger(options = {}) {
     keepDays = 14,
   } = options;
 
-  const minRank = LEVEL_RANK[level] ?? LEVEL_RANK.info;
+  let minRank = LEVEL_RANK[level] ?? LEVEL_RANK.info;
+  let writeToFile = toFile !== false;
 
-  if (toFile && logDir && !existsSync(logDir)) {
+  if (writeToFile && logDir && !existsSync(logDir)) {
     mkdirSync(logDir, { recursive: true });
   }
 
@@ -51,7 +52,7 @@ export function createRuntimeLogger(options = {}) {
   }
 
   function pruneOldLogs() {
-    if (!toFile || !logDir || !existsSync(logDir)) return;
+    if (!writeToFile || !logDir || !existsSync(logDir)) return;
     const files = readdirSync(logDir)
       .filter((name) => /^mygame-\d{4}-\d{2}-\d{2}\.log$/.test(name))
       .sort();
@@ -67,7 +68,7 @@ export function createRuntimeLogger(options = {}) {
   }
 
   function writeFile(line) {
-    if (!toFile || !logDir) return;
+    if (!writeToFile || !logDir) return;
     try {
       appendFileSync(logFilePath(), `${line}\n`, 'utf8');
       pruneOldLogs();
@@ -90,6 +91,19 @@ export function createRuntimeLogger(options = {}) {
     else console.log(line);
 
     writeFile(line);
+  }
+
+  function configure(next = {}) {
+    if (next.level !== undefined) {
+      const value = String(next.level || 'info').trim().toLowerCase();
+      minRank = LEVEL_RANK[value] ?? LEVEL_RANK.info;
+    }
+    if (next.toFile !== undefined) {
+      writeToFile = next.toFile !== false;
+      if (writeToFile && logDir && !existsSync(logDir)) {
+        mkdirSync(logDir, { recursive: true });
+      }
+    }
   }
 
   function shouldLogRequest(req) {
@@ -131,6 +145,7 @@ export function createRuntimeLogger(options = {}) {
     info: (label, detail) => emit('info', label, detail),
     warn: (label, detail) => emit('warn', label, detail),
     error: (label, detail) => emit('error', label, detail),
+    configure,
     requestMiddleware,
     logDir,
     todayLogPath: () => logFilePath(),
@@ -138,6 +153,10 @@ export function createRuntimeLogger(options = {}) {
       const filePath = logFilePath();
       if (!existsSync(filePath)) return [];
       return readTailSync(filePath, maxLines);
+    },
+    getConfig() {
+      const levelName = Object.entries(LEVEL_RANK).find(([, rank]) => rank === minRank)?.[0] || 'info';
+      return { level: levelName, toFile: writeToFile };
     },
   };
 }

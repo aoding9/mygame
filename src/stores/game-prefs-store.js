@@ -1,4 +1,4 @@
-export const GAME_PREF_PLATFORMS = ['steam', 'epic', 'ubisoft'];
+export const GAME_PREF_PLATFORMS = ['steam'];
 
 export function normalizeGamePrefPlatform(platform) {
   const value = String(platform || 'steam').trim().toLowerCase();
@@ -17,7 +17,7 @@ export function normalizeGamePrefAppId(platform, appid) {
 }
 
 export function createEmptyPlatformAppIds() {
-  return { steam: [], epic: [], ubisoft: [] };
+  return { steam: [] };
 }
 
 export function readPlatformAppIds(data) {

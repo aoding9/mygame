@@ -5,6 +5,7 @@ import {
   parseVdf,
   steamAccountId,
 } from './hidden-games.js';
+import { getLocalPathOptions } from '../services/local-path-options.js';
 
 const COLLECTION_LABELS = {
   favorite: '收藏夹',
@@ -33,11 +34,10 @@ function normalizeAppId(raw) {
 }
 
 function resolveSteamPaths(customPath = '') {
-  const paths = [];
   const manual = String(customPath || '').trim();
-  if (manual) paths.push(manual);
-  paths.push(...detectSteamInstallPaths());
-  return [...new Set(paths.filter(Boolean))];
+  if (manual) return detectSteamInstallPaths(manual);
+  const { steamPath } = getLocalPathOptions();
+  return detectSteamInstallPaths(steamPath);
 }
 
 function normalizeCollectionName(id, name) {
@@ -184,6 +184,22 @@ function finalizeCollections(entryMap) {
   return { collections, byAppId };
 }
 
+function buildByAppIdFromCollections(collections) {
+  const byAppId = new Map();
+  for (const entry of collections || []) {
+    const collectionId = String(entry?.id || '').trim();
+    if (!collectionId) continue;
+    for (const raw of entry.appids || []) {
+      const appid = normalizeAppId(raw);
+      if (!appid) continue;
+      const ids = byAppId.get(appid) || [];
+      if (!ids.includes(collectionId)) ids.push(collectionId);
+      byAppId.set(appid, ids);
+    }
+  }
+  return byAppId;
+}
+
 export function readSteamCollections(steamId, options = {}) {
   const { steamPath = '', debugLog = () => {} } = options;
   const accountId = steamAccountId(steamId);
@@ -237,7 +253,31 @@ export function listSteamCollectionsForFilter(collections) {
 }
 
 export function attachSteamCollectionsToGames(games, steamId, options = {}) {
-  const { collections, byAppId, found } = readSteamCollections(steamId, options);
+  const { steamPath = '', debugLog = () => {}, storedCollections = null } = options;
+  const live = readSteamCollections(steamId, { steamPath, debugLog });
+
+  let collections;
+  let byAppId;
+  let found;
+
+  if (live.found) {
+    found = true;
+    collections = live.collections;
+    byAppId = live.byAppId;
+  } else if (Array.isArray(storedCollections) && storedCollections.length) {
+    found = true;
+    collections = storedCollections;
+    byAppId = buildByAppIdFromCollections(storedCollections);
+  } else {
+    for (const game of games || []) {
+      game.steam_collection_ids = [];
+    }
+    return {
+      found: false,
+      collections: [],
+    };
+  }
+
   for (const game of games || []) {
     const appid = normalizeAppId(game?.appid);
     game.steam_collection_ids = appid ? [...(byAppId.get(appid) || [])] : [];

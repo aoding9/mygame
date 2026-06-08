@@ -1,5 +1,9 @@
+import { isInvalidStoreName, sanitizeStoreGameName } from './game-meta.js';
+import { hasControllerSupport, normalizeInputMethods } from './input-methods.js';
+
 export function parseGameFilters(query = {}) {
   const maxHoursRaw = query.maxHours;
+  const inputMethod = String(query.inputMethod || '').trim();
   return {
     search: String(query.search || '').trim(),
     genre: String(query.genre || '').trim(),
@@ -10,6 +14,10 @@ export function parseGameFilters(query = {}) {
     familyOnly: query.familyOnly === 'true',
     favoritesOnly: query.favoritesOnly === 'true',
     hiddenOnly: query.hiddenOnly === 'true',
+    installedOnly: query.installedOnly === 'true',
+    inputMethod: ['controller', 'controller_full', 'controller_partial', 'keyboard_mouse'].includes(inputMethod)
+      ? inputMethod
+      : '',
     ownerSteamId: String(query.ownerSteamId || query.owner || '').trim(),
     steamCollectionId: String(query.steamCollectionId || query.collectionId || '').trim(),
     minHours: Number(query.minHours) || 0,
@@ -20,11 +28,19 @@ export function parseGameFilters(query = {}) {
   };
 }
 
+function pickStoreChineseTitle(game) {
+  const cn = sanitizeStoreGameName(game.name_cn || '');
+  if (!cn || isInvalidStoreName(cn)) return '';
+  if (cn === game.name) return '';
+  return cn;
+}
+
 export function gameTitle(game) {
   if (game.display_name) return game.display_name;
   const customCn = game.custom_name_cn || '';
   if (customCn && customCn !== game.name) return customCn;
-  if (game.name_cn && game.name_cn !== game.name) return game.name_cn;
+  const cn = pickStoreChineseTitle(game);
+  if (cn) return cn;
   return game.name || '';
 }
 
@@ -115,6 +131,7 @@ export function sanitizeFiltersForPlatform(filters, platform) {
     maxHours: Infinity,
     ownerSteamId: '',
     steamCollectionId: '',
+    inputMethod: '',
     shareableOnly: false,
     nonShareableOnly: false,
     familyOnly: false,
@@ -129,6 +146,7 @@ export function filterGames(games, filters, context = {}) {
     hiddenAppIds = new Set(),
   } = context;
   const isSteam = platform === 'steam';
+  const supportsMetaFilters = platform === 'steam';
 
   const gameIdKey = (game) => (
     platform === 'steam' ? String(Number(game.appid)) : String(game.appid || '')
@@ -137,8 +155,8 @@ export function filterGames(games, filters, context = {}) {
 
   return games.filter((game) => {
     if (filters.search && !gameMatchesSearch(game, filters.search, platform)) return false;
-    if (isSteam && filters.genre && !(game.genres || []).includes(filters.genre)) return false;
-    if (isSteam && filters.tagSearch && !gameMatchesTagSearch(game, filters.tagSearch)) return false;
+    if (supportsMetaFilters && filters.genre && !(game.genres || []).includes(filters.genre)) return false;
+    if (supportsMetaFilters && filters.tagSearch && !gameMatchesTagSearch(game, filters.tagSearch)) return false;
     if (filters.favoritesOnly && !inSet(game, favoriteAppIds)) return false;
     if (filters.hiddenOnly && !inSet(game, hiddenAppIds)) return false;
     if (!filters.hiddenOnly && inSet(game, hiddenAppIds)) return false;
@@ -147,6 +165,11 @@ export function filterGames(games, filters, context = {}) {
       const collectionIds = game.steam_collection_ids || [];
       if (!collectionIds.includes(filters.steamCollectionId)) return false;
     }
+    if (isSteam && filters.installedOnly && !game.installed) return false;
+    if (isSteam && filters.inputMethod === 'controller_full' && !normalizeInputMethods(game.input_methods).includes('controller_full')) return false;
+    if (isSteam && filters.inputMethod === 'controller_partial' && !normalizeInputMethods(game.input_methods).includes('controller_partial')) return false;
+    if (isSteam && filters.inputMethod === 'controller' && !hasControllerSupport(game.input_methods)) return false;
+    if (isSteam && filters.inputMethod === 'keyboard_mouse' && hasControllerSupport(game.input_methods)) return false;
     if (isSteam && filters.unplayed && game.playtime_forever > 0) return false;
     if (isSteam && filters.shareableOnly && game.shareable === false) return false;
     if (isSteam && filters.nonShareableOnly && game.shareable !== false) return false;

@@ -1,7 +1,9 @@
-import { existsSync, readdirSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { createGamesTableAccess } from './games-table.js';
 
 export function createLibraryStore(db) {
+  const gamesTable = createGamesTableAccess(db);
+  gamesTable.migrateLegacyLibraryGames();
+
   const insertSnapshot = db.prepare(`
     INSERT INTO library_snapshots (platform, cache_key, cached_at, game_count, extra_json)
     VALUES (@platform, @cache_key, @cached_at, @game_count, @extra_json)
@@ -21,39 +23,19 @@ export function createLibraryStore(db) {
     DELETE FROM library_snapshots WHERE platform = ? AND cache_key = ?
   `);
 
-  const selectGames = db.prepare(`
-    SELECT data_json FROM library_games WHERE snapshot_id = ? ORDER BY id ASC
-  `);
-
-  const deleteGames = db.prepare(`DELETE FROM library_games WHERE snapshot_id = ?`);
-  const insertGame = db.prepare(`
-    INSERT INTO library_games (snapshot_id, platform, appid, data_json)
-    VALUES (@snapshot_id, @platform, @appid, @data_json)
-  `);
-
-  function parseGames(rows) {
-    return rows.map((row) => JSON.parse(row.data_json));
-  }
-
   function read(platform, cacheKey) {
-    const snapshot = selectSnapshot.get(platform, cacheKey);
-    if (!snapshot) return null;
-    const games = parseGames(selectGames.all(snapshot.id));
-    let extra = {};
-    try {
-      extra = JSON.parse(snapshot.extra_json || '{}');
-    } catch {
-      extra = {};
-    }
+    const data = gamesTable.readSnapshotLibrary(platform, cacheKey);
+    if (!data) return null;
+
     return {
       expired: false,
       data: {
-        cachedAt: snapshot.cached_at,
+        cachedAt: data.cachedAt,
         platform,
         cacheKey,
-        gameCount: snapshot.game_count,
-        games,
-        ...extra,
+        gameCount: data.gameCount,
+        games: data.games,
+        ...data.extra,
       },
     };
   }
@@ -71,16 +53,7 @@ export function createLibraryStore(db) {
         extra_json: extraJson,
       });
       const snapshot = selectSnapshot.get(platform, cacheKey);
-      deleteGames.run(snapshot.id);
-      for (const game of games) {
-        const appid = String(game.appid ?? game.id ?? '');
-        insertGame.run({
-          snapshot_id: snapshot.id,
-          platform,
-          appid,
-          data_json: JSON.stringify(game),
-        });
-      }
+      gamesTable.saveSnapshotGames(snapshot.id, platform, games);
       db.exec('COMMIT');
     } catch (err) {
       db.exec('ROLLBACK');
@@ -100,56 +73,44 @@ export function createLibraryStore(db) {
     deleteSnapshot.run(platform, cacheKey);
   }
 
-  function importLegacyJson(dataDir, debugLog = () => {}) {
-    const count = db.prepare('SELECT COUNT(*) AS c FROM library_snapshots').get().c;
-    if (count > 0) return { imported: 0 };
-
-    let imported = 0;
-    const cacheDir = join(dataDir, 'cache');
-    if (existsSync(cacheDir)) {
-      for (const name of readdirSync(cacheDir)) {
-        if (!name.endsWith('.json')) continue;
-        const path = join(cacheDir, name);
-        try {
-          const data = JSON.parse(readFileSync(path, 'utf-8'));
-          if (!Array.isArray(data.games) || !data.games.length) continue;
-          const cacheKey = name.replace(/\.json$/, '');
-          const useFamily = cacheKey.endsWith('_family');
-          const steamIds = data.steamIds || [];
-          write('steam', cacheKey, data.games, {
-            steamIds,
-            includeFamily: useFamily,
-          });
-          imported += 1;
-        } catch {
-          /* ignore broken cache */
-        }
-      }
-    }
-
-    const platformDir = join(cacheDir, 'platforms');
-    if (existsSync(platformDir)) {
-      for (const name of readdirSync(platformDir)) {
-        if (!name.endsWith('.json')) continue;
-        const platform = name.replace(/\.json$/, '');
-        if (!['epic', 'ubisoft'].includes(platform)) continue;
-        try {
-          const data = JSON.parse(readFileSync(join(platformDir, name), 'utf-8'));
-          if (!Array.isArray(data.games) || !data.games.length) continue;
-          const extra = {};
-          if (data.accountId) extra.accountId = data.accountId;
-          if (data.profileId) extra.profileId = data.profileId;
-          write(platform, platform, data.games, extra);
-          imported += 1;
-        } catch {
-          /* ignore */
-        }
-      }
-    }
-
-    if (imported) debugLog('已从 JSON 迁移游戏库到 SQLite', { imported });
-    return { imported };
+  function findCachedGame(platform, appid) {
+    const hit = gamesTable.findLatestGame(platform, appid);
+    return hit?.game || null;
   }
 
-  return { read, write, remove, importLegacyJson };
+  function updateCachedGameFields(platform, appid, patch = {}) {
+    const hit = gamesTable.findLatestGame(platform, appid);
+    if (!hit?.game) return null;
+
+    const snapshotPlatform = hit.snapshot.platform || platform;
+    const merged = { ...hit.game, ...patch, appid: hit.game.appid || appid };
+    const games = gamesTable.readSnapshotGames(hit.snapshot.id);
+    const idx = games.findIndex((item) => String(item.appid) === String(appid));
+    if (idx < 0) return merged;
+    games[idx] = merged;
+
+    db.exec('BEGIN IMMEDIATE');
+    try {
+      gamesTable.saveSnapshotGames(hit.snapshot.id, snapshotPlatform, games);
+      db.prepare(`
+        UPDATE library_snapshots
+        SET cached_at = ?, game_count = ?
+        WHERE id = ?
+      `).run(Date.now(), games.length, hit.snapshot.id);
+      db.exec('COMMIT');
+    } catch (err) {
+      db.exec('ROLLBACK');
+      throw err;
+    }
+
+    return merged;
+  }
+
+  return {
+    read,
+    write,
+    remove,
+    findCachedGame,
+    updateCachedGameFields,
+  };
 }

@@ -156,7 +156,6 @@ function defaultSteamInstallPaths() {
   const paths = [];
   const registryPath = readWindowsSteamPath();
   if (registryPath) paths.push(registryPath);
-  if (process.env.STEAM_PATH) paths.push(process.env.STEAM_PATH);
   if (process.platform === 'win32') {
     paths.push('C:\\Program Files (x86)\\Steam', 'C:\\Program Files\\Steam');
   } else if (process.platform === 'darwin') {
@@ -272,7 +271,7 @@ function extractHiddenFromCloudStorage(accountDir) {
   return hidden;
 }
 
-function resolveSteamInstallPaths(customPath = '') {
+export function resolveSteamInstallPaths(customPath = '') {
   const paths = [];
   const manual = String(customPath || '').trim();
   if (manual) paths.push(manual);
@@ -280,8 +279,8 @@ function resolveSteamInstallPaths(customPath = '') {
   return [...new Set(paths.filter(Boolean))];
 }
 
-export function detectSteamInstallPaths() {
-  return defaultSteamInstallPaths().filter((path) => existsSync(path));
+export function detectSteamInstallPaths(customPath = '') {
+  return resolveSteamInstallPaths(customPath).filter((path) => existsSync(path));
 }
 
 function readHiddenFromLocalSteam(steamId, options = {}) {

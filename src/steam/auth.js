@@ -70,17 +70,24 @@ export function extractWebApiToken(raw) {
   return text.replace(/^["']|["']$/g, '').trim();
 }
 
-export function loadStoredToken(tokenPath) {
-  if (!existsSync(tokenPath)) return null;
-
+export function readStoredTokenMeta(tokenPath) {
+  if (!existsSync(tokenPath)) return { token: '', expiresAt: 0 };
   try {
     const data = JSON.parse(readFileSync(tokenPath, 'utf-8'));
-    if (!data.token) return null;
-    if (data.expiresAt && Date.now() > data.expiresAt - 60000) return null;
-    return data.token;
+    return {
+      token: String(data.token || '').trim(),
+      expiresAt: Number(data.expiresAt) || 0,
+    };
   } catch {
-    return null;
+    return { token: '', expiresAt: 0 };
   }
+}
+
+export function loadStoredToken(tokenPath) {
+  const { token, expiresAt } = readStoredTokenMeta(tokenPath);
+  if (!token) return null;
+  if (expiresAt && Date.now() > expiresAt - 60000) return null;
+  return token;
 }
 
 export function saveStoredToken(tokenPath, token) {
@@ -91,7 +98,6 @@ export function saveStoredToken(tokenPath, token) {
     JSON.stringify({ token, savedAt: Date.now(), expiresAt }, null, 2),
     'utf-8'
   );
-  process.env.STEAM_ACCESS_TOKEN = token;
   return expiresAt;
 }
 
