@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyGame</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app" id="appRoot">
+    <aside id="appSidebar" class="app-sidebar">
+      <div class="sidebar-head">
+        <div class="sidebar-brand">
+          <span class="brand-icon">🎮</span>
+          <span class="sidebar-brand-text">MyGame</span>
+        </div>
+        <button id="btnToggleSidebar" type="button" class="btn btn-ghost btn-icon sidebar-collapse-btn" aria-expanded="true" aria-label="折叠侧边栏" title="折叠侧边栏">‹</button>
+      </div>
+
+      <nav id="platformTabs" class="sidebar-nav" aria-label="平台切换">
+        <button type="button" class="platform-tab active" data-platform="steam" title="Steam">
+          <span class="platform-tab-icon">S</span>
+          <span class="platform-tab-label">Steam</span>
+        </button>
+        <button type="button" class="platform-tab" data-platform="epic" title="Epic">
+          <span class="platform-tab-icon">E</span>
+          <span class="platform-tab-label">Epic</span>
+        </button>
+        <button type="button" class="platform-tab" data-platform="ubisoft" title="育碧">
+          <span class="platform-tab-icon">U</span>
+          <span class="platform-tab-label">育碧</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-body">
+        <section id="steamPanel" class="sidebar-panel platform-panel" data-platform="steam">
+          <div id="userCards" class="user-cards user-cards-sidebar"></div>
+          <button id="btnAddUser" type="button" class="btn btn-secondary btn-sm sidebar-action">添加用户</button>
+          <span id="authStatus" class="auth-status sidebar-meta">Token 未配置</span>
+          <button id="btnTokenModal" type="button" class="btn btn-secondary btn-sm sidebar-action">Token</button>
+          <span id="cacheInfo" class="cache-info sidebar-meta">切换用户后加载本地缓存，点「刷新」才更新</span>
+        </section>
+
+        <section id="epicPanel" class="sidebar-panel platform-panel hidden" data-platform="epic">
+          <span id="epicAuthStatus" class="auth-status sidebar-meta">未连接 Epic</span>
+          <button id="btnEpicConnect" type="button" class="btn btn-secondary btn-sm sidebar-action">连接 Epic</button>
+          <span id="epicCacheInfo" class="cache-info sidebar-meta">连接后将自动加载 Epic 游戏库</span>
+        </section>
+
+        <section id="ubisoftPanel" class="sidebar-panel platform-panel hidden" data-platform="ubisoft">
+          <span id="ubisoftAuthStatus" class="auth-status sidebar-meta">未连接育碧</span>
+          <button id="btnUbisoftConnect" type="button" class="btn btn-secondary btn-sm sidebar-action">登录育碧</button>
+          <span id="ubisoftCacheInfo" class="cache-info sidebar-meta">登录后将自动加载育碧游戏库</span>
+        </section>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar panel compact-panel">
+        <button id="btnExpandSidebar" type="button" class="btn btn-ghost btn-icon sidebar-expand-btn" aria-label="展开侧边栏" title="展开侧边栏">☰</button>
+        <div class="topbar-title-wrap">
+          <h1 id="topbarTitle" class="topbar-title">MyGame</h1>
+          <div id="statsBar" class="stats-bar stats-bar-inline">请先加载游戏库</div>
+        </div>
+        <div id="loadProgress" class="load-progress load-progress-top hidden">
+          <div class="load-progress-track">
+            <div id="loadProgressFill" class="load-progress-fill"></div>
+          </div>
+          <span id="loadProgressText" class="load-progress-text"></span>
+        </div>
+        <div class="topbar-actions">
+          <button id="btnRefresh" class="btn btn-secondary btn-sm" disabled>刷新</button>
+          <button id="btnImportHidden" type="button" class="btn btn-secondary btn-sm steam-only-control" disabled title="从 Steam 客户端导入隐藏列表">导入隐藏</button>
+          <button id="btnRandom" class="btn btn-accent btn-sm" disabled>🎲 随机</button>
+          <button id="btnToggleFilters" type="button" class="btn btn-secondary btn-sm filters-toggle" aria-expanded="false">筛选</button>
+        </div>
+      </header>
+
+      <section id="libraryMain" class="library-main">
+      <main id="gameGrid" class="game-grid"></main>
+
+      <nav id="pagination" class="pagination hidden" aria-label="游戏库分页">
+        <button id="btnPagePrev" type="button" class="btn btn-secondary btn-sm" disabled>上一页</button>
+        <span id="pageInfo" class="page-info"></span>
+        <button id="btnPageNext" type="button" class="btn btn-secondary btn-sm" disabled>下一页</button>
+      </nav>
+      </section>
+    </div>
+
+    <div id="filtersBackdrop" class="filters-backdrop hidden"></div>
+    <aside id="filtersDrawer" class="filters-drawer collapsed" aria-hidden="true">
+      <div class="filters-drawer-head">
+        <h2 class="filters-drawer-title">筛选</h2>
+        <button id="btnCloseFilters" type="button" class="btn btn-ghost btn-icon" aria-label="关闭筛选">×</button>
+      </div>
+      <div id="filtersBody" class="filters-drawer-body">
+        <div class="filters filters-drawer-grid">
+        <label class="search-box span-2">
+          <span>搜索（支持中文名、简称，如 cs2、老头环）</span>
+          <input id="filterSearch" type="search" placeholder="中英文游戏名、简称 cs2..." disabled>
+        </label>
+        <label id="filterGenreWrap" class="filter-steam-only">
+          类型
+          <select id="filterGenre" disabled><option value="">全部类型</option></select>
+        </label>
+        <label id="filterTagWrap" class="filter-steam-only">
+          标签
+          <input id="filterTag" type="search" list="filterTagOptions" placeholder="自走棋、rogue、卡牌..." disabled>
+          <datalist id="filterTagOptions"></datalist>
+        </label>
+        <label id="filterOwnerWrap" class="filter-steam-only">
+          所有者
+          <select id="filterOwner" disabled><option value="">全部所有者</option></select>
+        </label>
+        <label id="filterCollectionWrap" class="filter-steam-only">
+          Steam 收藏夹
+          <select id="filterCollection" disabled><option value="">全部收藏夹</option></select>
+        </label>
+        <label>
+          排序
+          <select id="filterSort" disabled>
+            <option value="name-asc">名称 A-Z</option>
+            <option value="name-desc">名称 Z-A</option>
+            <option value="playtime-desc">游玩时长 ↓</option>
+            <option value="playtime-asc">游玩时长 ↑</option>
+            <option value="recent">最近游玩</option>
+          </select>
+        </label>
+        <label id="filterMinHoursWrap" class="filter-steam-only">
+          最少时长(h)
+          <input id="filterMinHours" type="number" min="0" step="0.5" value="0" disabled>
+        </label>
+        <label id="filterMaxHoursWrap" class="filter-steam-only">
+          最多时长(h)
+          <input id="filterMaxHours" type="number" min="0" step="0.5" placeholder="不限" disabled>
+        </label>
+        <div class="filter-checks filter-checks-steam">
+          <label class="checkbox-label">
+            <input id="filterUnplayed" type="checkbox" disabled>
+            仅未玩过
+          </label>
+          <label class="checkbox-label">
+            <input id="filterShareable" type="checkbox" disabled>
+            仅可家庭共享
+          </label>
+          <label class="checkbox-label">
+            <input id="filterNonShareable" type="checkbox" disabled>
+            仅不可共享
+          </label>
+          <label class="checkbox-label">
+            <input id="filterFamilyOnly" type="checkbox" disabled>
+            仅家庭库
+          </label>
+        </div>
+        <div class="filter-checks filter-checks-common">
+          <label class="checkbox-label">
+            <input id="filterFavoritesOnly" type="checkbox" disabled>
+            仅收藏
+          </label>
+          <label class="checkbox-label">
+            <input id="filterHiddenOnly" type="checkbox" disabled>
+            仅隐藏
+          </label>
+        </div>
+        </div>
+      </div>
+    </aside>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <dialog id="randomDialog" class="modal-dialog random-dialog">
+      <div class="modal-content">
+        <button id="btnCloseRandom" class="dialog-close" aria-label="关闭">×</button>
+        <div id="randomBody"></div>
+        <div class="dialog-actions">
+          <button id="btnRandomAgain" class="btn btn-accent">再抽一次</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="tokenDialog" class="modal-dialog">
+      <div class="modal-content">
+        <button id="btnCloseToken" class="dialog-close" aria-label="关闭">×</button>
+        <h2 id="tokenDialogTitle" class="modal-title">添加用户</h2>
+        <p class="step-text">在 Edge 登录 Steam 后，点「获取 Token」全选复制整页 JSON 粘贴即可，会自动提取 <code>webapi_token</code></p>
+        <div class="token-input-row">
+          <textarea id="inputAccessToken" rows="4" autocomplete="off" spellcheck="false" placeholder="粘贴整页 JSON 或 webapi_token"></textarea>
+          <button id="btnOpenTokenPage" type="button" class="btn btn-secondary">获取 Token</button>
+        </div>
+        <div id="tokenProfilePreview" class="token-profile-preview hidden">
+          <img id="tokenPreviewAvatar" class="token-preview-avatar" alt="">
+          <div class="token-preview-info">
+            <div id="tokenPreviewName" class="token-preview-name"></div>
+            <div id="tokenPreviewSteamId" class="token-preview-id"></div>
+            <div id="tokenPreviewHint" class="token-preview-hint"></div>
+          </div>
+        </div>
+        <label class="token-field">
+          <span>API Key（可选，用于 Steam Web API）</span>
+          <div class="token-input-row token-input-row-compact">
+            <input id="inputApiKey" type="text" autocomplete="off" spellcheck="false" maxlength="32" placeholder="32 位 Key（可选）">
+            <button id="btnOpenApiKeyPage" type="button" class="btn btn-secondary">申请 Key</button>
+          </div>
+        </label>
+        <div class="dialog-actions dialog-actions-end">
+          <button id="btnCancelToken" type="button" class="btn btn-secondary">取消</button>
+          <button id="btnSaveToken" type="button" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="userEditDialog" class="modal-dialog">
+      <div class="modal-content">
+        <button id="btnCloseUserEdit" class="dialog-close" aria-label="关闭">×</button>
+        <h2 class="modal-title">编辑用户</h2>
+        <div id="userEditProfile" class="token-profile-preview">
+          <img id="userEditAvatar" class="token-preview-avatar" alt="">
+          <div class="token-preview-info">
+            <div id="userEditName" class="token-preview-name"></div>
+            <div id="userEditSteamId" class="token-preview-id"></div>
+            <div id="userEditKeyStatus" class="token-preview-hint"></div>
+          </div>
+        </div>
+        <label class="token-field">
+          <span>API Key（可选）</span>
+          <div class="token-input-row token-input-row-compact">
+            <input id="inputEditApiKey" type="text" autocomplete="off" spellcheck="false" maxlength="32" placeholder="32 位 Key">
+            <button id="btnEditOpenApiKeyPage" type="button" class="btn btn-secondary">申请 Key</button>
+          </div>
+        </label>
+        <p class="step-text">留空则不修改 Key；勾选下方可清除已保存的 Key。</p>
+        <label class="checkbox-label user-edit-clear-key">
+          <input id="inputEditClearApiKey" type="checkbox">
+          清除 API Key
+        </label>
+        <div class="dialog-actions dialog-actions-end">
+          <button id="btnCancelUserEdit" type="button" class="btn btn-secondary">取消</button>
+          <button id="btnSaveUserEdit" type="button" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="epicDialog" class="modal-dialog">
+      <div class="modal-content">
+        <button id="btnCloseEpic" class="dialog-close" aria-label="关闭">×</button>
+        <h2 class="modal-title">连接 Epic</h2>
+        <p class="step-text">可先尝试邮箱密码登录。Epic 常会要求人机验证（captcha），若密码登录失败，请展开下方「浏览器授权码」完成连接。刷新游戏库时会优先读取本机 Epic Launcher 数据。</p>
+        <label class="token-field">
+          <span>邮箱</span>
+          <input id="inputEpicEmail" type="email" autocomplete="username" placeholder="Epic 账号邮箱">
+        </label>
+        <label class="token-field">
+          <span>密码</span>
+          <input id="inputEpicPassword" type="password" autocomplete="current-password" placeholder="密码">
+        </label>
+        <label id="epicVerificationField" class="token-field hidden">
+          <span>邮箱/双重验证码</span>
+          <input id="inputEpicVerificationCode" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="Epic 发送到邮箱或验证器中的验证码">
+        </label>
+        <details id="epicAuthCodeField" class="token-field">
+          <summary>浏览器授权码（密码登录遇到 captcha 时使用）</summary>
+          <p class="step-text">1. 在浏览器打开 <a id="epicBrowserAuthLink" href="https://www.epicgames.com/id/login?redirectUrl=https%3A%2F%2Fwww.epicgames.com%2Fid%2Fapi%2Fredirect%3FclientId%3D34a02cf8f4414e29b15921876da36f9a%26responseType%3Dcode" target="_blank" rel="noopener">Epic 登录并获取授权码</a>（需先登录 Epic 账号）。<br>2. 在浏览器里<strong>全选复制</strong>整段 JSON 粘贴到下方，会自动解析 <code>authorizationCode</code> 并连接（约 5 分钟有效）。</p>
+          <label class="token-field">
+            <span>authorizationCode</span>
+            <textarea id="inputEpicAuthCode" rows="3" autocomplete="off" spellcheck="false" placeholder='粘贴 authorizationCode，或整段 JSON'></textarea>
+          </label>
+          <button id="btnSaveEpicAuthCode" type="button" class="btn btn-secondary btn-sm">使用授权码连接</button>
+        </details>
+        <div class="dialog-actions dialog-actions-end">
+          <button id="btnCancelEpic" type="button" class="btn btn-secondary">取消</button>
+          <button id="btnSaveEpic" type="button" class="btn btn-primary">登录</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="ubisoftDialog" class="modal-dialog">
+      <div class="modal-content">
+        <button id="btnCloseUbisoft" class="dialog-close" aria-label="关闭">×</button>
+        <h2 class="modal-title">连接育碧</h2>
+        <p class="step-text">使用 Ubisoft 账号邮箱和密码登录。若开启双重验证，提交密码后会显示验证码输入框。本机已登录 Ubisoft Connect 时，刷新会自动读取本地游戏库。</p>
+        <label class="token-field">
+          <span>邮箱</span>
+          <input id="inputUbisoftEmail" type="email" autocomplete="username" placeholder="Ubisoft 账号邮箱">
+        </label>
+        <label class="token-field">
+          <span>密码</span>
+          <input id="inputUbisoftPassword" type="password" autocomplete="current-password" placeholder="密码">
+        </label>
+        <label id="ubisoftVerificationField" class="token-field hidden">
+          <span>邮箱/双重验证码</span>
+          <input id="inputUbisoftVerificationCode" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="育碧发送到邮箱或验证器中的验证码">
+        </label>
+        <div class="dialog-actions dialog-actions-end">
+          <button id="btnCancelUbisoft" type="button" class="btn btn-secondary">取消</button>
+          <button id="btnSaveUbisoft" type="button" class="btn btn-primary">登录</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="gameEditDialog" class="modal-dialog game-edit-dialog">
+      <div class="modal-content">
+        <button id="btnCloseGameEdit" class="dialog-close" aria-label="关闭">×</button>
+        <h2 class="modal-title">编辑游戏资料</h2>
+        <p id="gameEditSourceInfo" class="step-text"></p>
+        <div id="gameEditPreview" class="cover-dialog-preview"></div>
+        <label class="token-field">
+          <span>显示名称（优先展示）</span>
+          <input id="inputDisplayName" type="text" placeholder="自定义显示名，可留空">
+        </label>
+        <label class="token-field">
+          <span>中文名</span>
+          <input id="inputNameCn" type="text" placeholder="中文名称">
+        </label>
+        <label class="token-field">
+          <span>英文名 / 原名</span>
+          <input id="inputNameEn" type="text" placeholder="英文名称或副标题">
+        </label>
+        <label class="token-field filter-steam-only" id="gameEditGenresWrap">
+          <span>类型（逗号分隔）</span>
+          <input id="inputGenres" type="text" placeholder="动作, 角色扮演">
+        </label>
+        <label class="token-field filter-steam-only" id="gameEditTagsWrap">
+          <span>标签（逗号分隔）</span>
+          <input id="inputTags" type="text" placeholder="开放世界, 剧情丰富">
+        </label>
+        <label class="token-field">
+          <span>搜索别名（逗号分隔）</span>
+          <input id="inputAliases" type="text" placeholder="cs2, 老头环">
+        </label>
+        <label class="token-field">
+          <span>封面图片链接</span>
+          <input id="inputCoverUrl" type="url" placeholder="https://...">
+        </label>
+        <label class="token-field">
+          <span>或上传封面图片</span>
+          <input id="inputCoverFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+        </label>
+        <label class="token-field">
+          <span>按游戏名搜索资料（RAWG / Steam）</span>
+          <div class="token-input-row token-input-row-compact">
+            <input id="inputCoverLookup" type="search" placeholder="输入游戏名搜索">
+            <button id="btnCoverLookup" type="button" class="btn btn-secondary">搜索</button>
+          </div>
+        </label>
+        <div id="coverLookupResults" class="cover-lookup-results"></div>
+        <label class="checkbox-label">
+          <input id="inputCoverLocalize" type="checkbox" checked>
+          外链封面保存时下载到本地
+        </label>
+        <label class="checkbox-label game-edit-lock">
+          <input id="inputLockFromRefresh" type="checkbox">
+          锁定自定义内容，刷新游戏库时不被自动覆盖
+        </label>
+        <div class="dialog-actions dialog-actions-end">
+          <button id="btnCancelGameEdit" type="button" class="btn btn-secondary">取消</button>
+          <button id="btnSaveGameEdit" type="button" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="hiddenImportDialog" class="modal-dialog">
+      <div class="modal-content">
+        <button id="btnCloseHiddenImport" class="dialog-close" aria-label="关闭">×</button>
+        <h2 class="modal-title">从 Steam 客户端导入隐藏</h2>
+        <p class="step-text">将读取本机 Steam 配置中的「已隐藏」分类，并合并到当前用户的隐藏列表（不会覆盖你手动隐藏的游戏）。</p>
+        <label class="token-field">
+          <span>Steam 安装路径（自动检测失败时手填，如 e:/steam）</span>
+          <input id="inputSteamPath" type="text" autocomplete="off" spellcheck="false" placeholder="留空则尝试自动检测">
+        </label>
+        <p id="hiddenImportHint" class="step-text"></p>
+        <div class="dialog-actions dialog-actions-end">
+          <button id="btnCancelHiddenImport" type="button" class="btn btn-secondary">取消</button>
+          <button id="btnConfirmHiddenImport" type="button" class="btn btn-primary">开始导入</button>
+        </div>
+      </div>
+    </dialog>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

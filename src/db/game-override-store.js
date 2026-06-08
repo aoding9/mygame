@@ -1,0 +1,239 @@
+import { existsSync } from 'fs';
+import { join } from 'path';
+
+function parseJsonArray(raw) {
+  try {
+    const value = JSON.parse(raw || '[]');
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+}
+
+function hasOverrideContent(row) {
+  if (!row) return false;
+  return !!(
+    row.display_name
+    || row.name_cn
+    || row.name_en
+    || row.cover_url
+    || row.cover_local
+    || parseJsonArray(row.genres_json).length
+    || parseJsonArray(row.tags_json).length
+    || parseJsonArray(row.aliases_json).length
+    || row.lock_from_refresh
+  );
+}
+
+export function createGameOverrideStore(db, coversDir) {
+  const selectOne = db.prepare(`
+    SELECT *
+    FROM game_overrides
+    WHERE platform = ? AND appid = ? AND user_id = ?
+  `);
+
+  const upsert = db.prepare(`
+    INSERT INTO game_overrides (
+      platform, appid, user_id,
+      display_name, name_cn, name_en,
+      genres_json, tags_json, aliases_json,
+      cover_url, cover_local, cover_source_url,
+      lock_from_refresh, updated_at
+    ) VALUES (
+      @platform, @appid, @user_id,
+      @display_name, @name_cn, @name_en,
+      @genres_json, @tags_json, @aliases_json,
+      @cover_url, @cover_local, @cover_source_url,
+      @lock_from_refresh, @updated_at
+    )
+    ON CONFLICT(platform, appid, user_id) DO UPDATE SET
+      display_name = excluded.display_name,
+      name_cn = excluded.name_cn,
+      name_en = excluded.name_en,
+      genres_json = excluded.genres_json,
+      tags_json = excluded.tags_json,
+      aliases_json = excluded.aliases_json,
+      cover_url = excluded.cover_url,
+      cover_local = excluded.cover_local,
+      cover_source_url = excluded.cover_source_url,
+      lock_from_refresh = excluded.lock_from_refresh,
+      updated_at = excluded.updated_at
+  `);
+
+  const removeOne = db.prepare(`
+    DELETE FROM game_overrides
+    WHERE platform = ? AND appid = ? AND user_id = ?
+  `);
+
+  function rowToOverride(row) {
+    if (!row) return null;
+    return {
+      platform: row.platform,
+      appid: row.appid,
+      user_id: row.user_id,
+      display_name: row.display_name || '',
+      name_cn: row.name_cn || '',
+      name_en: row.name_en || '',
+      genres: parseJsonArray(row.genres_json),
+      tags: parseJsonArray(row.tags_json),
+      aliases: parseJsonArray(row.aliases_json),
+      cover_url: row.cover_url || '',
+      cover_local: row.cover_local || '',
+      cover_source_url: row.cover_source_url || '',
+      lock_from_refresh: !!row.lock_from_refresh,
+      updated_at: row.updated_at,
+    };
+  }
+
+  function resolveCoverUrl(override) {
+    if (!override) return '';
+    if (override.cover_local && existsSync(join(coversDir, override.cover_local))) {
+      return `/covers/${override.cover_local.replace(/\\/g, '/')}`;
+    }
+    return override.cover_url || '';
+  }
+
+  function get(platform, appid, userId = '') {
+    return rowToOverride(selectOne.get(platform, String(appid), userId || ''));
+  }
+
+  function isLocked(platform, appid, userId = '') {
+    const row = selectOne.get(platform, String(appid), userId || '');
+    return !!row?.lock_from_refresh;
+  }
+
+  function save(platform, appid, userId, payload = {}) {
+    const existing = get(platform, appid, userId);
+    const merged = {
+      platform,
+      appid: String(appid),
+      user_id: userId || '',
+      display_name: payload.display_name ?? existing?.display_name ?? '',
+      name_cn: payload.name_cn ?? existing?.name_cn ?? '',
+      name_en: payload.name_en ?? existing?.name_en ?? '',
+      genres_json: JSON.stringify(payload.genres ?? existing?.genres ?? []),
+      tags_json: JSON.stringify(payload.tags ?? existing?.tags ?? []),
+      aliases_json: JSON.stringify(payload.aliases ?? existing?.aliases ?? []),
+      cover_url: payload.cover_url ?? existing?.cover_url ?? '',
+      cover_local: payload.cover_local ?? existing?.cover_local ?? '',
+      cover_source_url: payload.cover_source_url ?? existing?.cover_source_url ?? '',
+      lock_from_refresh: payload.lock_from_refresh !== undefined
+        ? (payload.lock_from_refresh ? 1 : 0)
+        : (existing?.lock_from_refresh ? 1 : 0),
+      updated_at: Date.now(),
+    };
+
+    const hasContent = !!(
+      merged.display_name
+      || merged.name_cn
+      || merged.name_en
+      || parseJsonArray(merged.genres_json).length
+      || parseJsonArray(merged.tags_json).length
+      || parseJsonArray(merged.aliases_json).length
+      || merged.cover_url
+      || merged.cover_local
+    );
+
+    if (!hasContent && !merged.lock_from_refresh) {
+      removeOne.run(platform, String(appid), userId || '');
+      return null;
+    }
+
+    upsert.run({
+      ...merged,
+      lock_from_refresh: merged.lock_from_refresh ? 1 : 0,
+    });
+    return get(platform, appid, userId);
+  }
+
+  function updateCoverFields(platform, appid, userId, coverPatch) {
+    const existing = get(platform, appid, userId) || {
+      display_name: '',
+      name_cn: '',
+      name_en: '',
+      genres: [],
+      tags: [],
+      aliases: [],
+      cover_url: '',
+      cover_local: '',
+      cover_source_url: '',
+      lock_from_refresh: false,
+    };
+    return save(platform, appid, userId, {
+      ...existing,
+      ...coverPatch,
+    });
+  }
+
+  function applyToGame(game, platform, userId = '') {
+    const appid = String(game.appid ?? '');
+    game.source_name = game.name || '';
+    game.source_name_cn = game.name_cn || '';
+
+    const override = get(platform, appid, userId);
+    if (!override) {
+      game.lock_from_refresh = false;
+      return game;
+    }
+
+    game.lock_from_refresh = override.lock_from_refresh;
+    game.has_override = true;
+
+    if (override.display_name) game.display_name = override.display_name;
+    if (override.name_cn) game.custom_name_cn = override.name_cn;
+    if (override.name_en) game.custom_name_en = override.name_en;
+    if (override.genres.length) game.genres = override.genres;
+    if (override.tags.length) game.tags = override.tags;
+    if (override.aliases.length) game.aliases = override.aliases;
+
+    const cover = resolveCoverUrl(override);
+    if (cover) {
+      game.cover_url = cover;
+      game.cover_custom = true;
+    }
+
+    return game;
+  }
+
+  function applyToGames(games, platform, userId = '') {
+    for (const game of games || []) {
+      applyToGame(game, platform, userId);
+    }
+    return games;
+  }
+
+  function shouldPreserveOnRefresh(platform, appid, userId = '') {
+    return isLocked(platform, appid, userId);
+  }
+
+  function buildPublicView(game, platform, userId = '') {
+    const override = get(platform, String(game.appid), userId);
+    return {
+      platform,
+      appid: String(game.appid),
+      source_name: game.source_name || game.name || '',
+      source_name_cn: game.source_name_cn || game.name_cn || '',
+      display_name: override?.display_name || game.display_name || '',
+      name_cn: override?.name_cn || game.custom_name_cn || '',
+      name_en: override?.name_en || game.custom_name_en || '',
+      genres: override?.genres?.length ? override.genres : (game.genres || []),
+      tags: override?.tags?.length ? override.tags : (game.tags || []),
+      aliases: override?.aliases?.length ? override.aliases : (game.aliases || []),
+      cover_url: resolveCoverUrl(override) || game.cover_url || '',
+      lock_from_refresh: !!override?.lock_from_refresh,
+      has_override: !!override && hasOverrideContent(override),
+    };
+  }
+
+  return {
+    get,
+    save,
+    updateCoverFields,
+    applyToGame,
+    applyToGames,
+    isLocked,
+    shouldPreserveOnRefresh,
+    buildPublicView,
+    resolveCoverUrl,
+  };
+}
