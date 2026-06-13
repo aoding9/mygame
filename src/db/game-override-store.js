@@ -99,10 +99,40 @@ export function createGameOverrideStore(db, coversDir) {
 
   function resolveCoverUrl(override) {
     if (!override) return '';
-    if (override.cover_local && existsSync(join(coversDir, override.cover_local))) {
-      return `/covers/${override.cover_local.replace(/\\/g, '/')}`;
+    const coverLocal = override.cover_local || '';
+    if (coverLocal) {
+      if (existsSync(join(coversDir, coverLocal))) {
+        return `/covers/${coverLocal.replace(/\\/g, '/')}`;
+      }
+      clearStaleLocalCover(override.platform, override.appid, override.user_id);
+      override.cover_local = '';
     }
     return override.cover_url || '';
+  }
+
+  function clearStaleLocalCover(platform, appid, userId = '') {
+    const override = get(platform, appid, userId);
+    if (!override?.cover_local) return false;
+    if (existsSync(join(coversDir, override.cover_local))) return false;
+    save(platform, appid, userId, {
+      ...override,
+      cover_local: '',
+    });
+    return true;
+  }
+
+  function clearStaleLocalCovers(platform, userId = '') {
+    let cleared = 0;
+    for (const row of selectByPlatform.all(platform, userId || '')) {
+      if (!row.cover_local) continue;
+      if (existsSync(join(coversDir, row.cover_local))) continue;
+      save(platform, row.appid, row.user_id || '', {
+        ...rowToOverride(row),
+        cover_local: '',
+      });
+      cleared += 1;
+    }
+    return cleared;
   }
 
   function get(platform, appid, userId = '') {
@@ -229,6 +259,7 @@ export function createGameOverrideStore(db, coversDir) {
   }
 
   function applyToGames(games, platform, userId = '') {
+    clearStaleLocalCovers(platform, userId);
     const overrideMap = loadMap(platform, userId);
     for (const game of games || []) {
       applyToGameWithMap(game, platform, overrideMap, userId);
@@ -279,6 +310,8 @@ export function createGameOverrideStore(db, coversDir) {
     shouldPreserveOnRefresh,
     buildPublicView,
     resolveCoverUrl,
+    clearStaleLocalCover,
+    clearStaleLocalCovers,
     listReferencedCoverLocals,
   };
 }

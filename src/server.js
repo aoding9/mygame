@@ -175,7 +175,7 @@ function isValidApiKey(apiKey) {
 
 function assertApiKeyFormat(apiKey) {
   if (!isValidApiKey(apiKey)) {
-    if (!apiKey) throw new Error('请先在添加用户时填写 API Key');
+    if (!apiKey) throw new Error('请先连接 Steam 并填写 API Key');
     throw new Error('API Key 格式不正确，应为 32 位字母和数字');
   }
 }
@@ -189,12 +189,12 @@ function applySteamAuthParams(params, apiKey, accessToken) {
     params.set('access_token', accessToken);
     return;
   }
-  throw new Error('请先添加用户并保存 Steam Token');
+  throw new Error('请先连接 Steam 并保存 Token');
 }
 
 function ensureGamesAuth(apiKey, accessToken) {
   if (isValidApiKey(apiKey) || accessToken) return;
-  throw new Error('请先添加用户并保存 Steam Token');
+  throw new Error('请先连接 Steam 并保存 Token');
 }
 
 async function steamFetch(url, options = {}) {
@@ -372,9 +372,9 @@ function scheduleCoverLocalization(games, platform) {
 
 function defaultRefreshParts(platform) {
   if (platform === 'steam') {
-    return { library: true, meta: false, covers: false, localizeCovers: true };
+    return { library: true, meta: false, covers: false, localizeCovers: false };
   }
-  return { library: true, meta: false, covers: false, localizeCovers: true };
+  return { library: true, meta: false, covers: false, localizeCovers: false };
 }
 
 function parseRefreshParts(query, platform) {
@@ -1010,7 +1010,7 @@ async function resolveSteamId(input, apiKey) {
   const vanity = vanityMatch?.[1];
   if (vanity) {
     if (!isValidApiKey(apiKey)) {
-      throw new Error('解析 Steam 自定义 URL 需要 API Key，请在添加用户时填写');
+      throw new Error('解析 Steam 自定义 URL 需要 API Key，请在连接 Steam 时填写');
     }
     const url = `https://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${normalizeApiKey(apiKey)}&vanityurl=${encodeURIComponent(vanity)}`;
     const res = await steamFetch(url);
@@ -1183,7 +1183,6 @@ app.get('/api/config', async (req, res) => {
     authState: getAuthState(),
     activeUserId: userList.activeUserId,
     activeUser: user ? usersStore.publicUser(user) : null,
-    users: userList.users,
   });
 });
 
@@ -1221,31 +1220,6 @@ app.get('/api/users', (_req, res) => {
   res.json(usersStore.listUsers());
 });
 
-app.post('/api/users', async (req, res) => {
-  try {
-    let body = { ...(req.body || {}) };
-    const apiKey = getApiKey(req);
-    if (body.steamId && apiKey) {
-      try {
-        const resolved = await resolveSteamId(body.steamId, apiKey);
-        body.steamId = resolved;
-        const profile = await fetchSteamProfile(resolved, apiKey);
-        if (profile) {
-          body.personaName = profile.personaName;
-          body.avatar = profile.avatar;
-          body.name = profile.personaName;
-        }
-      } catch {
-        /* keep manual input */
-      }
-    }
-    const saved = usersStore.saveUser(body);
-    res.json(saved);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
 app.get('/api/steam/profile', async (req, res) => {
   try {
     const apiKey = getApiKey(req);
@@ -1257,15 +1231,6 @@ app.get('/api/steam/profile', async (req, res) => {
       return;
     }
     res.json(profile);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.post('/api/users/switch', (req, res) => {
-  try {
-    const user = usersStore.switchUser(String(req.body?.userId || '').trim());
-    res.json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -1302,60 +1267,6 @@ app.post('/api/users/refresh-profile', async (req, res) => {
     });
     debugLog('用户资料已更新', { userId: saved.id, steamId: saved.steamId, name: saved.personaName });
     res.json(saved);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.patch('/api/users/:id', (req, res) => {
-  try {
-    const userId = String(req.params.id || '').trim();
-    const store = usersStore.readStore();
-    const existing = store.users.find((u) => u.id === userId);
-    if (!existing) {
-      res.status(404).json({ error: '用户不存在' });
-      return;
-    }
-
-    const body = req.body || {};
-    let apiKey = existing.apiKey;
-
-    if (body.clearApiKey) {
-      apiKey = '';
-    } else if (body.apiKey !== undefined) {
-      apiKey = String(body.apiKey || '').trim().replace(/\s+/g, '');
-      if (apiKey && !/^[A-Fa-f0-9]{32}$/i.test(apiKey)) {
-        res.status(400).json({ error: 'API Key 应为 32 位字母和数字' });
-        return;
-      }
-    } else {
-      res.status(400).json({ error: '请提供 apiKey 或 clearApiKey' });
-      return;
-    }
-
-    const saved = usersStore.saveUser({
-      id: userId,
-      apiKey,
-    });
-    debugLog('用户 API Key 已更新', { userId, hasApiKey: saved.hasApiKey });
-    res.json(saved);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.delete('/api/users/:id', (req, res) => {
-  try {
-    const userId = String(req.params.id || '').trim();
-    const existing = usersStore.readStore().users.find((u) => u.id === userId);
-    const data = usersStore.deleteUser(userId);
-    debugLog('用户已删除', {
-      userId,
-      steamId: existing?.steamId || '',
-      remaining: data.users.length,
-      activeUserId: data.activeUserId,
-    });
-    res.json(data);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -1478,13 +1389,12 @@ app.post('/api/users/add-token', async (req, res) => {
       return;
     }
 
-    const existingUser = usersStore.findUserBySteamId(steamId);
+    const existingUser = usersStore.getActiveUser();
     if (existingUser) {
-      debugLog('阻止重复添加用户', { steamId, existingUserId: existingUser.id });
       res.status(409).json({
-        error: `该 Steam 账号已添加：${existingUser.personaName || existingUser.name}`,
+        error: '已配置 Steam 账号，请使用更新 Token',
         userId: existingUser.id,
-        steamId,
+        steamId: existingUser.steamId,
       });
       return;
     }

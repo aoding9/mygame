@@ -1,10 +1,12 @@
-import { createWriteStream, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
+import { createWriteStream, existsSync, mkdirSync, readdirSync, unlinkSync, writeFileSync } from 'fs';
 import { extname, join } from 'path';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
+import sharp from 'sharp';
 import { isPortraitSteamCoverSource } from './steam-cover-urls.js';
 
 const ALLOWED_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
+const MAX_LOCAL_COVER_BYTES = 100 * 1024;
 
 function safeAppId(appid) {
   return String(appid || '').replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -17,6 +19,38 @@ function guessExt(url, contentType = '') {
   if (/webp/i.test(contentType)) return '.webp';
   if (/gif/i.test(contentType)) return '.gif';
   return '.jpg';
+}
+
+async function compressCoverForLocal(buffer) {
+  if (!buffer?.length || buffer.length <= MAX_LOCAL_COVER_BYTES) {
+    return { buffer, ext: '' };
+  }
+
+  try {
+    await sharp(buffer, { failOn: 'none' }).metadata();
+  } catch {
+    return { buffer, ext: '' };
+  }
+
+  const widths = [null, 512, 448, 384, 320, 256, 200];
+  const qualities = [85, 75, 65, 55, 45, 35, 25, 20];
+  let smallest = null;
+
+  for (const width of widths) {
+    for (const quality of qualities) {
+      let pipeline = sharp(buffer, { failOn: 'none' });
+      if (width) {
+        pipeline = pipeline.resize({ width, withoutEnlargement: true });
+      }
+      const out = await pipeline.jpeg({ quality, mozjpeg: true }).toBuffer();
+      if (!smallest || out.length < smallest.length) smallest = out;
+      if (out.length <= MAX_LOCAL_COVER_BYTES) {
+        return { buffer: out, ext: '.jpg' };
+      }
+    }
+  }
+
+  return { buffer: smallest || buffer, ext: '.jpg' };
 }
 
 export function createCoverService(dataDir, fetchImpl, overrideStore) {
@@ -69,6 +103,15 @@ export function createCoverService(dataDir, fetchImpl, overrideStore) {
   function hasProtectedLocalCover(platform, appid, userId = '') {
     if (overrideStore.isLocked(platform, appid, userId)) return true;
     const existing = overrideStore.get(platform, appid, userId);
+    if (existing?.cover_local) {
+      if (existsSync(join(coversDir, existing.cover_local))) return true;
+      overrideStore.clearStaleLocalCover?.(platform, appid, userId);
+    }
+    return !!findLocalCoverRelative(platform, appid);
+  }
+
+  function hasLocalCoverFile(platform, appid, userId = '') {
+    const existing = overrideStore.get(platform, appid, userId);
     if (existing?.cover_local && existsSync(join(coversDir, existing.cover_local))) return true;
     return !!findLocalCoverRelative(platform, appid);
   }
@@ -102,7 +145,10 @@ export function createCoverService(dataDir, fetchImpl, overrideStore) {
 
     const contentType = res.headers.get('content-type') || '';
     const ext = guessExt(url, contentType);
-    const relative = `${platform}/${safeAppId(appid)}${ext}`;
+    const rawBuffer = Buffer.from(await res.arrayBuffer());
+    const { buffer, ext: compressedExt } = await compressCoverForLocal(rawBuffer);
+    const finalExt = compressedExt || ext;
+    const relative = `${platform}/${safeAppId(appid)}${finalExt}`;
     localDir(platform);
     const fullPath = join(coversDir, relative);
 
@@ -115,8 +161,7 @@ export function createCoverService(dataDir, fetchImpl, overrideStore) {
       }
     }
 
-    const buffer = Buffer.from(await res.arrayBuffer());
-    await pipeline(Readable.from(buffer), createWriteStream(fullPath));
+    writeFileSync(fullPath, buffer);
 
     overrideStore.updateCoverFields(platform, appid, userId, {
       cover_url: '',
@@ -242,6 +287,7 @@ export function createCoverService(dataDir, fetchImpl, overrideStore) {
     const onFail = typeof options.onFail === 'function' ? options.onFail : () => {};
     const shouldSkipAppId = typeof options.shouldSkipAppId === 'function' ? options.shouldSkipAppId : () => false;
     const overwriteLocal = !!options.overwriteLocal;
+    overrideStore.clearStaleLocalCovers?.(platform);
     const localCoverIndex = buildLocalCoverIndex(platform);
     const overrideMap = overrideStore.loadMap?.(platform, '') || new Map();
     const skippedSet = options.skippedAppIds instanceof Set ? options.skippedAppIds : null;
@@ -308,7 +354,7 @@ export function createCoverService(dataDir, fetchImpl, overrideStore) {
       if (!includeLocal && hasProtectedLocalCover(platform, appid, userId)) continue;
 
       const existing = overrideStore.get(platform, appid, userId);
-      const hadLocal = !!(existing?.cover_local || findLocalCoverRelative(platform, appid));
+      const hadLocal = hasLocalCoverFile(platform, appid, userId);
       if (fillOnly && !needsLandscapeCoverReplace(platform, appid, userId)) {
         const coverUrl = String(existing?.cover_url || game?.cover_url || '').trim();
         if (coverUrl.startsWith('http') || coverUrl.startsWith('/covers/')) continue;

@@ -42,16 +42,10 @@
           <button id="btnSettings" type="button" class="topbar-icon-btn" title="设置" aria-label="设置">
             <span class="topbar-icon-glyph" aria-hidden="true">⚙</span>
           </button>
-          <div class="user-menu" id="userMenu">
-            <button id="btnUserMenu" type="button" class="user-menu-trigger" aria-haspopup="true" aria-expanded="false" title="切换用户">
+          <button id="btnUserMenu" type="button" class="user-menu-trigger" title="Steam 账号">
               <span id="userMenuAvatar" class="user-menu-avatar user-menu-avatar-add" aria-hidden="true">+</span>
-              <span id="userMenuName" class="user-menu-name">添加用户</span>
-              <span class="user-menu-caret" aria-hidden="true">▾</span>
+              <span id="userMenuName" class="user-menu-name hidden"></span>
             </button>
-            <div id="userMenuDropdown" class="user-menu-dropdown hidden" role="menu">
-              <div id="userMenuList" class="user-menu-list"></div>
-            </div>
-          </div>
         </div>
       </div>
     </header>
@@ -186,7 +180,7 @@
     <dialog id="tokenDialog" class="modal-dialog">
       <div class="modal-content">
         <button id="btnCloseToken" class="dialog-close" aria-label="关闭">×</button>
-        <h2 id="tokenDialogTitle" class="modal-title">添加用户</h2>
+        <h2 id="tokenDialogTitle" class="modal-title">连接 Steam</h2>
         <p class="step-text">在 Edge 登录 Steam 后，点「获取 Token」全选复制整页 JSON 粘贴即可，会自动提取 <code>webapi_token</code></p>
         <div class="token-input-row">
           <textarea id="inputAccessToken" rows="4" autocomplete="off" spellcheck="false" placeholder="粘贴整页 JSON 或 webapi_token"></textarea>
@@ -210,37 +204,6 @@
         <div class="dialog-actions dialog-actions-end">
           <button id="btnCancelToken" type="button" class="btn btn-secondary">取消</button>
           <button id="btnSaveToken" type="button" class="btn btn-primary">保存</button>
-        </div>
-      </div>
-    </dialog>
-
-    <dialog id="userEditDialog" class="modal-dialog">
-      <div class="modal-content">
-        <button id="btnCloseUserEdit" class="dialog-close" aria-label="关闭">×</button>
-        <h2 class="modal-title">编辑用户</h2>
-        <div id="userEditProfile" class="token-profile-preview">
-          <img id="userEditAvatar" class="token-preview-avatar" alt="">
-          <div class="token-preview-info">
-            <div id="userEditName" class="token-preview-name"></div>
-            <div id="userEditSteamId" class="token-preview-id"></div>
-            <div id="userEditKeyStatus" class="token-preview-hint"></div>
-          </div>
-        </div>
-        <label class="token-field">
-          <span>API Key（可选）</span>
-          <div class="token-input-row token-input-row-compact">
-            <input id="inputEditApiKey" type="text" autocomplete="off" spellcheck="false" maxlength="32" placeholder="32 位 Key">
-            <button id="btnEditOpenApiKeyPage" type="button" class="btn btn-secondary">申请 Key</button>
-          </div>
-        </label>
-        <p class="step-text">留空则不修改 Key；勾选下方可清除已保存的 Key。</p>
-        <label class="checkbox-label user-edit-clear-key">
-          <input id="inputEditClearApiKey" type="checkbox">
-          清除 API Key
-        </label>
-        <div class="dialog-actions dialog-actions-end">
-          <button id="btnCancelUserEdit" type="button" class="btn btn-secondary">取消</button>
-          <button id="btnSaveUserEdit" type="button" class="btn btn-primary">保存</button>
         </div>
       </div>
     </dialog>

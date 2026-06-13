@@ -10,8 +10,6 @@ const els = {
   btnUserMenu: document.getElementById('btnUserMenu'),
   userMenuAvatar: document.getElementById('userMenuAvatar'),
   userMenuName: document.getElementById('userMenuName'),
-  userMenuDropdown: document.getElementById('userMenuDropdown'),
-  userMenuList: document.getElementById('userMenuList'),
   loadProgress: document.getElementById('loadProgress'),
   loadProgressFill: document.getElementById('loadProgressFill'),
   loadProgressText: document.getElementById('loadProgressText'),
@@ -66,17 +64,6 @@ const els = {
   inputApiKey: document.getElementById('inputApiKey'),
   btnOpenApiKeyPage: document.getElementById('btnOpenApiKeyPage'),
   btnSaveToken: document.getElementById('btnSaveToken'),
-  userEditDialog: document.getElementById('userEditDialog'),
-  btnCloseUserEdit: document.getElementById('btnCloseUserEdit'),
-  btnCancelUserEdit: document.getElementById('btnCancelUserEdit'),
-  btnSaveUserEdit: document.getElementById('btnSaveUserEdit'),
-  btnEditOpenApiKeyPage: document.getElementById('btnEditOpenApiKeyPage'),
-  inputEditApiKey: document.getElementById('inputEditApiKey'),
-  inputEditClearApiKey: document.getElementById('inputEditClearApiKey'),
-  userEditAvatar: document.getElementById('userEditAvatar'),
-  userEditName: document.getElementById('userEditName'),
-  userEditSteamId: document.getElementById('userEditSteamId'),
-  userEditKeyStatus: document.getElementById('userEditKeyStatus'),
   filterChecksSteam: document.querySelector('.filter-checks-steam'),
   hiddenImportDialog: document.getElementById('hiddenImportDialog'),
   btnCloseHiddenImport: document.getElementById('btnCloseHiddenImport'),
@@ -160,8 +147,6 @@ let gameEditTarget = null;
 let gameEditPreviewObjectUrl = '';
 let currentPageGames = [];
 let currentRandomGame = null;
-
-let editUserId = '';
 
 let tokenPreviewTimer = null;
 let tokenPreviewRequestId = 0;
@@ -394,14 +379,8 @@ function applyTokenInputValue(raw, notify = false) {
   return extracted;
 }
 
-function findUserBySteamId(steamId) {
-  const target = String(steamId || '').trim();
-  if (!target) return null;
-  return users.find((u) => u.steamId === target) || null;
-}
-
 function getActiveUser() {
-  return users.find((u) => u.id === activeUserId) || null;
+  return users[0] || null;
 }
 
 function buildHeaders() {
@@ -433,7 +412,6 @@ function bindDialogBackdropClose(dialog, onClose) {
 function initDialogBackdropClose() {
   bindDialogBackdropClose(els.settingsDialog, closeSettingsDialog);
   bindDialogBackdropClose(els.gameEditDialog, closeGameEditDialog);
-  bindDialogBackdropClose(els.userEditDialog, closeUserEditDialog);
   bindDialogBackdropClose(els.tokenDialog, closeTokenDialog);
   bindDialogBackdropClose(els.refreshDialog, closeRefreshDialog);
   bindDialogBackdropClose(els.hiddenImportDialog, closeHiddenImportDialog);
@@ -445,7 +423,6 @@ function initDialogBackdropClose() {
 function getToastHost() {
   const dialogs = [
     els.tokenDialog,
-    els.userEditDialog,
     els.hiddenImportDialog,
     els.randomDialog,
     els.gameActionConfirmDialog,
@@ -1360,7 +1337,7 @@ async function fetchLibraryPage(refreshParts = null, page = 1, options = {}) {
   const user = getActiveUser();
   const steamId = (user?.steamId || '').trim();
   if (!steamId) {
-    if (!quiet) showToast('请先添加用户', true);
+    if (!quiet) showToast('请先连接 Steam 账号', true);
     return;
   }
   if (parts.library) await ensureTokenReady();
@@ -2240,7 +2217,7 @@ function syncHiddenButton(appid, hidden) {
 
 async function toggleHidden(appid) {
   if (!activeUserId) {
-    showToast('请先添加用户', true);
+    showToast('请先连接 Steam 账号', true);
     return;
   }
   const res = await fetch('/api/hidden/toggle', {
@@ -2268,7 +2245,7 @@ function syncFavoriteButton(appid, favorited) {
 
 async function toggleFavorite(appid) {
   if (!activeUserId) {
-    showToast('请先添加用户', true);
+    showToast('请先连接 Steam 账号', true);
     return;
   }
   const res = await fetch('/api/favorites/toggle', {
@@ -2297,17 +2274,6 @@ function userCardLabel(user) {
   return user.name || '未命名';
 }
 
-function userMenuItemAvatarMarkup(user, isAdd = false) {
-  if (isAdd) {
-    return '<span class="user-menu-item-avatar" aria-hidden="true">+</span>';
-  }
-  const avatar = (user?.avatar || '').trim();
-  if (avatar) {
-    return `<img class="user-menu-item-avatar" src="${escapeHtml(avatar)}" alt="">`;
-  }
-  return '<span class="user-menu-item-avatar user-menu-avatar-default" aria-hidden="true"></span>';
-}
-
 function setUserMenuTriggerAvatar(el, user, isAddOnly) {
   if (!el) return;
   el.replaceChildren();
@@ -2329,88 +2295,45 @@ function setUserMenuTriggerAvatar(el, user, isAddOnly) {
   el.className = 'user-menu-avatar user-menu-avatar-default';
 }
 
-function renderUserMenu() {
-  if (!els.userMenuList) return;
-  const addItem = `
-    <button type="button" class="user-menu-item user-menu-item-add" data-action="add-user" role="menuitem">
-      ${userMenuItemAvatarMarkup(null, true)}
-      <span class="user-menu-item-name">添加用户</span>
-    </button>`;
-  const userItems = users.map((u) => {
-    const active = u.id === activeUserId ? ' active' : '';
-    return `
-      <div class="user-menu-item${active}" role="menuitem" data-user-id="${u.id}">
-        <span class="user-menu-item-avatar-wrap">${userMenuItemAvatarMarkup(u)}</span>
-        <span class="user-menu-item-body">
-          <span class="user-menu-item-name">${escapeHtml(userCardLabel(u))}</span>
-        </span>
-        <span class="user-menu-item-actions">
-          <button type="button" class="user-menu-mini-btn" data-action="edit-user" data-user-id="${u.id}" title="编辑用户" aria-label="编辑用户">✎</button>
-          <button type="button" class="user-menu-mini-btn danger" data-action="delete-user" data-user-id="${u.id}" title="删除用户" aria-label="删除用户">×</button>
-        </span>
-      </div>`;
-  }).join('');
-  els.userMenuList.innerHTML = addItem + userItems;
-}
-
-function closeUserMenuDropdown() {
-  els.userMenuDropdown?.classList.add('hidden');
-  els.btnUserMenu?.setAttribute('aria-expanded', 'false');
-}
-
-function toggleUserMenuDropdown() {
-  if (!users.length) return;
-  const isOpen = !els.userMenuDropdown?.classList.contains('hidden');
-  if (isOpen) closeUserMenuDropdown();
-  else {
-    renderUserMenu();
-    els.userMenuDropdown?.classList.remove('hidden');
-    els.btnUserMenu?.setAttribute('aria-expanded', 'true');
-  }
-}
-
 function updateUserMenuTrigger() {
-  const isAddOnly = !users.length;
-  const active = getActiveUser();
+  const user = getActiveUser();
+  const isAddOnly = !user;
   els.btnUserMenu?.classList.toggle('is-add-only', isAddOnly);
-  setUserMenuTriggerAvatar(els.userMenuAvatar, isAddOnly ? null : (active || users[0]), isAddOnly);
+  setUserMenuTriggerAvatar(els.userMenuAvatar, user, isAddOnly);
   if (els.userMenuName) {
     if (isAddOnly) {
       els.userMenuName.textContent = '';
       els.userMenuName.classList.add('hidden');
     } else {
-      els.userMenuName.textContent = userCardLabel(active || users[0]);
+      els.userMenuName.textContent = userCardLabel(user);
       els.userMenuName.classList.remove('hidden');
     }
   }
 }
 
 function refreshUserUi() {
-  renderUserMenu();
   updateUserMenuTrigger();
   updateModeUi();
 }
 
 async function refreshMissingUserProfiles() {
-  const targets = users.filter((u) => u.steamId && (!u.personaName || !u.avatar));
-  if (!targets.length) return;
+  const user = getActiveUser();
+  if (!user?.steamId || (user.personaName && user.avatar)) return;
 
-  for (const user of targets) {
-    try {
-      const res = await fetch('/api/users/refresh-profile', {
-        method: 'POST',
-        headers: { ...buildHeaders(), 'X-User-Id': user.id },
-      });
-      const data = await readApiJson(res);
-      if (!res.ok) continue;
-      const idx = users.findIndex((u) => u.id === user.id);
-      if (idx >= 0) users[idx] = data;
-      debugLog('用户资料已补全', { userId: user.id, name: data.personaName || data.name });
-    } catch {
-      /* ignore */
-    }
+  try {
+    const res = await fetch('/api/users/refresh-profile', {
+      method: 'POST',
+      headers: buildHeaders(),
+    });
+    const data = await readApiJson(res);
+    if (!res.ok) return;
+    users = [data];
+    activeUserId = data.id;
+    debugLog('用户资料已补全', { userId: user.id, name: data.personaName || data.name });
+    refreshUserUi();
+  } catch {
+    /* ignore */
   }
-  refreshUserUi();
 }
 
 async function loadUsers() {
@@ -2418,102 +2341,9 @@ async function loadUsers() {
   const data = await readApiJson(res);
   users = data.users || [];
   activeUserId = data.activeUserId || users[0]?.id || '';
-  debugLog('用户列表已加载', { count: users.length, activeUserId });
+  debugLog('用户已加载', { activeUserId });
   refreshUserUi();
   await refreshMissingUserProfiles();
-}
-
-function openUserEditDialog(userId) {
-  const user = users.find((u) => u.id === userId);
-  if (!user) return;
-
-  editUserId = userId;
-  const avatar = (user.avatar || '').trim();
-  if (avatar) {
-    els.userEditAvatar.src = avatar;
-    els.userEditAvatar.classList.remove('hidden');
-  } else {
-    els.userEditAvatar.removeAttribute('src');
-    els.userEditAvatar.classList.add('hidden');
-  }
-  els.userEditName.textContent = userCardLabel(user);
-  els.userEditSteamId.textContent = user.steamId ? `Steam ID: ${user.steamId}` : '';
-  els.userEditKeyStatus.textContent = user.hasApiKey
-    ? '已保存 API Key'
-    : '未配置 API Key（可选）';
-  els.inputEditApiKey.value = '';
-  els.inputEditClearApiKey.checked = false;
-  els.userEditDialog.showModal();
-}
-
-function closeUserEditDialog() {
-  editUserId = '';
-  els.userEditDialog.close();
-}
-
-async function saveUserEdit() {
-  if (!editUserId) return;
-
-  const clearKey = els.inputEditClearApiKey.checked;
-  const apiKey = normalizeApiKeyInput(els.inputEditApiKey.value);
-  if (!clearKey && apiKey && !isValidApiKeyFormat(apiKey)) {
-    showToast('API Key 应为 32 位字母和数字', true);
-    return;
-  }
-  if (!clearKey && !apiKey) {
-    showToast('请输入 API Key，或勾选清除', true);
-    return;
-  }
-
-  const body = clearKey ? { clearApiKey: true } : { apiKey };
-  els.btnSaveUserEdit.disabled = true;
-  els.btnSaveUserEdit.textContent = '保存中...';
-
-  try {
-    const res = await fetch(`/api/users/${encodeURIComponent(editUserId)}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const data = await readApiJson(res);
-    if (!res.ok) throw new Error(data.error || '保存失败');
-
-    closeUserEditDialog();
-    await loadUsers();
-    await refreshAuthStatus();
-    showToast(clearKey ? 'API Key 已清除' : 'API Key 已保存');
-  } finally {
-    els.btnSaveUserEdit.disabled = false;
-    els.btnSaveUserEdit.textContent = '保存';
-  }
-}
-
-async function deleteUser(userId) {
-  const user = users.find((u) => u.id === userId);
-  if (!user) return;
-  const label = userCardLabel(user);
-  if (!window.confirm(`确定删除用户「${label}」？\n将同时清除该用户的 Token 和收藏。`)) return;
-
-  debugLog('删除用户', { userId, steamId: user.steamId, label });
-  const res = await fetch(`/api/users/${encodeURIComponent(userId)}`, { method: 'DELETE' });
-  const data = await readApiJson(res);
-  if (!res.ok) throw new Error(data.error || '删除失败');
-
-  users = data.users || [];
-  activeUserId = data.activeUserId || users[0]?.id || '';
-  refreshUserUi();
-  libraryLoaded = false;
-  await loadSteamUserPrefs();
-
-  if (activeUserId) {
-    await refreshAuthStatus();
-    await fetchSteamGames(false, { quiet: false });
-    showToast('用户已删除');
-  } else {
-    resetGamesView('暂无用户，请添加');
-    await refreshAuthStatus();
-    showToast('用户已删除');
-  }
 }
 
 function buildRefreshStages(parts) {
@@ -3086,13 +2916,10 @@ function renderTokenPreview(data) {
   }
   els.tokenPreviewName.textContent = data.personaName || `Steam 用户 ${String(data.steamId || '').slice(-4)}`;
   els.tokenPreviewSteamId.textContent = data.steamId || '';
-  if (data.duplicate) {
-    els.tokenPreviewHint.textContent = `该账号已添加：${data.existingUserName || data.steamId}`;
-    els.tokenPreviewHint.classList.add('warn');
-  } else {
-    els.tokenPreviewHint.textContent = 'Token 有效，保存后将使用该账号';
-    els.tokenPreviewHint.classList.remove('warn');
-  }
+  els.tokenPreviewHint.textContent = tokenDialogMode === 'add'
+    ? 'Token 有效，保存后将连接该账号'
+    : 'Token 有效，保存后将更新账号';
+  els.tokenPreviewHint.classList.remove('warn');
 }
 
 function renderTokenPreviewError(message) {
@@ -3157,7 +2984,7 @@ async function previewTokenProfile() {
 
 function openTokenDialog(mode) {
   tokenDialogMode = mode;
-  els.tokenDialogTitle.textContent = mode === 'add' ? '添加用户' : '更新 Token';
+  els.tokenDialogTitle.textContent = mode === 'add' ? '连接 Steam' : '更新 Token';
   els.inputAccessToken.value = '';
   els.inputApiKey.value = '';
   clearTokenPreview();
@@ -3187,14 +3014,9 @@ async function saveTokenFromDialog() {
   els.inputAccessToken.value = token;
 
   const isAdd = tokenDialogMode === 'add';
-  if (isAdd) {
-    const steamId = parseSteamIdFromToken(token);
-    const existing = findUserBySteamId(steamId);
-    if (existing) {
-      showToast(`该 Steam 账号已添加：${userCardLabel(existing)}`, true);
-      debugLog('阻止重复添加用户', { steamId, existingUserId: existing.id });
-      return;
-    }
+  if (isAdd && getActiveUser()) {
+    showToast('已配置 Steam 账号，请使用更新 Token', true);
+    return;
   }
 
   const apiKey = normalizeApiKeyInput(els.inputApiKey.value);
@@ -3212,7 +3034,7 @@ async function saveTokenFromDialog() {
     body.apiKey = apiKey;
   }
 
-  debugLog(isAdd ? '添加用户' : '更新 Token', { mode: tokenDialogMode, hasApiKey: !!apiKey });
+  debugLog(isAdd ? '连接 Steam' : '更新 Token', { mode: tokenDialogMode, hasApiKey: !!apiKey });
   els.btnSaveToken.disabled = true;
   els.btnSaveToken.textContent = '保存中...';
 
@@ -3238,7 +3060,7 @@ async function saveTokenFromDialog() {
     await loadUsers();
     await refreshAuthStatus();
     await loadSteamUserPrefs();
-    showToast(profileName ? `${isAdd ? '用户已添加' : 'Token 已更新'}：${profileName}` : (isAdd ? '用户已添加' : 'Token 已更新'));
+    showToast(profileName ? `${isAdd ? 'Steam 已连接' : 'Token 已更新'}：${profileName}` : (isAdd ? 'Steam 已连接' : 'Token 已更新'));
 
     showGameGridLoading('正在加载游戏库...');
     els.statsBar.textContent = '正在加载游戏库...';
@@ -3246,34 +3068,6 @@ async function saveTokenFromDialog() {
   } finally {
     els.btnSaveToken.disabled = false;
     els.btnSaveToken.textContent = '保存';
-  }
-}
-
-async function switchUser(userId, options = {}) {
-  const { loadGames = true, refresh = false, quiet = true } = options;
-
-  if (userId !== activeUserId) {
-    abortEnrichStream();
-    debugLog('切换用户', { from: activeUserId, to: userId, refresh });
-    const res = await fetch('/api/users/switch', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId }),
-    });
-    const data = await readApiJson(res);
-    if (!res.ok) throw new Error(data.error || '切换失败');
-    activeUserId = data.id;
-    refreshUserUi();
-    libraryLoaded = false;
-    setControlsEnabled(false);
-    showGameGridLoading('正在加载...');
-    els.statsBar.textContent = '正在加载游戏库...';
-    await refreshAuthStatus();
-    await loadSteamUserPrefs();
-  }
-
-  if (loadGames) {
-    await fetchSteamGames(refresh, { quiet });
   }
 }
 
@@ -3327,7 +3121,7 @@ function renderRandomGame(game) {
 
 async function openHiddenImportDialog() {
   if (!activeUserId) {
-    showToast('请先添加用户', true);
+    showToast('请先连接 Steam 账号', true);
     return;
   }
   els.hiddenImportHint.textContent = '正在检测本机 Steam 路径...';
@@ -3394,7 +3188,7 @@ async function confirmHiddenImport() {
 
 async function openCollectionsImportDialog() {
   if (!activeUserId) {
-    showToast('请先添加用户', true);
+    showToast('请先连接 Steam 账号', true);
     return;
   }
   els.collectionsImportHint.textContent = '正在检测本机 Steam 路径...';
@@ -3578,7 +3372,7 @@ async function loadEnvConfig() {
   await refreshAuthStatus();
 
   if (!activeUserId) {
-    resetGamesView('请先添加 Steam 用户');
+    resetGamesView('请先连接 Steam 账号');
     return;
   }
 
@@ -3596,50 +3390,8 @@ async function fetchSteamGames(refresh = false, options = {}) {
   return fetchLibraryPage(parts, 1, options);
 }
 
-els.btnUserMenu?.addEventListener('click', (e) => {
-  e.stopPropagation();
-  if (!users.length) {
-    openTokenDialog('add');
-    return;
-  }
-  toggleUserMenuDropdown();
-});
-
-els.userMenuList?.addEventListener('click', (e) => {
-  const addBtn = e.target.closest('[data-action="add-user"]');
-  if (addBtn) {
-    closeUserMenuDropdown();
-    openTokenDialog('add');
-    return;
-  }
-  const editBtn = e.target.closest('[data-action="edit-user"]');
-  if (editBtn) {
-    e.stopPropagation();
-    closeUserMenuDropdown();
-    openUserEditDialog(editBtn.dataset.userId);
-    return;
-  }
-  const deleteBtn = e.target.closest('[data-action="delete-user"]');
-  if (deleteBtn) {
-    e.stopPropagation();
-    closeUserMenuDropdown();
-    deleteUser(deleteBtn.dataset.userId).catch((err) => showToast(err.message, true));
-    return;
-  }
-  const row = e.target.closest('.user-menu-item[data-user-id]');
-  if (!row || e.target.closest('.user-menu-item-actions')) return;
-  const userId = row.dataset.userId;
-  if (!userId) return;
-  closeUserMenuDropdown();
-  switchUser(userId, { loadGames: true, refresh: false, quiet: userId === activeUserId })
-    .catch((err) => showToast(err.message, true));
-});
-
-document.addEventListener('click', (e) => {
-  if (!els.userMenuDropdown?.classList.contains('hidden')
-    && !e.target.closest('#userMenu')) {
-    closeUserMenuDropdown();
-  }
+els.btnUserMenu?.addEventListener('click', () => {
+  openTokenDialog(getActiveUser() ? 'update' : 'add');
 });
 
 els.btnTokenStatus?.addEventListener('click', () => {
@@ -3670,18 +3422,9 @@ els.btnSaveToken.addEventListener('click', () => {
   saveTokenFromDialog().catch((err) => showToast(err.message, true));
 });
 
-els.btnCloseUserEdit.addEventListener('click', closeUserEditDialog);
-els.btnCancelUserEdit.addEventListener('click', closeUserEditDialog);
-els.btnSaveUserEdit.addEventListener('click', () => {
-  saveUserEdit().catch((err) => showToast(err.message, true));
-});
-els.btnEditOpenApiKeyPage.addEventListener('click', () => {
-  window.open('https://steamcommunity.com/dev/apikey', '_blank');
-});
-
 els.btnRefresh.addEventListener('click', () => {
   if (!activeUserId) {
-    showToast('请先添加 Steam 用户', true);
+    showToast('请先连接 Steam 账号', true);
     return;
   }
   openRefreshDialog();

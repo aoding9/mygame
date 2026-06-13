@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 
 import { dirname, join } from 'path';
 
@@ -32,6 +32,15 @@ export function createUsersStore(dataDir) {
 
 
 
+  function normalizeStore(store) {
+    const users = Array.isArray(store.users) ? store.users : [];
+    if (!users.length) {
+      return { activeUserId: '', users: [] };
+    }
+    const active = users.find((u) => u.id === store.activeUserId) || users[0];
+    return { activeUserId: active.id, users: [active] };
+  }
+
   function readStore() {
 
     const cached = storeCache.get();
@@ -51,13 +60,13 @@ export function createUsersStore(dataDir) {
 
       const data = JSON.parse(readFileSync(storePath, 'utf-8'));
 
-      const store = {
+      const store = normalizeStore({
 
         activeUserId: data.activeUserId || '',
 
         users: Array.isArray(data.users) ? data.users : [],
 
-      };
+      });
       storeCache.set(store);
       return store;
 
@@ -208,21 +217,8 @@ export function createUsersStore(dataDir) {
 
 
 
-    const index = store.users.findIndex((u) => u.id === payload.id);
-
-    if (index >= 0) {
-
-      store.users[index] = payload;
-
-    } else {
-
-      store.users.push(payload);
-
-      store.activeUserId = payload.id;
-
-    }
-
-
+    store.users = [payload];
+    store.activeUserId = payload.id;
 
     writeStore(store);
 
@@ -239,69 +235,6 @@ export function createUsersStore(dataDir) {
     return user ? publicUser(user) : null;
   }
 
-  function switchUser(userId) {
-
-    const store = readStore();
-
-    if (!store.users.some((u) => u.id === userId)) {
-
-      throw new Error('用户不存在');
-
-    }
-
-    store.activeUserId = userId;
-
-    writeStore(store);
-
-    return publicUser(store.users.find((u) => u.id === userId));
-
-  }
-
-
-
-  function deleteUser(userId) {
-
-    const store = readStore();
-
-    const target = store.users.find((u) => u.id === userId);
-
-    if (!target) throw new Error('用户不存在');
-
-    store.users = store.users.filter((u) => u.id !== userId);
-
-    if (store.activeUserId === userId) {
-
-      store.activeUserId = store.users[0]?.id || '';
-
-    }
-
-    writeStore(store);
-
-    const { tokenPath } = getUserPaths(userId);
-
-    if (existsSync(tokenPath)) unlinkSync(tokenPath);
-
-    const profileDir = join(dataDir, `browser-profile-${userId}`);
-    if (existsSync(profileDir)) rmSync(profileDir, { recursive: true, force: true });
-
-    const favoritesPath = join(dataDir, `favorites-${userId}.json`);
-
-    if (existsSync(favoritesPath)) unlinkSync(favoritesPath);
-
-    const hiddenPath = join(dataDir, `hidden-${userId}.json`);
-    if (existsSync(hiddenPath)) unlinkSync(hiddenPath);
-
-    if (target.steamId) {
-      const legacyHiddenPath = join(dataDir, `hidden-${target.steamId}.json`);
-      if (existsSync(legacyHiddenPath)) unlinkSync(legacyHiddenPath);
-    }
-
-    return listUsers();
-
-  }
-
-
-
   return {
 
     storePath,
@@ -317,10 +250,6 @@ export function createUsersStore(dataDir) {
     saveUser,
 
     findUserBySteamId,
-
-    switchUser,
-
-    deleteUser,
 
     sanitizeUser,
 
