@@ -1177,13 +1177,14 @@ function scheduleLibraryReload() {
   }, 250);
 }
 
-function buildRefreshPartsParam(parts = {}) {
+function buildRefreshPartsParam(parts) {
+  const p = parts ?? {};
   const list = [];
-  if (parts.library) list.push('library');
-  if (parts.meta) list.push('meta');
-  if (parts.metaAll) list.push('metaAll');
-  if (parts.covers || parts.coversAll) list.push(parts.coversAll ? 'coversAll' : 'covers');
-  if (parts.localizeCovers) list.push('localizeCovers');
+  if (p.library) list.push('library');
+  if (p.meta) list.push('meta');
+  if (p.metaAll) list.push('metaAll');
+  if (p.covers || p.coversAll) list.push(p.coversAll ? 'coversAll' : 'covers');
+  if (p.localizeCovers) list.push('localizeCovers');
   return list.join(',');
 }
 
@@ -1302,7 +1303,7 @@ async function pullLibraryWithProgress(parts, page, options = {}) {
   if (staleFetch()) return null;
 
   const listRes = await fetch(
-    getLibraryApiUrl(null, page),
+    getLibraryApiUrl({}, page),
     headers ? { headers, ...fetchOpts } : fetchOpts,
   );
   if (staleFetch()) return null;
