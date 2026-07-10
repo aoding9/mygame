@@ -253,6 +253,7 @@ export function createGameOverrideStore(db, coversDir) {
     if (cover) {
       game.cover_url = cover;
       game.cover_custom = true;
+      game.cover_updated_at = override.updated_at || 0;
     }
 
     return game;

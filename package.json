@@ -4,16 +4,24 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.5.0"
   },
   "scripts": {
     "start": "node scripts/run-server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "build": "vite build",
+    "dev:client": "vite"
   },
   "dependencies": {
     "express": "^4.21.2",
     "multer": "^2.1.1",
+    "pinia": "^3.0.4",
     "sharp": "^0.35.1",
-    "undici": "^8.4.0"
+    "undici": "^6.27.0",
+    "vue": "^3.5.39"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "vite": "^6.4.3"
   }
 }

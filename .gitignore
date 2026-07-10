@@ -1,7 +1,10 @@
 node_modules/
 data/
-port.txt
 .env
+
+# Vite 构建产物（源码在 client/）
+public/index.html
+public/assets/
 *.log
 scripts/tmp-*
 

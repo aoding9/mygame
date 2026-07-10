@@ -41,6 +41,16 @@ if (-not (Test-Path 'node_modules')) {
     }
 }
 
+Write-Host 'Building frontend...'
+npm run build
+if ($LASTEXITCODE -ne 0) {
+    Write-Host ''
+    Write-Host 'Frontend build failed.' -ForegroundColor Red
+    Write-Host ''
+    Read-Host 'Press Enter to exit'
+    exit 1
+}
+
 $Port = [int](node (Join-Path $PSScriptRoot 'resolve-port.js'))
 if ($Port -le 0) { $Port = 3000 }
 
@@ -62,8 +72,8 @@ Write-Host ''
 if ($code -ne 0) {
     Write-Host "[ERROR] MyGame failed. Exit code: $code" -ForegroundColor Red
     Write-Host 'Possible causes:'
-    Write-Host '  - Node.js version too old (need 22.13+ for node:sqlite). Run: node -v'
-    Write-Host '  - Port in use. Change port: set PORT in .env or create port.txt with e.g. 3001.'
+    Write-Host '  - Node.js version too old (need 22.5+). Run: node -v'
+    Write-Host '  - Port in use. Change port: set PORT in .env (e.g. PORT=3001).'
     Write-Host 'Logs: data\logs\'
 } else {
     Write-Host 'MyGame stopped.'

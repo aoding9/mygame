@@ -73,15 +73,15 @@
 
 ## 环境要求
 
-- [Node.js](https://nodejs.org/) **22.13.0 或更高版本**（推荐最新 LTS）
-  - 项目使用 Node.js 内置模块 `node:sqlite` 作为数据库
-  - 启动前会自动执行 `scripts/check-node.js` 校验版本；版本不符时会提示升级
+- [Node.js](https://nodejs.org/) **22.5.0 或更高版本**（推荐 22 LTS）
+  - 数据库使用 Node 内置模块 `node:sqlite`，无需额外安装 SQLite 原生包
+  - 启动前会自动执行 `scripts/check-node.js` 校验版本
 - Windows 推荐双击 `mygame.bat` 启动（依赖 PowerShell 脚本）；其他系统可用 npm 命令
 
 **确认 Node 版本：**
 
 ```bash
-node -v          # 应显示 v22.13.0 或更高
+node -v          # 应显示 v22.5.0 或更高
 where node       # Windows：确认 PATH 指向新版本
 which node       # macOS / Linux
 ```
@@ -96,11 +96,12 @@ which node       # macOS / Linux
 git clone <你的仓库地址>
 cd mygame
 npm install
+npm run build    # 构建前端（产物在 public/，未纳入 Git）
 ```
 
 ### 2. 启动
 
-**Windows：** 双击 `mygame.bat`，会在新窗口中自动安装依赖、释放监听端口并打开浏览器。
+**Windows：** 双击 `mygame.bat`，会在新窗口中自动安装依赖、构建前端、释放监听端口并打开浏览器。
 
 **命令行：**
 
@@ -108,6 +109,8 @@ npm install
 npm start
 # 开发模式（监听 src/server.js 变更，无 Ctrl+R 热键包装）
 npm run dev
+# 前端开发（Vite 热更新，API 代理到 localhost:3000）
+npm run dev:client
 ```
 
 `npm start` 通过 `scripts/run-server.js` 启动，终端中：
@@ -125,25 +128,13 @@ npm run dev
 
 **方式一：`.env`（推荐）**
 
-复制 `.env.example` 为 `.env`，修改端口后重启：
-
-```bash
-cp .env.example .env   # Windows: copy .env.example .env
-```
+编辑项目根目录的 `.env`（首次启动会自动从 `.env.example` 创建），修改端口后重启：
 
 ```env
 PORT=3001
 ```
 
-**方式二：`port.txt`**
-
-在项目根目录创建 `port.txt`，写入一行端口号：
-
-```text
-3001
-```
-
-**方式三：命令行环境变量**
+**方式二：命令行环境变量**
 
 ```powershell
 # PowerShell（仅当前窗口）
@@ -156,7 +147,7 @@ npm start
 PORT=3001 npm start
 ```
 
-优先级：命令行 `PORT` > `.env` > `port.txt` > 默认 3000。
+优先级：命令行 `PORT` > `.env` > 默认 3000。
 
 ## Steam 连接说明
 
@@ -206,9 +197,20 @@ PORT=3001 npm start
 
 ```
 mygame/
-├── public/                 # 前端页面与静态资源
+├── client/                 # Vue 3 前端源码
+│   └── src/
+│       ├── App.vue
+│       ├── components/
+│       ├── stores/         # Pinia 状态
+│       └── ...
+├── public/
+│   └── style.css           # 样式源文件（纳入 Git）
+│   # index.html、assets/ 为 Vite 构建产物，不纳入 Git
 ├── src/
 │   ├── server.js           # Express 服务入口
+│   ├── server/
+│   │   ├── runtime.js      # 核心业务逻辑
+│   │   └── routes/         # HTTP 路由（auth、games、settings 等）
 │   ├── platforms/          # Steam 本地库、Epic/Ubisoft 等占位
 │   ├── steam/              # 认证、收藏夹、隐藏游戏
 │   ├── db/                 # SQLite、迁移脚本、游戏/元数据存储
@@ -216,10 +218,11 @@ mygame/
 │   └── services/           # 封面、筛选、元数据、日志、Token 校验、清理
 ├── scripts/
 │   ├── check-node.js       # 启动前校验 Node 版本与 node:sqlite
-│   ├── resolve-port.js     # 解析 PORT（.env / 环境变量 / port.txt）
+│   ├── resolve-port.js     # 解析 PORT（.env / 环境变量）
 │   ├── run-server.js       # 启动包装（Ctrl+R 重启）
 │   ├── start-mygame.ps1    # Windows 启动脚本
 │   └── kill-port.ps1       # 释放占用端口
+├── vite.config.js          # Vite 配置（构建到 public/）
 ├── .env.example            # 环境变量示例（复制为 .env 后修改）
 ├── mygame.bat              # Windows 一键启动
 └── package.json
@@ -227,19 +230,24 @@ mygame/
 
 ## 技术栈
 
-- **后端**：Node.js 22.13+、Express、`node:sqlite`（内置 SQLite，含迁移）
-- **前端**：原生 HTML / CSS / JavaScript
-- **网络**：undici（支持 HTTP 代理）
+- **后端**：Node.js 22.5+、Express、`node:sqlite`（内置 SQLite，含迁移）
+- **前端**：Vue 3 + Pinia + Vite 6（源码在 `client/`，构建到 `public/`）
+- **网络**：undici 6（支持 HTTP 代理）
+- **图片**：sharp（封面本地化压缩）
 
 ## 常见问题
 
 ### 启动报错 `No such built-in module: node:sqlite`
 
-当前 Node.js 版本过低。请升级到 **22.13.0+**，并确认 `node -v` 输出正确版本。`mygame.bat` / `npm start` 会在启动前自动检测并给出提示。
+当前 Node.js 版本过低。请升级到 **22.5.0+**（推荐 22 LTS），并确认 `node -v` 输出正确版本。`mygame.bat` / `npm start` 会在启动前自动检测并给出提示。
+
+### 前端构建失败
+
+在项目根目录执行 `npm install` 后运行 `npm run build`。Windows 下 `mygame.bat` 会自动构建。若切换过 Node 版本，请重新 `npm install`。
 
 ### 端口被占用（EADDRINUSE）
 
-在项目根目录创建 `.env` 并设置 `PORT=3001`，或创建 `port.txt` 写入端口号，保存后重新启动。
+在项目根目录 `.env` 中设置 `PORT=3001`，保存后重新启动。
 
 ## 许可证
 

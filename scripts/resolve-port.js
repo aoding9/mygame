@@ -1,4 +1,3 @@
-import { existsSync, readFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { loadEnv } from './load-env.js';
@@ -11,12 +10,6 @@ export function resolvePort(baseDir = projectRoot) {
 
   const fromEnv = Number(process.env.PORT);
   if (Number.isInteger(fromEnv) && fromEnv > 0 && fromEnv < 65536) return fromEnv;
-
-  const portFile = join(baseDir, 'port.txt');
-  if (existsSync(portFile)) {
-    const fromFile = Number(readFileSync(portFile, 'utf-8').trim());
-    if (Number.isInteger(fromFile) && fromFile > 0 && fromFile < 65536) return fromFile;
-  }
 
   return DEFAULT_PORT;
 }
