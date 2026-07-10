@@ -1,5 +1,6 @@
 node_modules/
 data/
+port.txt
 .env
 *.log
 scripts/tmp-*

@@ -73,8 +73,20 @@
 
 ## 环境要求
 
-- [Node.js](https://nodejs.org/) 18 或更高版本
+- [Node.js](https://nodejs.org/) **22.13.0 或更高版本**（推荐最新 LTS）
+  - 项目使用 Node.js 内置模块 `node:sqlite` 作为数据库
+  - 启动前会自动执行 `scripts/check-node.js` 校验版本；版本不符时会提示升级
 - Windows 推荐双击 `mygame.bat` 启动（依赖 PowerShell 脚本）；其他系统可用 npm 命令
+
+**确认 Node 版本：**
+
+```bash
+node -v          # 应显示 v22.13.0 或更高
+where node       # Windows：确认 PATH 指向新版本
+which node       # macOS / Linux
+```
+
+若已安装新版本但仍报错，通常是 PATH 中旧版 Node 优先，请调整环境变量或卸载旧版本。
 
 ## 快速开始
 
@@ -88,7 +100,7 @@ npm install
 
 ### 2. 启动
 
-**Windows：** 双击 `mygame.bat`，会在新窗口中自动安装依赖、释放 3000 端口并打开浏览器。
+**Windows：** 双击 `mygame.bat`，会在新窗口中自动安装依赖、释放监听端口并打开浏览器。
 
 **命令行：**
 
@@ -103,9 +115,48 @@ npm run dev
 - **Ctrl+R** — 重启服务
 - **Ctrl+C** — 退出
 
-浏览器访问：<http://localhost:3000>
+浏览器访问：<http://localhost:3000>（默认端口，见下方「修改端口」）
 
 首次使用点击右上角 **+** 添加 Steam 用户；**设置**（⚙）与 **Token 状态**（🔑，绿/红）也在右上角。
+
+### 修改端口
+
+默认监听 **3000**。若端口被占用，任选一种方式即可：
+
+**方式一：`.env`（推荐）**
+
+复制 `.env.example` 为 `.env`，修改端口后重启：
+
+```bash
+cp .env.example .env   # Windows: copy .env.example .env
+```
+
+```env
+PORT=3001
+```
+
+**方式二：`port.txt`**
+
+在项目根目录创建 `port.txt`，写入一行端口号：
+
+```text
+3001
+```
+
+**方式三：命令行环境变量**
+
+```powershell
+# PowerShell（仅当前窗口）
+$env:PORT = 3001
+npm start
+```
+
+```bash
+# macOS / Linux
+PORT=3001 npm start
+```
+
+优先级：命令行 `PORT` > `.env` > `port.txt` > 默认 3000。
 
 ## Steam 连接说明
 
@@ -164,18 +215,31 @@ mygame/
 │   ├── stores/             # 用户、收藏、收藏夹、设置等 JSON 存储
 │   └── services/           # 封面、筛选、元数据、日志、Token 校验、清理
 ├── scripts/
+│   ├── check-node.js       # 启动前校验 Node 版本与 node:sqlite
+│   ├── resolve-port.js     # 解析 PORT（.env / 环境变量 / port.txt）
 │   ├── run-server.js       # 启动包装（Ctrl+R 重启）
 │   ├── start-mygame.ps1    # Windows 启动脚本
 │   └── kill-port.ps1       # 释放占用端口
+├── .env.example            # 环境变量示例（复制为 .env 后修改）
 ├── mygame.bat              # Windows 一键启动
 └── package.json
 ```
 
 ## 技术栈
 
-- **后端**：Node.js、Express、SQLite（内置迁移）
+- **后端**：Node.js 22.13+、Express、`node:sqlite`（内置 SQLite，含迁移）
 - **前端**：原生 HTML / CSS / JavaScript
 - **网络**：undici（支持 HTTP 代理）
+
+## 常见问题
+
+### 启动报错 `No such built-in module: node:sqlite`
+
+当前 Node.js 版本过低。请升级到 **22.13.0+**，并确认 `node -v` 输出正确版本。`mygame.bat` / `npm start` 会在启动前自动检测并给出提示。
+
+### 端口被占用（EADDRINUSE）
+
+在项目根目录创建 `.env` 并设置 `PORT=3001`，或创建 `port.txt` 写入端口号，保存后重新启动。
 
 ## 许可证
 

@@ -1,9 +1,13 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import readline from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const checkNodePath = join(root, 'scripts', 'check-node.js');
+
+const check = spawnSync(process.execPath, [checkNodePath], { stdio: 'inherit' });
+if (check.status !== 0) process.exit(check.status ?? 1);
 const serverPath = join(root, 'src', 'server.js');
 
 let child = null;

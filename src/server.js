@@ -41,11 +41,12 @@ import {
   resolveSteamCoverCandidates,
 } from './services/steam-cover-urls.js';
 import { createRuntimeLogger } from './services/runtime-logger.js';
+import { resolvePort } from '../scripts/resolve-port.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const DATA_DIR = join(ROOT_DIR, 'data');
-const PORT = 3000;
+const PORT = resolvePort(ROOT_DIR);
 const META_DIR = join(DATA_DIR, 'meta');
 const COVERS_DIR = join(DATA_DIR, 'covers');
 const LOG_DIR = join(DATA_DIR, 'logs');
@@ -2468,7 +2469,10 @@ const server = app.listen(PORT, () => {
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    logger.error('端口被占用，无法启动', { port: PORT });
+    logger.error('端口被占用，无法启动', {
+      port: PORT,
+      hint: '在项目根目录 .env 中设置 PORT=3001，或创建 port.txt 写入其他端口',
+    });
   } else {
     logger.error('MyGame 启动失败', err);
   }

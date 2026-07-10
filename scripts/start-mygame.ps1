@@ -23,6 +23,12 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
+node scripts\check-node.js
+if ($LASTEXITCODE -ne 0) {
+    Read-Host 'Press Enter to exit'
+    exit 1
+}
+
 if (-not (Test-Path 'node_modules')) {
     Write-Host 'Installing npm packages...'
     npm install
@@ -35,15 +41,19 @@ if (-not (Test-Path 'node_modules')) {
     }
 }
 
-Write-Host 'Stopping old service on port 3000...'
-Stop-PortListener 3000
+$Port = [int](node (Join-Path $PSScriptRoot 'resolve-port.js'))
+if ($Port -le 0) { $Port = 3000 }
+
+Write-Host "Stopping old service on port $Port..."
+Stop-PortListener $Port
 Start-Sleep -Seconds 2
 
 Write-Host 'Starting MyGame... (Ctrl+R restart, Ctrl+C quit)'
 Start-Job -ScriptBlock {
+    param($ListenPort)
     Start-Sleep -Seconds 2
-    Start-Process 'http://localhost:3000/'
-} | Out-Null
+    Start-Process "http://localhost:$ListenPort/"
+} -ArgumentList $Port | Out-Null
 
 node scripts\run-server.js
 $code = $LASTEXITCODE
@@ -51,7 +61,9 @@ $code = $LASTEXITCODE
 Write-Host ''
 if ($code -ne 0) {
     Write-Host "[ERROR] MyGame failed. Exit code: $code" -ForegroundColor Red
-    Write-Host 'Port 3000 may be in use. Kill node.exe and retry.'
+    Write-Host 'Possible causes:'
+    Write-Host '  - Node.js version too old (need 22.13+ for node:sqlite). Run: node -v'
+    Write-Host '  - Port in use. Change port: set PORT in .env or create port.txt with e.g. 3001.'
     Write-Host 'Logs: data\logs\'
 } else {
     Write-Host 'MyGame stopped.'
