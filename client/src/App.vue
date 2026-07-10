@@ -30,6 +30,18 @@ useNativeDialog(computed(() => library.hiddenImportOpen), hiddenImportDialogRef)
 useNativeDialog(computed(() => library.collectionsImportOpen), collectionsImportDialogRef);
 useNativeDialog(computed(() => settings.settingsDialogOpen), settingsDialogRef);
 
+const toastTarget = computed(() => {
+  if (library.gameEditOpen && gameEditDialogRef.value) return gameEditDialogRef.value;
+  if (library.refreshDialogOpen && refreshDialogRef.value) return refreshDialogRef.value;
+  if (auth.tokenDialogOpen && tokenDialogRef.value) return tokenDialogRef.value;
+  if (settings.settingsDialogOpen && settingsDialogRef.value) return settingsDialogRef.value;
+  if (library.randomDialogOpen && randomDialogRef.value) return randomDialogRef.value;
+  if (library.hiddenImportOpen && hiddenImportDialogRef.value) return hiddenImportDialogRef.value;
+  if (library.collectionsImportOpen && collectionsImportDialogRef.value) return collectionsImportDialogRef.value;
+  if (ui.confirmOpen && confirmDialogRef.value) return confirmDialogRef.value;
+  return 'body';
+});
+
 const refreshBtnText = computed(() => {
   if (library.gamesLoading) return '加载中...';
   return '刷新数据';
@@ -82,7 +94,6 @@ watch(() => ui.filtersExpanded, (expanded) => {
 });
 
 onMounted(() => {
-  library.layoutGameGrid();
   library.loadEnvConfig();
   window.addEventListener('resize', library.onResize);
 });
@@ -205,7 +216,7 @@ onUnmounted(() => {
           <div v-else-if="!library.games.length" class="empty-state">
             {{ library.libraryLoaded ? '没有符合筛选条件的游戏' : library.statsBarText }}
           </div>
-          <GameCard v-for="game in library.games" :key="`${game.appid}-steam`" :game="game" />
+          <GameCard v-else v-for="game in library.games" :key="`${game.appid}-steam`" :game="game" />
         </main>
         <footer :ref="setLibraryFooterRef" class="library-footer">
           <div class="stats-bar stats-bar-footer">{{ library.statsBarText }}</div>
@@ -321,7 +332,9 @@ onUnmounted(() => {
       </div>
     </aside>
 
-    <div class="toast" :class="{ hidden: !ui.toastVisible, error: ui.toastError }">{{ ui.toastMessage }}</div>
+    <Teleport :to="toastTarget">
+      <div class="toast" :class="{ hidden: !ui.toastVisible, error: ui.toastError }">{{ ui.toastMessage }}</div>
+    </Teleport>
 
     <!-- Confirm -->
     <dialog ref="confirmDialogRef" class="modal-dialog confirm-dialog" @cancel.prevent="ui.finishConfirm(false)">
@@ -388,15 +401,18 @@ onUnmounted(() => {
 
     <!-- Game Edit -->
     <dialog ref="gameEditDialogRef" class="modal-dialog game-edit-dialog" @cancel.prevent="library.closeGameEditDialog()">
-      <div class="modal-content">
-        <button class="dialog-close" aria-label="关闭" @click="library.closeGameEditDialog()">×</button>
-        <h2 class="modal-title">编辑游戏资料</h2>
-        <p class="step-text">{{ library.gameEditSourceInfo }}</p>
-        <div class="game-edit-toolbar">
-          <button type="button" class="btn btn-secondary btn-sm" :disabled="!!library.gameEditBusy" @click="library.refreshGameEditMeta()">
-            {{ library.gameEditBusy === 'meta' ? '刷新中...' : '从平台刷新资料' }}
-          </button>
-        </div>
+      <div class="modal-content game-edit-content">
+        <header class="game-edit-header">
+          <button class="dialog-close" aria-label="关闭" @click="library.closeGameEditDialog()">×</button>
+          <h2 class="modal-title">编辑游戏资料</h2>
+          <p class="step-text">{{ library.gameEditSourceInfo }}</p>
+          <div class="game-edit-toolbar">
+            <button type="button" class="btn btn-secondary btn-sm" :disabled="!!library.gameEditBusy" @click="library.refreshGameEditMeta()">
+              {{ library.gameEditBusy === 'meta' ? '刷新中...' : '从平台刷新资料' }}
+            </button>
+          </div>
+        </header>
+        <div class="game-edit-body">
         <label class="token-field"><span>显示名称（优先展示）</span><input v-model="library.gameEditForm.displayName" type="text" placeholder="自定义显示名，可留空"></label>
         <label class="token-field"><span>中文名</span><input v-model="library.gameEditForm.nameCn" type="text" placeholder="中文名称"></label>
         <label class="token-field"><span>英文名 / 原名</span><input v-model="library.gameEditForm.nameEn" type="text" placeholder="英文名称或副标题"></label>
@@ -439,10 +455,11 @@ onUnmounted(() => {
         </div>
         <label class="checkbox-label"><input v-model="library.gameEditForm.coverLocalize" type="checkbox"> 外链封面保存时下载到本地</label>
         <label class="checkbox-label game-edit-lock"><input v-model="library.gameEditForm.lockFromRefresh" type="checkbox"> 锁定自定义内容，刷新游戏库时不被自动覆盖</label>
-        <div class="dialog-actions dialog-actions-end">
+        </div>
+        <footer class="game-edit-footer dialog-actions dialog-actions-end">
           <button type="button" class="btn btn-secondary" @click="library.closeGameEditDialog()">取消</button>
           <button type="button" class="btn btn-primary" :disabled="library.gameEditBusy === 'save'" @click="library.saveGameEditDialog()">{{ library.gameEditBusy === 'save' ? '保存中...' : '保存' }}</button>
-        </div>
+        </footer>
       </div>
     </dialog>
 

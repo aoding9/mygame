@@ -197,15 +197,14 @@ PORT=3001 npm start
 
 ```
 mygame/
+├── public/                 # Vite 构建产物（index.html、assets/，不纳入 Git）
 ├── client/                 # Vue 3 前端源码
 │   └── src/
 │       ├── App.vue
+│       ├── style.css       # 全局样式
 │       ├── components/
 │       ├── stores/         # Pinia 状态
 │       └── ...
-├── public/
-│   └── style.css           # 样式源文件（纳入 Git）
-│   # index.html、assets/ 为 Vite 构建产物，不纳入 Git
 ├── src/
 │   ├── server.js           # Express 服务入口
 │   ├── server/

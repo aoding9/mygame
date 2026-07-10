@@ -537,9 +537,11 @@ export function registerGamesRoutes(app) {
     }
   });
 
-  app.post('/api/games/:platform/:appid/cover/rt.upload', (req, res) => { upload.single('cover')(req, res, async (err) => {
+  app.post('/api/games/:platform/:appid/cover/upload', (req, res) => {
+    upload.single('cover')(req, res, async (err) => {
       try {
-        if (err) { debugLog('封面上传解析失败', { message: err.message });
+        if (err) {
+          debugLog('封面上传解析失败', { message: err.message });
           res.status(400).json({ error: err.message || '上传解析失败' });
           return;
         }
@@ -558,7 +560,8 @@ export function registerGamesRoutes(app) {
           req.file.originalname,
         );
         res.json({ ok: true, ...result });
-      } catch (uploadErr) { debugLog('封面上传失败', { platform: req.params.platform, appid: req.params.appid, message: uploadErr.message });
+      } catch (uploadErr) {
+        debugLog('封面上传失败', { platform: req.params.platform, appid: req.params.appid, message: uploadErr.message });
         res.status(400).json({ error: uploadErr.message });
       }
     });

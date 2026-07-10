@@ -738,10 +738,18 @@ body {
 }
 
 .game-grid.is-loading {
+  position: relative;
+}
+
+.game-grid.is-loading .grid-loading-state {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: center;
-  align-content: center;
+  background: rgba(10, 14, 20, 0.72);
+  backdrop-filter: blur(2px);
 }
 
 .grid-loading-state {
@@ -970,8 +978,7 @@ h4,
   display: none !important;
 }
 
-.game-card:hover .game-cover-placeholder,
-.game-card:focus-within .game-cover-placeholder {
+.game-card:hover .game-cover-placeholder {
   transform: scale(1.03);
 }
 
@@ -1847,8 +1854,7 @@ select option {
   max-height: calc(0.86rem * 1.35 * 2);
 }
 
-.game-card:hover .game-cover-actions,
-.game-card:focus-within .game-cover-actions {
+.game-card:hover .game-cover-actions {
   opacity: 1;
   pointer-events: auto;
 }
@@ -1936,8 +1942,7 @@ select option {
   transition: transform 0.25s ease;
 }
 
-.game-card:hover .game-cover,
-.game-card:focus-within .game-cover {
+.game-card:hover .game-cover {
   transform: scale(1.03);
 }
 
@@ -2303,8 +2308,9 @@ select option {
   pointer-events: none;
 }
 
-dialog > .toast {
+dialog .toast {
   position: fixed;
+  z-index: 1;
 }
 
 .toast.error {
@@ -2540,7 +2546,48 @@ code {
 .game-edit-toolbar {
   display: flex;
   justify-content: flex-end;
-  margin: 4px 0 10px;
+  margin: 4px 0 0;
+}
+
+.game-edit-content {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.game-edit-header {
+  position: relative;
+  flex-shrink: 0;
+  padding: 24px 24px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 18px 18px 0 0;
+}
+
+.game-edit-header .modal-title {
+  margin: 0 36px 10px 0;
+}
+
+.game-edit-header .step-text {
+  margin-bottom: 0;
+}
+
+.game-edit-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 24px 16px;
+}
+
+.game-edit-footer {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 12px 24px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 0 0 18px 18px;
 }
 
 .game-edit-preview-wrap {
@@ -2554,11 +2601,6 @@ code {
 .game-edit-preview-label {
   font-size: 0.9rem;
   color: var(--muted);
-}
-
-.game-edit-dialog .modal-content {
-  max-height: 90vh;
-  overflow: auto;
 }
 
 .game-edit-lock {

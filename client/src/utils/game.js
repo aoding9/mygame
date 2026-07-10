@@ -105,13 +105,20 @@ export function resolveOwnerName(steamId, users) {
   if (!id) return '';
   const user = users.find((u) => u.steamId === id);
   if (user) return userCardLabel(user);
-  return `用户 …${id.slice(-4)}`;
+  return `…${id.slice(-4)}`;
 }
 
 export function userCardLabel(user) {
   if (user.personaName) return user.personaName;
-  if (user.steamId) return `用户 ${user.steamId.slice(-4)}`;
+  if (user.steamId) return `…${user.steamId.slice(-4)}`;
   return user.name || '未命名';
+}
+
+export function formatOwnerBadge(labelOrId, users) {
+  const raw = String(labelOrId || '').trim();
+  if (!raw) return '';
+  if (/^\d{10,}$/.test(raw)) return resolveOwnerName(raw, users);
+  return raw.replace(/^用户\s*/, '');
 }
 
 export function ownerNames(game) {

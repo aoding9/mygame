@@ -440,7 +440,7 @@ function buildFilterContext(req, platform) {
     const found = store.users.find((item) => item.steamId === id);
     if (found?.personaName) return found.personaName;
     if (found?.name) return found.name;
-    return `用户 …${id.slice(-4)}`;
+    return `…${id.slice(-4)}`;
   };
 
   return { platform, favoriteAppIds, hiddenAppIds, resolveOwnerName };
@@ -691,7 +691,7 @@ function buildOwnerNameMap() {
   for (const user of usersStore.readStore().users) {
     const steamId = String(user.steamId || '').trim();
     if (!steamId) continue;
-    map[steamId] = String(user.personaName || user.name || '').trim() || `用户 …${steamId.slice(-4)}`;
+    map[steamId] = String(user.personaName || user.name || '').trim() || `…${steamId.slice(-4)}`;
   }
   return map;
 }

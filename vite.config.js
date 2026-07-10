@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [vue()],
   build: {
     outDir: resolve(__dirname, 'public'),
-    emptyOutDir: false,
+    emptyOutDir: true,
   },
   server: {
     port: 5173,

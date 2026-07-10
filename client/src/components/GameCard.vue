@@ -17,7 +17,7 @@ import {
   getInputMethodInfo,
   ownerLabel,
   ownerNames,
-  resolveOwnerName,
+  formatOwnerBadge,
 } from '../utils/game.js';
 import { useAuthStore } from '../stores/auth.js';
 import { useLibraryStore } from '../stores/library.js';
@@ -86,6 +86,7 @@ function onStore(e) {
 
 function onEdit(e) {
   e.stopPropagation();
+  e.currentTarget?.blur();
   library.openGameEditDialog(props.game);
 }
 
@@ -149,12 +150,12 @@ function onHidden(e) {
           <span
             v-for="oid in owners.slice(0, 3)"
             :key="oid"
-            class="owner-badge"
-          >{{ resolveOwnerName(oid, auth.users) }}</span>
-          <span v-if="owners.length > 3" class="owner-badge">+{{ owners.length - 3 }}</span>
+            class="badge badge-owner"
+          >{{ formatOwnerBadge(oid, auth.users) }}</span>
+          <span v-if="owners.length > 3" class="badge badge-owner">+{{ owners.length - 3 }}</span>
         </div>
         <div v-else-if="ownerText" class="game-owners">
-          <span class="owner-badge">{{ ownerText }}</span>
+          <span class="badge badge-owner">{{ formatOwnerBadge(ownerText, auth.users) }}</span>
         </div>
       </div>
       <div class="game-meta">

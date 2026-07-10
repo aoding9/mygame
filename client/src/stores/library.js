@@ -424,6 +424,12 @@ export const useLibraryStore = defineStore('library', () => {
     return metrics;
   }
 
+  function scheduleLayoutGameGrid() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => layoutGameGrid());
+    });
+  }
+
   async function relayoutGridIfNeeded() {
     const prevSize = dynamicPageSize.value;
     layoutGameGrid();
@@ -902,6 +908,7 @@ export const useLibraryStore = defineStore('library', () => {
 
       applyLibraryResponse(data);
       hideGridLoading();
+      if (!nested) scheduleLayoutGameGrid();
       if (staleFetch()) return;
 
       if (!quiet && !parts.localizeCovers && !staleFetch()) {
@@ -986,12 +993,12 @@ export const useLibraryStore = defineStore('library', () => {
       if (!libraryLoaded.value) {
         statsOverride.value = err.message.includes('Token') ? err.message : '加载失败';
         games.value = [];
-        hideGridLoading();
       }
       throw err;
     } finally {
       if (!nested && fetchToken === libraryFetchToken) {
         gamesLoading.value = false;
+        hideGridLoading();
         if (libraryFetchController?.signal?.aborted) libraryFetchController = null;
       }
     }
@@ -1218,6 +1225,7 @@ export const useLibraryStore = defineStore('library', () => {
     revokeGameEditPreviewObjectUrl();
     gameEditPreview.value = '';
     coverLookupResults.value = [];
+    document.activeElement?.blur?.();
   }
 
   function applyMetaToGameEditForm(meta = {}, onlyEmpty = false) {
@@ -1362,7 +1370,8 @@ export const useLibraryStore = defineStore('library', () => {
       if (!res.ok) throw new Error(data.error || '保存失败');
 
       closeGameEditDialog();
-      await fetchLibraryPage(null, pagination.value.page, { quiet: true });
+      await fetchLibraryPage(null, pagination.value.page, { quiet: true, nested: true, suppressProgress: true });
+      scheduleLayoutGameGrid();
       ui.showToast(body.lock_from_refresh ? '已保存并锁定' : '游戏资料已更新');
     } catch (err) {
       ui.showToast(err.message, true);
