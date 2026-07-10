@@ -1293,15 +1293,15 @@ app.get('/api/storage', (_req, res) => {
   res.json({
     dataDir: DATA_DIR,
     items: [
-      { path: 'data/users.json', desc: '用户配置（Steam ID、头像昵称）' },
+      { path: 'data/users.json', desc: 'Steam 账号配置（Steam ID、头像昵称）' },
       { path: 'data/mygame.db', desc: 'SQLite（games 游戏表、library_snapshot_games 库关联、元数据、封面覆盖）' },
       { path: 'data/covers/', desc: '本地化游戏封面图片' },
       { path: 'data/logs/', desc: '运行日志（按天滚动，默认保留 14 天）' },
-      { path: 'data/hidden-<用户ID>.json', desc: '各用户的隐藏游戏列表与 Steam 路径' },
-      { path: 'data/steam-token-<用户ID>.json', desc: '各用户的 Steam 登录 Token' },
+      { path: 'data/hidden-<用户ID>.json', desc: '隐藏游戏列表与 Steam 路径' },
+      { path: 'data/steam-token-<用户ID>.json', desc: 'Steam 登录 Token' },
       { path: 'data/app-settings.json', desc: '应用设置（代理、日志、封面清理、客户端路径）' },
       { path: 'data/cover-localize-skip.json', desc: '封面本地化失败跳过记录（30 天内不再重试）' },
-      { path: 'data/favorites-<用户ID>.json', desc: '各用户的游戏收藏' },
+      { path: 'data/favorites-<用户ID>.json', desc: '游戏收藏' },
     ],
   });
 });

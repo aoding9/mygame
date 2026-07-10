@@ -1,4 +1,4 @@
-/** 仅用于体积极小、读取频繁的数据（用户列表、平台账号、收藏等）。 */
+/** 仅用于体积极小、读取频繁的数据（账号配置、平台账号、收藏等）。 */
 export function createTinyCache() {
   let value = null;
   return {

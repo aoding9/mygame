@@ -6,7 +6,7 @@
 
 ### 游戏库与缓存
 
-- **多用户**：可添加多个 Steam 账号并切换
+- **Steam 账号**：通过 Token 绑定单个 Steam 账号
 - **本地 SQLite 缓存**：游戏库快照、元数据、封面覆盖写入 `data/mygame.db`；**仅手动刷新**时拉取远程数据
 - **Token 过期仍可浏览**：缓存库可离线查看；需要更新时再配置 Token
 - **家庭共享库**：可选合并家庭成员游戏
@@ -16,7 +16,7 @@
 
 - **顶栏搜索**：中英文名称、简称与别名（如 `cs2`、`老头环`）
 - **筛选抽屉**：类型、标签、时长、所有者、Steam 收藏夹、排序等
-- **收藏 / 隐藏**：按用户独立保存；支持「仅收藏」「仅隐藏」筛选
+- **收藏 / 隐藏**：本地独立保存；支持「仅收藏」「仅隐藏」筛选
 - **自适应网格**：固定 4 行展示，列数随窗口宽度变化；底部分页
 - **随机抽游戏**：在当前筛选结果中随机挑选，弹窗复用完整卡片交互
 
@@ -117,7 +117,7 @@ npm run dev
 
 浏览器访问：<http://localhost:3000>（默认端口，见下方「修改端口」）
 
-首次使用点击右上角 **+** 添加 Steam 用户；**设置**（⚙）与 **Token 状态**（🔑，绿/红）也在右上角。
+首次使用点击右上角 **+** 连接 Steam 账号；**设置**（⚙）与 **Token 状态**（🔑，绿/红）也在右上角。
 
 ### 修改端口
 
@@ -160,11 +160,11 @@ PORT=3001 npm start
 
 ## Steam 连接说明
 
-1. 点击右上角用户头像（首次为 **+**）→ **添加用户**
+1. 点击右上角用户头像（首次为 **+**）→ **连接 Steam**
 2. 在已登录 Steam 的 Edge 中点击 **获取 Token**，打开 Token 页后 **全选复制整页 JSON** 粘贴到对话框，会自动提取 `webapi_token` 并预览头像、昵称与 Steam ID（**无需手动填写 ID**）
 3. [Web API Key](https://steamcommunity.com/dev/apikey) 可选；填写后可使用 Steam Web API 拉取资料，不填则尝试社区公开页
-4. 保存后自动创建用户；已有账号再次粘贴相同 Token 会提示重复
-5. 切换用户后默认加载本地缓存；点击 **🔑** 可更新 Token（绿点=有效，红点=未配置或过期）
+4. 保存后完成账号连接；再次粘贴相同 Token 会提示重复
+5. 连接后默认加载本地缓存；点击 **🔑** 可更新 Token（绿点=有效，红点=未配置或过期）
 6. 点击 **刷新数据** 可选择要更新的内容；Token 过期后会提示「显示缓存」
 
 > **注意**：账号凭证与 Token 仅存储在本机 `data/` 目录，请勿将该目录提交到 Git 或分享给他人。
@@ -192,11 +192,11 @@ PORT=3001 npm start
 | 路径 | 说明 |
 |------|------|
 | `data/mygame.db` | SQLite（游戏库快照、元数据、覆盖记录、迁移） |
-| `data/users.json` | Steam 用户列表与 API Key |
-| `data/steam-token-<用户ID>.json` | 各用户 Steam Token |
-| `data/favorites-<用户ID>.json` | 各用户收藏 |
-| `data/hidden-<用户ID>.json` | 各用户隐藏列表 |
-| `data/collections-<用户ID>.json` | 各用户导入的 Steam 收藏夹 |
+| `data/users.json` | Steam 账号配置与 API Key |
+| `data/steam-token-<用户ID>.json` | Steam Token |
+| `data/favorites-<用户ID>.json` | 收藏列表 |
+| `data/hidden-<用户ID>.json` | 隐藏列表 |
+| `data/collections-<用户ID>.json` | 导入的 Steam 收藏夹 |
 | `data/app-settings.json` | 应用设置（Steam 路径、代理、日志、封面清理等） |
 | `data/meta/` | 元数据 JSON 缓存（与数据库互补） |
 | `data/covers/` | 本地化封面图片 |
@@ -212,7 +212,7 @@ mygame/
 │   ├── platforms/          # Steam 本地库、Epic/Ubisoft 等占位
 │   ├── steam/              # 认证、收藏夹、隐藏游戏
 │   ├── db/                 # SQLite、迁移脚本、游戏/元数据存储
-│   ├── stores/             # 用户、收藏、收藏夹、设置等 JSON 存储
+│   ├── stores/             # 账号、收藏、收藏夹、设置等 JSON 存储
 │   └── services/           # 封面、筛选、元数据、日志、Token 校验、清理
 ├── scripts/
 │   ├── check-node.js       # 启动前校验 Node 版本与 node:sqlite
