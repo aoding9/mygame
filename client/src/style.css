@@ -948,20 +948,24 @@ h4,
 }
 
 .game-cover-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  aspect-ratio: 460 / 215;
-  min-height: 72px;
+  height: 100%;
+  aspect-ratio: unset;
+  min-height: 0;
   background: linear-gradient(135deg, var(--surface-2), var(--surface-3));
   color: rgba(255, 255, 255, 0.92);
   transition: transform 0.25s ease;
 }
 
-.game-cover-placeholder.hidden,
-.game-cover-placeholder.is-fallback.hidden {
-  display: none;
+.game-cover-placeholder.is-loading {
+  background: var(--surface-2);
+  color: transparent;
 }
 
 .game-cover-abbrev {
@@ -1678,6 +1682,7 @@ select option {
   flex: 1 1 0;
   min-height: 0;
   max-height: calc(var(--card-min-height) - var(--steam-card-body-height));
+  aspect-ratio: unset;
 }
 
 .game-grid .game-card:not(.game-card--compact) .game-cover,
@@ -1716,6 +1721,8 @@ select option {
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
+  width: 100%;
+  aspect-ratio: 460 / 215;
 }
 
 .game-cover-loading {
@@ -1933,9 +1940,12 @@ select option {
 }
 
 .game-cover {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  aspect-ratio: 460 / 215;
-  min-height: 72px;
+  height: 100%;
+  aspect-ratio: unset;
+  min-height: 0;
   object-fit: cover;
   background: var(--surface-2);
   display: block;
@@ -2213,6 +2223,14 @@ select option {
   max-width: 480px;
 }
 
+.random-dialog .modal-content {
+  padding-top: 44px;
+}
+
+.random-dialog .dialog-close {
+  z-index: 30;
+}
+
 #randomBody {
   margin-top: 4px;
 }
@@ -2220,6 +2238,10 @@ select option {
 .game-card.game-card--random {
   min-height: 0;
   height: auto;
+}
+
+.game-card.game-card--random .game-cover-wrap {
+  aspect-ratio: 460 / 215;
 }
 
 .game-card.game-card--random:hover {
@@ -2364,11 +2386,13 @@ dialog .toast {
   position: absolute;
   top: 12px;
   right: 14px;
+  z-index: 20;
   border: none;
   background: transparent;
   color: var(--muted);
   font-size: 1.6rem;
   cursor: pointer;
+  line-height: 1;
 }
 
 .dialog-actions {

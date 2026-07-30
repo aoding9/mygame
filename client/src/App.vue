@@ -349,10 +349,19 @@ onUnmounted(() => {
     </dialog>
 
     <!-- Random -->
-    <dialog ref="randomDialogRef" class="modal-dialog random-dialog" @cancel.prevent="library.randomDialogOpen = false">
+    <dialog
+      ref="randomDialogRef"
+      class="modal-dialog random-dialog"
+      @cancel.prevent="library.randomDialogOpen = false"
+      @click.self="library.randomDialogOpen = false"
+    >
       <div class="modal-content">
         <button class="dialog-close" aria-label="关闭" @click="library.randomDialogOpen = false">×</button>
-        <GameCard v-if="library.randomGame" :game="library.randomGame" random />
+        <GameCard
+          v-if="library.randomGame"
+          :game="library.randomGame"
+          random
+        />
         <div class="dialog-actions">
           <button class="btn btn-accent" @click="library.pickRandomGame()">再抽一次</button>
         </div>

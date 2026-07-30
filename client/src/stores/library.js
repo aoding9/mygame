@@ -7,11 +7,12 @@ import {
   gameCoverFallback,
   gameCoverImage,
   gamePlatform,
-  gameSourceName,
   gameSubtitle,
   gameTitle,
   normalizePrefAppId,
   resolveCoverLookupQuery,
+  resolveGameEnglishName,
+  hasChineseTextClient,
 } from '../utils/game.js';
 import {
   debugLog,
@@ -1184,7 +1185,7 @@ export const useLibraryStore = defineStore('library', () => {
     gameEditForm.value = {
       displayName: game.display_name || '',
       nameCn: game.custom_name_cn || game.name_cn || '',
-      nameEn: game.custom_name_en || gameSourceName(game) || game.name || '',
+      nameEn: resolveGameEnglishName(game),
       genres: listToInputValue(game.genres),
       tags: listToInputValue(game.tags),
       aliases: listToInputValue(game.aliases),
@@ -1206,10 +1207,16 @@ export const useLibraryStore = defineStore('library', () => {
         const o = data.override;
         gameEditForm.value.displayName = o.display_name || gameEditForm.value.displayName;
         gameEditForm.value.nameCn = o.name_cn || gameEditForm.value.nameCn;
-        gameEditForm.value.nameEn = o.name_en || gameEditForm.value.nameEn;
-        gameEditForm.value.genres = listToInputValue(o.genres);
-        gameEditForm.value.tags = listToInputValue(o.tags);
-        gameEditForm.value.aliases = listToInputValue(o.aliases);
+        if (o.name_en?.trim()) {
+          const overrideEn = o.name_en.trim();
+          // Ignore previously saved Chinese values in name_en.
+          if (!hasChineseTextClient(overrideEn) || !gameEditForm.value.nameEn) {
+            gameEditForm.value.nameEn = overrideEn;
+          }
+        }
+        if (o.genres?.length) gameEditForm.value.genres = listToInputValue(o.genres);
+        if (o.tags?.length) gameEditForm.value.tags = listToInputValue(o.tags);
+        if (o.aliases?.length) gameEditForm.value.aliases = listToInputValue(o.aliases);
         gameEditForm.value.lockFromRefresh = !!o.lock_from_refresh;
         if (o.cover_url?.startsWith('http')) gameEditForm.value.coverUrl = o.cover_url;
         if (o.resolved_cover_url) setGameEditPreview(o.resolved_cover_url, true);

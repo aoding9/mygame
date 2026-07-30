@@ -707,12 +707,14 @@ export function registerGamesRoutes(app) {
       });
 
       if (!body.lock_from_refresh && saved && platform === 'steam') {
-        if (saved.name_cn && !rt.overrideStore.isLocked(platform, appid, userId)) { gameMetaStore.writeMeta(appid, {
+        if (saved.name_cn && !rt.overrideStore.isLocked(platform, appid, userId)) {
+          const existingMeta = gameMetaStore.readMeta(appid, platform) || {};
+          gameMetaStore.writeMeta(appid, {
             name_cn: saved.name_cn,
-            name_en: saved.name_en,
-            genres: saved.genres,
-            tags: saved.tags,
-            aliases: saved.aliases,
+            name_en: saved.name_en || existingMeta.name_en || '',
+            genres: saved.genres?.length ? saved.genres : (existingMeta.genres || []),
+            tags: saved.tags?.length ? saved.tags : (existingMeta.tags || []),
+            aliases: saved.aliases?.length ? saved.aliases : (existingMeta.aliases || []),
           }, saved.name_en, platform);
         }
       }

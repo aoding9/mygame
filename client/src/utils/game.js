@@ -50,6 +50,33 @@ export function gameSourceName(game) {
   return game.name_cn || game.name || '';
 }
 
+export function hasChineseTextClient(text) {
+  return /[\u4e00-\u9fff]/.test(String(text || ''));
+}
+
+/** Prefer English / original Steam name, never Chinese store title. */
+export function resolveGameEnglishName(game) {
+  const cn = String(
+    game.custom_name_cn || game.name_cn || game.source_name_cn || '',
+  ).trim();
+  const candidates = [
+    game.custom_name_en,
+    game.name_en,
+    game.source_name,
+    game.name,
+  ]
+    .map((s) => String(s || '').trim())
+    .filter(Boolean);
+
+  for (const name of candidates) {
+    if (name !== cn && !hasChineseTextClient(name)) return name;
+  }
+  for (const name of candidates) {
+    if (name !== cn) return name;
+  }
+  return candidates[0] || '';
+}
+
 export function gameStoreUrl(game) {
   if (game.store_url) return game.store_url;
   return `https://store.steampowered.com/app/${game.appid}`;

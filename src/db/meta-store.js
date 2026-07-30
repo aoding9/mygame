@@ -153,6 +153,7 @@ export function createMetaStore(db, dataDir, debugLog = () => {}) {
       return {
         ...game,
         name_cn: cached?.name_cn || game.name_cn || '',
+        name_en: cached?.name_en || game.name_en || game.name || '',
         aliases: cached?.aliases || game.aliases || [],
         genres: cached?.genres || game.genres || [],
         tags: cached?.tags || game.tags || [],

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
   coverSrcForDisplay,
   formatHours,
@@ -34,6 +34,8 @@ const ui = useUiStore();
 
 const coverError = ref(false);
 const coverLoaded = ref(false);
+const displayedCoverSrc = ref('');
+let coverLoadToken = 0;
 
 const title = computed(() => gameTitle(props.game));
 const subtitle = computed(() => gameSubtitle(props.game));
@@ -50,22 +52,60 @@ const isFavorite = computed(() => library.isFavorite(props.game.appid));
 const isHidden = computed(() => library.isHidden(props.game.appid));
 const isUpdating = computed(() => library.isCardUpdating(props.game.appid, 'steam'));
 const storeUrl = computed(() => gameStoreUrl(props.game));
+const coverDisplaySrc = computed(() => coverSrcForDisplay(coverSrc.value, props.game.cover_updated_at));
+const showCoverLoading = computed(() => !coverError.value && !coverLoaded.value && !displayedCoverSrc.value);
 
-function onCoverError(e) {
-  const img = e.target;
-  if (img.dataset.fallbackTried) {
+function loadCover(src, allowFallback = true) {
+  const token = ++coverLoadToken;
+  if (!src) {
+    coverLoaded.value = false;
     coverError.value = true;
-    img.classList.add('is-hidden');
+    displayedCoverSrc.value = '';
     return;
   }
-  img.dataset.fallbackTried = '1';
-  img.src = fallbackSrc.value;
+
+  const img = new Image();
+  img.onload = () => {
+    if (token !== coverLoadToken) return;
+    displayedCoverSrc.value = src;
+    coverLoaded.value = true;
+    coverError.value = false;
+  };
+  img.onerror = () => {
+    if (token !== coverLoadToken) return;
+    const fallback = coverSrcForDisplay(fallbackSrc.value, props.game.cover_updated_at);
+    if (allowFallback && fallback && fallback !== src) {
+      loadCover(fallback, false);
+      return;
+    }
+    coverLoaded.value = false;
+    coverError.value = true;
+    if (!displayedCoverSrc.value) displayedCoverSrc.value = '';
+  };
+  img.src = src;
 }
 
-function onCoverLoad(e) {
-  coverLoaded.value = true;
-  e.target.classList.remove('is-hidden');
-}
+watch(
+  coverDisplaySrc,
+  (src) => {
+    coverError.value = false;
+    if (!src) {
+      coverLoadToken += 1;
+      coverLoaded.value = false;
+      coverError.value = true;
+      displayedCoverSrc.value = '';
+      return;
+    }
+    if (src === displayedCoverSrc.value) {
+      coverLoaded.value = true;
+      return;
+    }
+    // Keep previous cover visible while the next image preloads.
+    coverLoaded.value = !!displayedCoverSrc.value;
+    loadCover(src, true);
+  },
+  { immediate: true },
+);
 
 async function onLaunch(e) {
   e.stopPropagation();
@@ -115,21 +155,16 @@ function onHidden(e) {
   >
     <div class="game-cover-wrap">
       <img
-        v-if="coverSrc && !coverError"
+        v-if="displayedCoverSrc && !coverError"
         class="game-cover"
-        :src="coverSrcForDisplay(coverSrc, game.cover_updated_at)"
+        :src="displayedCoverSrc"
         :alt="title"
-        loading="lazy"
-        @error="onCoverError"
-        @load="onCoverLoad"
+        loading="eager"
       >
       <div
-        v-if="!coverLoaded && !coverError"
-        class="game-cover-placeholder"
-        :style="{ background: placeholderColor }"
-      >
-        {{ placeholderAbbrev }}
-      </div>
+        v-if="showCoverLoading"
+        class="game-cover-placeholder is-loading"
+      />
       <div
         v-if="coverError"
         class="game-cover-placeholder is-fallback"
